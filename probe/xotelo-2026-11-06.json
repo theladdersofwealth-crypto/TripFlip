@@ -1,0 +1,57 @@
+{
+ "checkedAt": "2026-11-06T05:26:22.270Z",
+ "results": [
+  {
+   "name": "list",
+   "http": 200,
+   "ok": false,
+   "error": {
+    "status_code": 400,
+    "message": "Failed to fetch list data, please check your params and try again."
+   },
+   "sample": "{\"error\":{\"status_code\":400,\"message\":\"Failed to fetch list data, please check your params and try again.\"},\"result\":null,\"timestamp\":1793942782969}"
+  },
+  {
+   "name": "rates g293928-d7620255",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_in\":\"2026-12-06\",\"chk_out\":\"2026-12-07\",\"currency\":\"USD\",\"rates\":[{\"code\":\"CtripTA\",\"name\":\"Trip.com\",\"rate\":124,\"tax\":null},{\"code\":\"BookingCom\",\"name\":\"Booking.com\",\"rate\":123,\"tax\":null},{\"code\":\"Agoda\",\"name\":\"Agoda.com\",\"rate\":108,\"tax\":null}]},\"timestamp\":1793942784955}"
+  },
+  {
+   "name": "rates g294217-d2031570",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_in\":\"2026-12-06\",\"chk_out\":\"2026-12-07\",\"currency\":\"USD\",\"rates\":[{\"code\":\"CtripTA\",\"name\":\"Trip.com\",\"rate\":373,\"tax\":null},{\"code\":\"BookingCom\",\"name\":\"Booking.com\",\"rate\":398,\"tax\":null},{\"code\":\"Agoda\",\"name\":\"Agoda.com\",\"rate\":339,\"tax\":null},{\"code\":\"Vio\",\"name\":\"Vio.com\",\"rate\":415,\"tax\":null}]},\"timestamp\":1793942789305}"
+  },
+  {
+   "name": "rates g298566-d302242",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_in\":\"2026-12-06\",\"chk_out\":\"2026-12-07\",\"currency\":\"USD\",\"rates\":[{\"code\":\"Marriott1\",\"name\":\"RitzCarlton.com\",\"rate\":560,\"tax\":null},{\"code\":\"BookingCom\",\"name\":\"Booking.com\",\"rate\":568,\"tax\":null},{\"code\":\"Vio\",\"name\":\"Vio.com\",\"rate\":489,\"tax\":null},{\"code\":\"CtripTA\",\"name\":\"Trip.com\",\"rate\":561,\"tax\":null},{\"code\":\"Agoda\",\"name\":\"Agoda.com\",\"rate\":561,\"tax\":null},{"
+  },
+  {
+   "name": "rates g298085-d2368744",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_in\":\"2026-12-06\",\"chk_out\":\"2026-12-07\",\"currency\":\"USD\",\"rates\":[{\"code\":\"CtripTA\",\"name\":\"Trip.com\",\"rate\":479,\"tax\":null},{\"code\":\"BookingCom\",\"name\":\"Booking.com\",\"rate\":481,\"tax\":null},{\"code\":\"Vio\",\"name\":\"Vio.com\",\"rate\":456,\"tax\":null},{\"code\":\"Agoda\",\"name\":\"Agoda.com\",\"rate\":479,\"tax\":null}]},\"timestamp\":1793942798300}"
+  },
+  {
+   "name": "rates g469418-d6920092",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_in\":\"2026-12-06\",\"chk_out\":\"2026-12-07\",\"currency\":\"USD\",\"rates\":[{\"code\":\"CtripTA\",\"name\":\"Trip.com\",\"rate\":217,\"tax\":null},{\"code\":\"BookingCom\",\"name\":\"Booking.com\",\"rate\":217,\"tax\":null},{\"code\":\"Agoda\",\"name\":\"Agoda.com\",\"rate\":190,\"tax\":null},{\"code\":\"Vio\",\"name\":\"Vio.com\",\"rate\":195,\"tax\":null},{\"code\":\"DerbySoft\",\"name\":\"Official Site\",\"rate\":213,\"tax\":null}]},\""
+  },
+  {
+   "name": "heatmap",
+   "http": 200,
+   "ok": true,
+   "error": null,
+   "sample": "{\"error\":null,\"result\":{\"chk_out\":\"2026-12-07\",\"heatmap\":{\"average_price_days\":[\"2026-11-07\",\"2026-11-10\",\"2026-11-11\",\"2026-11-12\",\"2026-11-13\",\"2026-11-14\",\"2026-11-20\",\"2026-11-23\",\"2026-11-24\",\"2026-11-25\"],\"cheap_price_days\":[\"2026-11-06\",\"2026-11-09\",\"2026-11-19\",\"2026-11-21\",\"2026-11-22\",\"2026-11-26\",\"2026-11-27\",\"2026-11-28\",\"2026-11-29\",\"2026-11-30\",\"2026-12-01\",\"2026-12-02\",\"2026-12-05\","
+  }
+ ]
+}
