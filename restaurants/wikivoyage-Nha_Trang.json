@@ -1,0 +1,259 @@
+{
+ "collectedAt": "2026-11-06T22:53:15.038Z",
+ "source": "Wikivoyage \"Nha_Trang\" (CC BY-SA 4.0) + OpenStreetMap (ODbL)",
+ "page": "Nha_Trang",
+ "count": 14,
+ "osm": {
+  "restaurant": 369,
+  "cafe": 445,
+  "fast_food": 60,
+  "withCuisine": 297,
+  "withHours": 183,
+  "topCuisine": [
+   [
+    "vietnamese",
+    129
+   ],
+   [
+    "coffee_shop",
+    71
+   ],
+   [
+    "asian",
+    34
+   ],
+   [
+    "seafood",
+    28
+   ],
+   [
+    "russian",
+    23
+   ],
+   [
+    "italian",
+    15
+   ],
+   [
+    "pizza",
+    15
+   ],
+   [
+    "regional",
+    15
+   ],
+   [
+    "breakfast",
+    15
+   ],
+   [
+    "japanese",
+    12
+   ],
+   [
+    "burger",
+    12
+   ],
+   [
+    "local",
+    12
+   ],
+   [
+    "chicken",
+    11
+   ],
+   [
+    "grill",
+    10
+   ],
+   [
+    "italian_pizza",
+    10
+   ]
+  ]
+ },
+ "rows": [
+  {
+   "name": "Núi Một",
+   "alt": null,
+   "tier": "Budget",
+   "price": null,
+   "hours": null,
+   "address": null,
+   "lat": 12.24495,
+   "lng": 109.18946,
+   "url": null,
+   "updated": null,
+   "content": null
+  },
+  {
+   "name": "Huyền Hương - Bánh Căn 37",
+   "alt": null,
+   "tier": "Budget",
+   "price": "Mixed 25,000 dong; meat 40,000 dong",
+   "hours": null,
+   "address": null,
+   "lat": 12.23861,
+   "lng": 109.18884,
+   "url": null,
+   "updated": "2023-12-08",
+   "content": "A friendly family serving mixed or pure plates of Bánh Căn with 6 pieces and mango salad at no extra charge."
+  },
+  {
+   "name": "Mê Linh 68 - Bánh Hỏi",
+   "alt": null,
+   "tier": "Budget",
+   "price": "25,000 dong",
+   "hours": null,
+   "address": null,
+   "lat": 12.23962,
+   "lng": 109.18802,
+   "url": null,
+   "updated": "2023-12-08",
+   "content": "Authentic and inexpensive Bánh Hỏi."
+  },
+  {
+   "name": "Mì Quảng 82",
+   "alt": null,
+   "tier": "Budget",
+   "price": "20–25,000 dong",
+   "hours": "Daily morning to late noon",
+   "address": null,
+   "lat": 12.24238,
+   "lng": 109.19017,
+   "url": null,
+   "updated": "2023-12-08",
+   "content": "Not so authentic dish, but the eatery is very authentic though."
+  },
+  {
+   "name": "Roasted Duck Shop 69",
+   "alt": null,
+   "tier": "Budget",
+   "price": null,
+   "hours": null,
+   "address": "69 Bạch Đằng",
+   "lat": 12.241017,
+   "lng": 109.1908605,
+   "url": null,
+   "updated": "2022-08-01",
+   "content": "Delicious noodles and roasted duck."
+  },
+  {
+   "name": "Bánh Căn Ba Thua",
+   "alt": null,
+   "tier": "Budget",
+   "price": null,
+   "hours": null,
+   "address": "10A Phan Chu Trinh",
+   "lat": 12.2532303,
+   "lng": 109.1939346,
+   "url": null,
+   "updated": "2022-08-01",
+   "content": "Good Bánh Căn, a unique taste, special fish cakes and a delicious cake soup."
+  },
+  {
+   "name": "Ẩm Thực Chay - Bồ Đề Sao",
+   "alt": null,
+   "tier": "Budget",
+   "price": null,
+   "hours": null,
+   "address": "11 Huỳnh Thúc Kháng",
+   "lat": 12.244941,
+   "lng": 109.1885015,
+   "url": null,
+   "updated": "2022-08-01",
+   "content": "Great place for vegetarian dishes."
+  },
+  {
+   "name": "Phở Bò Hà Nội",
+   "alt": null,
+   "tier": "Budget",
+   "price": null,
+   "hours": null,
+   "address": "81 Bạch Đằng",
+   "lat": 12.2405209,
+   "lng": 109.1913822,
+   "url": null,
+   "updated": "2022-08-01",
+   "content": "Delicious pho and known for their dishes with rice noodles."
+  },
+  {
+   "name": "Cheers Sports Pub",
+   "alt": null,
+   "tier": "Mid-range",
+   "price": null,
+   "hours": null,
+   "address": "138 Nguyễn Thiện Thuật",
+   "lat": 12.2346693,
+   "lng": 109.19445,
+   "url": null,
+   "updated": "2022-08-01",
+   "content": "Western home style food and big TVs to watch sport events."
+  },
+  {
+   "name": "Lac Canh",
+   "alt": null,
+   "tier": "Mid-range",
+   "price": "50-250,000 dong",
+   "hours": "07:00-21:00",
+   "address": "11 Hang Ca St",
+   "lat": 12.2566,
+   "lng": 109.19462,
+   "url": null,
+   "updated": "2022-05-01",
+   "content": "What’s different about this long established restaurant (25 years) is that you get to cook, yourself, and both locals and tourists seem to love it. It's famous for its thinly sliced beef, marinated in chilli source that you cook with your own mini tabletop BBQ. Large San Miguel bottled beers are served by San Miguel-attired servers for 18,000 dong."
+  },
+  {
+   "name": "Truc Linh 2",
+   "alt": null,
+   "tier": "Mid-range",
+   "price": "US1-10",
+   "hours": "07:00-23:00",
+   "address": "Biet Thu St",
+   "lat": 12.2357,
+   "lng": 109.1946,
+   "url": null,
+   "updated": null,
+   "content": "Asian and Western food. Especially popular for seafood. Truc Linh has been here for years but the original corner one is now the location of a new high rise hotel."
+  },
+  {
+   "name": "Nha Trang Seafood",
+   "alt": null,
+   "tier": "Mid-range",
+   "price": "US2-14",
+   "hours": "09:30-22:00",
+   "address": "46 Nguyen Thi Minh Khai St",
+   "lat": 12.2386,
+   "lng": 109.1933,
+   "url": null,
+   "updated": null,
+   "content": "Serves fresh and scrumptious seafood. Inexpensive prices and good service."
+  },
+  {
+   "name": "Louisiane Brewhouse",
+   "alt": null,
+   "tier": "Splurge",
+   "price": "30,000-600,000&nbsp;dong",
+   "hours": "08:00-23:00",
+   "address": "Lot 29, Tran Phu",
+   "lat": 12.2314,
+   "lng": 109.1987,
+   "url": "http://www.louisianebrewhouse.com.vn/",
+   "updated": null,
+   "content": "Microbrewery with locally brewed beers, restaurant with fresh cakes and tarts, sushi, quality pizzas, steaks, Vietnamese food and seafood. Pool table, live music and own loungers right at the beach or pool available. Chaises longues at either the pool or beach are 40,000 dong per day. Even if you get a chair on the beach, you still have pool access. They have a sampling tray of beer for 100,000 dong."
+  },
+  {
+   "name": "Sailing Club",
+   "alt": null,
+   "tier": "Splurge",
+   "price": null,
+   "hours": "07:00-23:00",
+   "address": "72 Tran Phu St",
+   "lat": 12.2343,
+   "lng": 109.198,
+   "url": "http://www.sailingclubvietnam.com",
+   "updated": null,
+   "content": "This restaurant serves Japanese, Indian, Vietnamese, and Italian food. Crowded at night, when it turns into bar."
+  }
+ ]
+}
