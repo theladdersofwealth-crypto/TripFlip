@@ -1,8 +1,10 @@
 // TripFlip 가격 수집 Worker (Cloudflare 무료 플랜)
 // - 항공권: Travelpayouts Data API, 하루 4회 → KV flight-prices/날짜_UTC시
 // - 숙소: Xotelo /api/rates, 고정 목록(hotels.json) × 체크인 14/30/60일 뒤 → KV hotel-rates/날짜/part-NN
+// - 위키 조회수: 매월 2일 5분마다 45건 → KV wiki-pageviews/YYYY-MM/part-NNN (권역 물가는 Xotelo 목록 고장으로 보류)
 // - 읽기: GET /list?prefix=..., GET /get?key=..., GET /hotel-rates?date=YYYY-MM-DD (조각 합본)
 import HOTELS from "./hotels.json";
+import WIKI from "./wiki-titles.json";
 
 const FIELDS = ["destination", "departure_at", "return_at", "price", "airline", "transfers", "return_transfers", "duration"];
 const ORIGIN = "ICN";
@@ -123,12 +125,65 @@ async function mergedHotelRates(env, date) {
   return { collectedAt: parts[0].collectedAt, source: "Xotelo /api/rates (TripAdvisor 기반, 비공식). 고정 숙소 목록", currency: "USD", priceUnit: "1박 객실(세금 미포함일 수 있음)", stays: parts[0].stays, fields: ["key", "chk_in", "min_rate", "min_provider", "rates"], status, parts: `${parts.length}/${total}`, requests: req, failedRequests: fail, regions };
 }
 
+
+// ---------- 위키 조회수 (매월 2일, 5분마다 45건) ----------
+const WIKI_BATCH = 45;
+function wikiPeriod(now) {
+  const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 0));
+  const start = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth() - 11, 1));
+  const f = (d) => d.toISOString().slice(0, 10).replaceAll("-", "");
+  return { start: f(start), end: f(end), label: end.toISOString().slice(0, 7) };
+}
+async function collectWikiBatch(env, now, index) {
+  const p = wikiPeriod(now);
+  const slice = WIKI.jobs.slice(index * WIKI_BATCH, (index + 1) * WIKI_BATCH);
+  if (!slice.length) return null;
+  const rows = [];
+  const errors = [];
+  for (const [id, w, title] of slice) {
+    const t = encodeURIComponent(title.replaceAll(" ", "_"));
+    try {
+      const r = await fetch(`https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/${w}.wikipedia/all-access/user/${t}/monthly/${p.start}/${p.end}`, { headers: { "User-Agent": "TripFlip/0.1 (https://tripflip.ohysky0127.workers.dev; data collection)", Accept: "application/json" }, signal: AbortSignal.timeout(15000) });
+      if (r.status === 404) rows.push([id, w, title, 0]);
+      else if (!r.ok) errors.push(`${w}:${title} ${r.status}`);
+      else rows.push([id, w, title, ((await r.json()).items ?? []).reduce((s, x) => s + x.views, 0)]);
+    } catch (e) {
+      errors.push(`${w}:${title} ${e?.message ?? e}`);
+    }
+    await sleep(200);
+  }
+  const key = `wiki-pageviews/${p.label}/part-${String(index).padStart(3, "0")}`;
+  await env.DATA.put(key, JSON.stringify({ period: p, index, total: Math.ceil(WIKI.jobs.length / WIKI_BATCH), rows, errors }), { expirationTtl: TTL });
+  return key;
+}
+// 예전 형식(wiki-pageviews/YYYY-MM.json)으로 합친다
+async function mergedWiki(env, label) {
+  const list = await env.DATA.list({ prefix: `wiki-pageviews/${label}/` });
+  if (!list.keys.length) return null;
+  const places = {};
+  for (const [id, qid] of Object.entries(WIKI.qid)) places[id] = { qid, ko: null, en: null };
+  let period, total, errors = [];
+  for (const k of list.keys) {
+    const part = JSON.parse(await env.DATA.get(k.name));
+    period = part.period; total = part.total; errors = errors.concat(part.errors);
+    for (const [id, w, title, views] of part.rows) places[id][w] = { title, views };
+  }
+  const v = Object.values(places);
+  return { source: "Wikimedia Pageviews API (user agent, all-access, monthly sum). 문서 제목은 2026-10 위키데이터 기준 고정", generatedAt: new Date().toISOString(), period: { start: period.start, end: period.end }, parts: `${list.keys.length}/${total}`, summary: { places: v.length, koArticle: v.filter((r) => r.ko).length, enArticle: v.filter((r) => r.en).length, errors: errors.length }, errors: errors.slice(0, 50), places };
+}
+
 // ---------- 진입점 ----------
 export default {
   async scheduled(event, env, ctx) {
     const now = new Date(event.scheduledTime);
     if (event.cron.startsWith("0 0,6,12,18")) {
       console.log("항공권 저장", await collectFlights(env, now));
+      return;
+    }
+    if (event.cron.endsWith(" 2 * *")) {
+      const idx = (now.getUTCHours() * 60 + now.getUTCMinutes()) / 5;
+      const key = Number.isInteger(idx) ? await collectWikiBatch(env, now, idx) : null;
+      if (key) console.log("위키 저장", key);
       return;
     }
     const minutes = now.getUTCHours() * 60 + now.getUTCMinutes() - START_MIN;
@@ -145,6 +200,7 @@ export default {
       const now = new Date();
       const job = u.searchParams.get("job");
       if (job === "flight") return json({ saved: await collectFlights(env, now) });
+      if (job === "wiki") return json({ saved: await collectWikiBatch(env, now, Number(u.searchParams.get("i") ?? 0)) });
       if (job === "hotel") return json({ saved: await collectHotelBatch(env, now, Number(u.searchParams.get("i") ?? 0), Number(u.searchParams.get("n") ?? BATCH)) });
       return json({ error: "job=flight|hotel" }, 400);
     }
@@ -160,6 +216,10 @@ export default {
       const v = await mergedHotelRates(env, u.searchParams.get("date") ?? ymd(new Date()));
       return v ? json(v) : json({ error: "없음" }, 404);
     }
-    return json({ ok: true, routes: ["/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD"] });
+    if (u.pathname === "/wiki-pageviews") {
+      const v = await mergedWiki(env, u.searchParams.get("month") ?? wikiPeriod(new Date()).label);
+      return v ? json(v) : json({ error: "없음" }, 404);
+    }
+    return json({ ok: true, routes: ["/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
   },
 };
