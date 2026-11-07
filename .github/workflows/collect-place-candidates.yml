@@ -1,0 +1,41 @@
+name: 장소 후보 수집
+
+# 전 세계 권역 명소 후보(위키데이터). 필요할 때 수동 실행, 결과는 data 브랜치 places/에만 둔다.
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "권역 id 쉼표 구분 (비우면 전체)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-branch
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: store
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/collect-place-candidates.mjs store/places
+        env:
+          ONLY: ${{ inputs.only }}
+      - name: 결과 커밋
+        working-directory: store
+        run: |
+          git config user.name "tripflip-bot"
+          git config user.email "tripflip-bot@users.noreply.github.com"
+          git add places
+          git diff --cached --quiet || git commit -m "장소 후보 수집 $(date -u +%F)"
+          git pull --rebase
+          git push

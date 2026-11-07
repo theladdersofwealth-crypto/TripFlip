@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "region": {
+    "schemaVersion": 1,
+    "id": "vie-phuquoc",
+    "kind": "region",
+    "regionId": "vie-phuquoc",
+    "fields": {
+      "name": {
+        "value": "푸꾸옥섬",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q146695"
+        ]
+      },
+      "en": {
+        "value": "Phú Quốc",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q146695"
+        ]
+      },
+      "lat": {
+        "value": 10.228888888889,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q146695"
+        ]
+      },
+      "lon": {
+        "value": 103.95722222222,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q146695"
+        ]
+      },
+      "wikidataId": {
+        "value": "Q146695",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q146695"
+        ]
+      }
+    },
+    "sources": [
+      {
+        "id": "wikidata:Q146695",
+        "kind": "wikidata",
+        "url": "https://www.wikidata.org/wiki/Q146695",
+        "license": "CC0-1.0",
+        "checkedAt": "2026-11-03",
+        "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2541716908. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+        "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+      }
+    ],
+    "aliases": [
+      "PQ"
+    ],
+    "demo": false,
+    "replacesHash": "a4aa8032556476cd6e61f0cb58134cd6cb7c0d6eb75526102c27b4a032834e12"
+  },
+  "places": [
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q1749599",
+      "kind": "place",
+      "regionId": "vie-phuquoc",
+      "fields": {
+        "name": {
+          "value": "Phu Quoc National Park",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "en": {
+          "value": "Phu Quoc National Park",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "lat": {
+          "value": 10.325,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "lon": {
+          "value": 103.95,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q1749599",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자연경관"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q1749599",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q1749599",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2316927060. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-phuquoc-674"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q48078466",
+      "kind": "place",
+      "regionId": "vie-phuquoc",
+      "fields": {
+        "name": {
+          "value": "Hòn Thơm cable car",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "en": {
+          "value": "Hòn Thơm cable car",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "lat": {
+          "value": 10.027054,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "lon": {
+          "value": 104.007388,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q48078466",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자체분류:케이블카"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q48078466",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q48078466",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2530912417. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-phuquoc-665"
+      ],
+      "demo": false
+    }
+  ],
+  "restaurants": [],
+  "hotels": []
+}

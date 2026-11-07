@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "regions": [
+    {
+      "id": "hon-hongkong",
+      "name": "홍콩",
+      "counts": {
+        "place": 2
+      },
+      "url": "/catalog/regions/hon-hongkong.json"
+    },
+    {
+      "id": "jap-osaka",
+      "name": "오사카시",
+      "counts": {
+        "place": 2
+      },
+      "url": "/catalog/regions/jap-osaka.json"
+    },
+    {
+      "id": "vie-danang",
+      "name": "다낭",
+      "counts": {
+        "place": 2
+      },
+      "url": "/catalog/regions/vie-danang.json"
+    },
+    {
+      "id": "vie-nhatrang",
+      "name": "냐짱",
+      "counts": {
+        "place": 2
+      },
+      "url": "/catalog/regions/vie-nhatrang.json"
+    },
+    {
+      "id": "vie-phuquoc",
+      "name": "푸꾸옥섬",
+      "counts": {
+        "place": 2
+      },
+      "url": "/catalog/regions/vie-phuquoc.json"
+    }
+  ],
+  "summary": {
+    "valid": {
+      "region": 164,
+      "place": 3649,
+      "restaurant": 93,
+      "hotel": 2040
+    },
+    "published": {
+      "region": 5,
+      "place": 10
+    },
+    "fieldStatuses": {
+      "unverified": 34332,
+      "estimated": 18946,
+      "unknown": 29733,
+      "verified": 75
+    },
+    "quarantined": 0,
+    "demoRecords": 27,
+    "publicationHolds": {
+      "LICENSE_REVIEW_REQUIRED": 5931,
+      "IDENTITY_VERIFICATION_REQUIRED": 5931,
+      "REVIEW_REQUIRED": 5931,
+      "DEMO_NOT_PUBLISHABLE": 27
+    },
+    "rawCounts": {
+      "worldRegions": 164,
+      "worldPlaces": 3649,
+      "pilotPlaces": 89,
+      "legacyHotelRegions": 66,
+      "legacyHotels": 2040,
+      "legacyDemoRestaurants": 11,
+      "companionFitRows": 0
+    }
+  }
+}

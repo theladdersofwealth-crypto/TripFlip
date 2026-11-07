@@ -1,0 +1,35 @@
+{
+  "published": 117,
+  "skipped": [
+    {
+      "page": "hongkong-kowloon",
+      "name": "Choi Lung Restaurant",
+      "reason": "no specific branch location"
+    },
+    {
+      "page": "hongkong-kowloon",
+      "name": "Tim Ho Wan",
+      "reason": "no specific branch location"
+    },
+    {
+      "page": "osaka",
+      "name": "Tako Tako King",
+      "reason": "no specific branch location"
+    },
+    {
+      "page": "osaka",
+      "name": "Torikizoku",
+      "reason": "no specific branch location"
+    },
+    {
+      "page": "osaka-kita",
+      "name": "Torikizoku",
+      "reason": "no specific branch location"
+    },
+    {
+      "page": "osaka-kita",
+      "name": "Cafe de Jumpin' Jumpin'",
+      "reason": "no specific branch location"
+    }
+  ]
+}

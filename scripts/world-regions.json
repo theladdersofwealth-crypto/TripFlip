@@ -1,0 +1,1314 @@
+[
+{
+"id": "jap-osaka",
+"country": "일본",
+"countryEn": "Japan",
+"name": "오사카",
+"query": "Osaka, Japan",
+"tier": "메인"
+},
+{
+"id": "jap-tokyo",
+"country": "일본",
+"countryEn": "Japan",
+"name": "도쿄",
+"query": "Tokyo, Japan",
+"tier": "메인"
+},
+{
+"id": "jap-fukuoka",
+"country": "일본",
+"countryEn": "Japan",
+"name": "후쿠오카",
+"query": "Fukuoka, Japan",
+"tier": "메인"
+},
+{
+"id": "jap-sapporo",
+"country": "일본",
+"countryEn": "Japan",
+"name": "삿포로",
+"query": "Sapporo, Japan",
+"tier": "메인"
+},
+{
+"id": "jap-naha",
+"country": "일본",
+"countryEn": "Japan",
+"name": "오키나와",
+"query": "Naha, Japan",
+"tier": "메인"
+},
+{
+"id": "jap-nagoya",
+"country": "일본",
+"countryEn": "Japan",
+"name": "나고야",
+"query": "Nagoya, Japan",
+"tier": "뎁스"
+},
+{
+"id": "jap-kyoto",
+"country": "일본",
+"countryEn": "Japan",
+"name": "교토",
+"query": "Kyoto, Japan",
+"tier": "뎁스"
+},
+{
+"id": "jap-hiroshima",
+"country": "일본",
+"countryEn": "Japan",
+"name": "히로시마",
+"query": "Hiroshima, Japan",
+"tier": "뎁스"
+},
+{
+"id": "jap-kagoshima",
+"country": "일본",
+"countryEn": "Japan",
+"name": "가고시마",
+"query": "Kagoshima, Japan",
+"tier": "뎁스"
+},
+{
+"id": "jap-matsuyama",
+"country": "일본",
+"countryEn": "Japan",
+"name": "마쓰야마",
+"query": "Matsuyama, Japan",
+"tier": "뎁스"
+},
+{
+"id": "jap-takamatsu",
+"country": "일본",
+"countryEn": "Japan",
+"name": "다카마쓰",
+"query": "Takamatsu, Japan",
+"tier": "뎁스"
+},
+{
+"id": "vie-danang",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "다낭",
+"query": "Da Nang, Vietnam",
+"tier": "메인"
+},
+{
+"id": "vie-nhatrang",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "나트랑",
+"query": "Nha Trang, Vietnam",
+"tier": "메인"
+},
+{
+"id": "vie-phuquoc",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "푸꾸옥",
+"query": "Phu Quoc, Vietnam",
+"tier": "메인"
+},
+{
+"id": "vie-hanoi",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "하노이",
+"query": "Hanoi, Vietnam",
+"tier": "메인"
+},
+{
+"id": "vie-hochiminhcity",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "호치민",
+"query": "Ho Chi Minh City, Vietnam",
+"tier": "메인"
+},
+{
+"id": "vie-dalat",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "달랏",
+"query": "Da Lat, Vietnam",
+"tier": "뎁스"
+},
+{
+"id": "vie-hoian",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "호이안",
+"query": "Hoi An, Vietnam",
+"tier": "뎁스"
+},
+{
+"id": "vie-halong",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "하롱베이",
+"query": "Ha Long, Vietnam",
+"tier": "뎁스"
+},
+{
+"id": "vie-sapa",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "사파",
+"query": "Sa Pa, Vietnam",
+"tier": "뎁스"
+},
+{
+"id": "vie-muine",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "무이네",
+"query": "Mui Ne, Vietnam",
+"tier": "뎁스"
+},
+{
+"id": "chi-shanghai",
+"country": "중국",
+"countryEn": "China",
+"name": "상하이",
+"query": "Shanghai, China",
+"tier": "메인"
+},
+{
+"id": "chi-beijing",
+"country": "중국",
+"countryEn": "China",
+"name": "베이징",
+"query": "Beijing, China",
+"tier": "메인"
+},
+{
+"id": "chi-qingdao",
+"country": "중국",
+"countryEn": "China",
+"name": "칭다오",
+"query": "Qingdao, China",
+"tier": "메인"
+},
+{
+"id": "chi-zhangjiajie",
+"country": "중국",
+"countryEn": "China",
+"name": "장자제",
+"query": "Zhangjiajie, China",
+"tier": "메인"
+},
+{
+"id": "chi-sanya",
+"country": "중국",
+"countryEn": "China",
+"name": "싼야(하이난)",
+"query": "Sanya, China",
+"tier": "메인"
+},
+{
+"id": "chi-xian",
+"country": "중국",
+"countryEn": "China",
+"name": "시안",
+"query": "Xi'an, China",
+"tier": "뎁스"
+},
+{
+"id": "chi-chengdu",
+"country": "중국",
+"countryEn": "China",
+"name": "청두",
+"query": "Chengdu, China",
+"tier": "뎁스"
+},
+{
+"id": "chi-harbin",
+"country": "중국",
+"countryEn": "China",
+"name": "하얼빈",
+"query": "Harbin, China",
+"tier": "뎁스"
+},
+{
+"id": "chi-guilin",
+"country": "중국",
+"countryEn": "China",
+"name": "구이린",
+"query": "Guilin, China",
+"tier": "뎁스"
+},
+{
+"id": "chi-kunming",
+"country": "중국",
+"countryEn": "China",
+"name": "쿤밍",
+"query": "Kunming, China",
+"tier": "뎁스"
+},
+{
+"id": "uni-honolulu",
+"country": "미국",
+"countryEn": "United States",
+"name": "하와이(호놀룰루)",
+"query": "Honolulu, United States",
+"tier": "메인"
+},
+{
+"id": "uni-newyorkcity",
+"country": "미국",
+"countryEn": "United States",
+"name": "뉴욕",
+"query": "New York City, United States",
+"tier": "메인"
+},
+{
+"id": "uni-losangeles",
+"country": "미국",
+"countryEn": "United States",
+"name": "로스앤젤레스",
+"query": "Los Angeles, United States",
+"tier": "메인"
+},
+{
+"id": "uni-lasvegas",
+"country": "미국",
+"countryEn": "United States",
+"name": "라스베이거스",
+"query": "Las Vegas, United States",
+"tier": "메인"
+},
+{
+"id": "uni-sanfrancisco",
+"country": "미국",
+"countryEn": "United States",
+"name": "샌프란시스코",
+"query": "San Francisco, United States",
+"tier": "뎁스"
+},
+{
+"id": "uni-seattle",
+"country": "미국",
+"countryEn": "United States",
+"name": "시애틀",
+"query": "Seattle, United States",
+"tier": "뎁스"
+},
+{
+"id": "uni-orlando",
+"country": "미국",
+"countryEn": "United States",
+"name": "올랜도",
+"query": "Orlando, United States",
+"tier": "뎁스"
+},
+{
+"id": "tha-bangkok",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "방콕",
+"query": "Bangkok, Thailand",
+"tier": "메인"
+},
+{
+"id": "tha-phuket",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "푸켓",
+"query": "Phuket, Thailand",
+"tier": "메인"
+},
+{
+"id": "tha-chiangmai",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "치앙마이",
+"query": "Chiang Mai, Thailand",
+"tier": "메인"
+},
+{
+"id": "tha-pattaya",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "파타야",
+"query": "Pattaya, Thailand",
+"tier": "메인"
+},
+{
+"id": "tha-kosamui",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "코사무이",
+"query": "Ko Samui, Thailand",
+"tier": "뎁스"
+},
+{
+"id": "tha-krabi",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "끄라비",
+"query": "Krabi, Thailand",
+"tier": "뎁스"
+},
+{
+"id": "tha-huahin",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "후아힌",
+"query": "Hua Hin, Thailand",
+"tier": "뎁스"
+},
+{
+"id": "tha-chiangrai",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "치앙라이",
+"query": "Chiang Rai, Thailand",
+"tier": "뎁스"
+},
+{
+"id": "phi-cebucity",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "세부",
+"query": "Cebu City, Philippines",
+"tier": "메인"
+},
+{
+"id": "phi-boracay",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "보라카이",
+"query": "Boracay, Philippines",
+"tier": "메인"
+},
+{
+"id": "phi-manila",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "마닐라",
+"query": "Manila, Philippines",
+"tier": "메인"
+},
+{
+"id": "phi-tagbilaran",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "보홀",
+"query": "Tagbilaran, Philippines",
+"tier": "뎁스"
+},
+{
+"id": "phi-elnido",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "엘니도(팔라완)",
+"query": "El Nido, Philippines",
+"tier": "뎁스"
+},
+{
+"id": "phi-angelescity",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "클락",
+"query": "Angeles City, Philippines",
+"tier": "뎁스"
+},
+{
+"id": "tai-taipei",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "타이베이",
+"query": "Taipei, Taiwan",
+"tier": "메인"
+},
+{
+"id": "tai-kaohsiung",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "가오슝",
+"query": "Kaohsiung, Taiwan",
+"tier": "메인"
+},
+{
+"id": "tai-taichung",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "타이중",
+"query": "Taichung, Taiwan",
+"tier": "뎁스"
+},
+{
+"id": "tai-tainan",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "타이난",
+"query": "Tainan, Taiwan",
+"tier": "뎁스"
+},
+{
+"id": "tai-hualiencity",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "화롄",
+"query": "Hualien City, Taiwan",
+"tier": "뎁스"
+},
+{
+"id": "hon-hongkong",
+"country": "홍콩",
+"countryEn": "Hong Kong",
+"name": "홍콩",
+"query": "Hong Kong, Hong Kong",
+"tier": "메인"
+},
+{
+"id": "sin-singapore",
+"country": "싱가포르",
+"countryEn": "Singapore",
+"name": "싱가포르",
+"query": "Singapore, Singapore",
+"tier": "메인"
+},
+{
+"id": "mac-macau",
+"country": "마카오",
+"countryEn": "Macau",
+"name": "마카오",
+"query": "Macau, Macau",
+"tier": "메인"
+},
+{
+"id": "ind-ubud",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "발리",
+"query": "Ubud, Indonesia",
+"tier": "메인"
+},
+{
+"id": "ind-mataram",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "롬복",
+"query": "Mataram, Indonesia",
+"tier": "뎁스"
+},
+{
+"id": "ind-yogyakarta",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "족자카르타",
+"query": "Yogyakarta, Indonesia",
+"tier": "뎁스"
+},
+{
+"id": "ind-jakarta",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "자카르타",
+"query": "Jakarta, Indonesia",
+"tier": "뎁스"
+},
+{
+"id": "ind-batam",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "바탐",
+"query": "Batam, Indonesia",
+"tier": "뎁스"
+},
+{
+"id": "spa-barcelona",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "바르셀로나",
+"query": "Barcelona, Spain",
+"tier": "메인"
+},
+{
+"id": "spa-madrid",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "마드리드",
+"query": "Madrid, Spain",
+"tier": "메인"
+},
+{
+"id": "spa-seville",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "세비야",
+"query": "Seville, Spain",
+"tier": "뎁스"
+},
+{
+"id": "spa-granada",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "그라나다",
+"query": "Granada, Spain",
+"tier": "뎁스"
+},
+{
+"id": "spa-mlaga",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "말라가",
+"query": "Málaga, Spain",
+"tier": "뎁스"
+},
+{
+"id": "mal-kotakinabalu",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "코타키나발루",
+"query": "Kota Kinabalu, Malaysia",
+"tier": "메인"
+},
+{
+"id": "mal-kualalumpur",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "쿠알라룸푸르",
+"query": "Kuala Lumpur, Malaysia",
+"tier": "메인"
+},
+{
+"id": "mal-langkawi",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "랑카위",
+"query": "Langkawi, Malaysia",
+"tier": "뎁스"
+},
+{
+"id": "mal-georgetown",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "페낭",
+"query": "George Town, Penang, Malaysia",
+"tier": "뎁스"
+},
+{
+"id": "gua-tumon",
+"country": "괌(미국령)",
+"countryEn": "Guam",
+"name": "괌",
+"query": "Tumon, Guam",
+"tier": "메인"
+},
+{
+"id": "aus-sydney",
+"country": "호주",
+"countryEn": "Australia",
+"name": "시드니",
+"query": "Sydney, Australia",
+"tier": "메인"
+},
+{
+"id": "aus-melbourne",
+"country": "호주",
+"countryEn": "Australia",
+"name": "멜버른",
+"query": "Melbourne, Australia",
+"tier": "메인"
+},
+{
+"id": "aus-goldcoast",
+"country": "호주",
+"countryEn": "Australia",
+"name": "골드코스트(브리즈번)",
+"query": "Gold Coast, Australia",
+"tier": "뎁스"
+},
+{
+"id": "aus-cairns",
+"country": "호주",
+"countryEn": "Australia",
+"name": "케언스",
+"query": "Cairns, Australia",
+"tier": "뎁스"
+},
+{
+"id": "aus-perth",
+"country": "호주",
+"countryEn": "Australia",
+"name": "퍼스",
+"query": "Perth, Australia",
+"tier": "뎁스"
+},
+{
+"id": "tur-istanbul",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "이스탄불",
+"query": "Istanbul, Turkey",
+"tier": "메인"
+},
+{
+"id": "tur-greme",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "카파도키아",
+"query": "Göreme, Turkey",
+"tier": "뎁스"
+},
+{
+"id": "tur-antalya",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "안탈리아",
+"query": "Antalya, Turkey",
+"tier": "뎁스"
+},
+{
+"id": "tur-pamukkale",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "파묵칼레",
+"query": "Pamukkale, Turkey",
+"tier": "뎁스"
+},
+{
+"id": "aus-vienna",
+"country": "오스트리아",
+"countryEn": "Austria",
+"name": "빈",
+"query": "Vienna, Austria",
+"tier": "메인"
+},
+{
+"id": "aus-salzburg",
+"country": "오스트리아",
+"countryEn": "Austria",
+"name": "잘츠부르크",
+"query": "Salzburg, Austria",
+"tier": "뎁스"
+},
+{
+"id": "aus-innsbruck",
+"country": "오스트리아",
+"countryEn": "Austria",
+"name": "인스브루크",
+"query": "Innsbruck, Austria",
+"tier": "뎁스"
+},
+{
+"id": "ger-munich",
+"country": "독일",
+"countryEn": "Germany",
+"name": "뮌헨",
+"query": "Munich, Germany",
+"tier": "메인"
+},
+{
+"id": "ger-berlin",
+"country": "독일",
+"countryEn": "Germany",
+"name": "베를린",
+"query": "Berlin, Germany",
+"tier": "메인"
+},
+{
+"id": "ger-frankfurt",
+"country": "독일",
+"countryEn": "Germany",
+"name": "프랑크푸르트",
+"query": "Frankfurt, Germany",
+"tier": "뎁스"
+},
+{
+"id": "ger-hamburg",
+"country": "독일",
+"countryEn": "Germany",
+"name": "함부르크",
+"query": "Hamburg, Germany",
+"tier": "뎁스"
+},
+{
+"id": "mon-ulaanbaatar",
+"country": "몽골",
+"countryEn": "Mongolia",
+"name": "울란바토르",
+"query": "Ulaanbaatar, Mongolia",
+"tier": "메인"
+},
+{
+"id": "mon-khatgal",
+"country": "몽골",
+"countryEn": "Mongolia",
+"name": "홉스골",
+"query": "Khatgal, Mongolia",
+"tier": "뎁스"
+},
+{
+"id": "can-vancouver",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "밴쿠버",
+"query": "Vancouver, Canada",
+"tier": "메인"
+},
+{
+"id": "can-toronto",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "토론토",
+"query": "Toronto, Canada",
+"tier": "메인"
+},
+{
+"id": "can-banff",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "밴프(캘거리)",
+"query": "Banff, Canada",
+"tier": "뎁스"
+},
+{
+"id": "can-quebeccity",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "퀘벡시티",
+"query": "Quebec City, Canada",
+"tier": "뎁스"
+},
+{
+"id": "can-montreal",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "몬트리올",
+"query": "Montreal, Canada",
+"tier": "뎁스"
+},
+{
+"id": "cam-siemreap",
+"country": "캄보디아",
+"countryEn": "Cambodia",
+"name": "시엠립",
+"query": "Siem Reap, Cambodia",
+"tier": "메인"
+},
+{
+"id": "cam-phnompenh",
+"country": "캄보디아",
+"countryEn": "Cambodia",
+"name": "프놈펜",
+"query": "Phnom Penh, Cambodia",
+"tier": "뎁스"
+},
+{
+"id": "mex-cancn",
+"country": "멕시코",
+"countryEn": "Mexico",
+"name": "칸쿤",
+"query": "Cancún, Mexico",
+"tier": "메인"
+},
+{
+"id": "mex-mexicocity",
+"country": "멕시코",
+"countryEn": "Mexico",
+"name": "멕시코시티",
+"query": "Mexico City, Mexico",
+"tier": "뎁스"
+},
+{
+"id": "nor-garapan",
+"country": "북마리아나(사이판)",
+"countryEn": "Northern Mariana Islands",
+"name": "사이판",
+"query": "Garapan, Northern Mariana Islands",
+"tier": "메인"
+},
+{
+"id": "new-auckland",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "오클랜드",
+"query": "Auckland, New Zealand",
+"tier": "메인"
+},
+{
+"id": "new-queenstown",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "퀸스타운",
+"query": "Queenstown, New Zealand",
+"tier": "메인"
+},
+{
+"id": "new-christchurch",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "크라이스트처치",
+"query": "Christchurch, New Zealand",
+"tier": "뎁스"
+},
+{
+"id": "new-rotorua",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "로토루아",
+"query": "Rotorua, New Zealand",
+"tier": "뎁스"
+},
+{
+"id": "slo-ljubljana",
+"country": "슬로베니아",
+"countryEn": "Slovenia",
+"name": "류블랴나",
+"query": "Ljubljana, Slovenia",
+"tier": "메인"
+},
+{
+"id": "slo-bled",
+"country": "슬로베니아",
+"countryEn": "Slovenia",
+"name": "블레드",
+"query": "Bled, Slovenia",
+"tier": "뎁스"
+},
+{
+"id": "mal-mal",
+"country": "몰디브",
+"countryEn": "Maldives",
+"name": "몰디브",
+"query": "Malé, Maldives",
+"tier": "메인"
+},
+{
+"id": "fin-helsinki",
+"country": "핀란드",
+"countryEn": "Finland",
+"name": "헬싱키",
+"query": "Helsinki, Finland",
+"tier": "메인"
+},
+{
+"id": "fin-rovaniemi",
+"country": "핀란드",
+"countryEn": "Finland",
+"name": "로바니에미",
+"query": "Rovaniemi, Finland",
+"tier": "뎁스"
+},
+{
+"id": "dom-puntacana",
+"country": "도미니카공화국",
+"countryEn": "Dominican Republic",
+"name": "푼타카나",
+"query": "Punta Cana, Dominican Republic",
+"tier": "메인"
+},
+{
+"id": "sou-capetown",
+"country": "남아프리카공화국",
+"countryEn": "South Africa",
+"name": "케이프타운",
+"query": "Cape Town, South Africa",
+"tier": "메인"
+},
+{
+"id": "sou-johannesburg",
+"country": "남아프리카공화국",
+"countryEn": "South Africa",
+"name": "요하네스버그",
+"query": "Johannesburg, South Africa",
+"tier": "뎁스"
+},
+{
+"id": "sri-colombo",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "콜롬보",
+"query": "Colombo, Sri Lanka",
+"tier": "메인"
+},
+{
+"id": "sri-kandy",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "캔디",
+"query": "Kandy, Sri Lanka",
+"tier": "뎁스"
+},
+{
+"id": "sri-galle",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "갈레",
+"query": "Galle, Sri Lanka",
+"tier": "뎁스"
+},
+{
+"id": "bos-sarajevo",
+"country": "보스니아",
+"countryEn": "Bosnia and Herzegovina",
+"name": "사라예보",
+"query": "Sarajevo, Bosnia and Herzegovina",
+"tier": "메인"
+},
+{
+"id": "bos-mostar",
+"country": "보스니아",
+"countryEn": "Bosnia and Herzegovina",
+"name": "모스타르",
+"query": "Mostar, Bosnia and Herzegovina",
+"tier": "뎁스"
+},
+{
+"id": "mau-portlouis",
+"country": "모리셔스",
+"countryEn": "Mauritius",
+"name": "모리셔스",
+"query": "Port Louis, Mauritius",
+"tier": "메인"
+},
+{
+"id": "cos-sanjos",
+"country": "코스타리카",
+"countryEn": "Costa Rica",
+"name": "산호세",
+"query": "San José, Costa Rica",
+"tier": "메인"
+},
+{
+"id": "fij-nadi",
+"country": "피지",
+"countryEn": "Fiji",
+"name": "난디",
+"query": "Nadi, Fiji",
+"tier": "메인"
+},
+{
+"id": "pal-koror",
+"country": "팔라우",
+"countryEn": "Palau",
+"name": "코로르",
+"query": "Koror, Palau",
+"tier": "메인"
+},
+{
+"id": "fra-paris",
+"country": "프랑스",
+"countryEn": "France",
+"name": "파리",
+"query": "Paris, France",
+"tier": "메인"
+},
+{
+"id": "fra-nice",
+"country": "프랑스",
+"countryEn": "France",
+"name": "니스",
+"query": "Nice, France",
+"tier": "뎁스"
+},
+{
+"id": "fra-lyon",
+"country": "프랑스",
+"countryEn": "France",
+"name": "리옹",
+"query": "Lyon, France",
+"tier": "뎁스"
+},
+{
+"id": "fra-strasbourg",
+"country": "프랑스",
+"countryEn": "France",
+"name": "스트라스부르",
+"query": "Strasbourg, France",
+"tier": "뎁스"
+},
+{
+"id": "ita-rome",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "로마",
+"query": "Rome, Italy",
+"tier": "메인"
+},
+{
+"id": "ita-florence",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "피렌체",
+"query": "Florence, Italy",
+"tier": "메인"
+},
+{
+"id": "ita-venice",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "베네치아",
+"query": "Venice, Italy",
+"tier": "메인"
+},
+{
+"id": "ita-milan",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "밀라노",
+"query": "Milan, Italy",
+"tier": "뎁스"
+},
+{
+"id": "ita-naples",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "나폴리(아말피)",
+"query": "Naples, Italy",
+"tier": "뎁스"
+},
+{
+"id": "ita-palermo",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "시칠리아",
+"query": "Palermo, Italy",
+"tier": "뎁스"
+},
+{
+"id": "uni-london",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "런던",
+"query": "London, United Kingdom",
+"tier": "메인"
+},
+{
+"id": "uni-edinburgh",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "에든버러",
+"query": "Edinburgh, United Kingdom",
+"tier": "뎁스"
+},
+{
+"id": "uni-liverpool",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "리버풀",
+"query": "Liverpool, United Kingdom",
+"tier": "뎁스"
+},
+{
+"id": "swi-interlaken",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "인터라켄",
+"query": "Interlaken, Switzerland",
+"tier": "메인"
+},
+{
+"id": "swi-zurich",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "취리히",
+"query": "Zurich, Switzerland",
+"tier": "메인"
+},
+{
+"id": "swi-lucerne",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "루체른",
+"query": "Lucerne, Switzerland",
+"tier": "뎁스"
+},
+{
+"id": "swi-zermatt",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "체르마트",
+"query": "Zermatt, Switzerland",
+"tier": "뎁스"
+},
+{
+"id": "swi-geneva",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "제네바",
+"query": "Geneva, Switzerland",
+"tier": "뎁스"
+},
+{
+"id": "cze-prague",
+"country": "체코",
+"countryEn": "Czechia",
+"name": "프라하",
+"query": "Prague, Czechia",
+"tier": "메인"
+},
+{
+"id": "cze-eskkrumlov",
+"country": "체코",
+"countryEn": "Czechia",
+"name": "체스키크룸로프",
+"query": "Český Krumlov, Czechia",
+"tier": "뎁스"
+},
+{
+"id": "lao-vientiane",
+"country": "라오스",
+"countryEn": "Laos",
+"name": "비엔티안",
+"query": "Vientiane, Laos",
+"tier": "메인"
+},
+{
+"id": "lao-luangprabang",
+"country": "라오스",
+"countryEn": "Laos",
+"name": "루앙프라방",
+"query": "Luang Prabang, Laos",
+"tier": "메인"
+},
+{
+"id": "lao-vangvieng",
+"country": "라오스",
+"countryEn": "Laos",
+"name": "방비엥",
+"query": "Vang Vieng, Laos",
+"tier": "뎁스"
+},
+{
+"id": "cro-dubrovnik",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "두브로브니크",
+"query": "Dubrovnik, Croatia",
+"tier": "메인"
+},
+{
+"id": "cro-split",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "스플리트",
+"query": "Split, Croatia",
+"tier": "뎁스"
+},
+{
+"id": "cro-zagreb",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "자그레브",
+"query": "Zagreb, Croatia",
+"tier": "뎁스"
+},
+{
+"id": "por-lisbon",
+"country": "포르투갈",
+"countryEn": "Portugal",
+"name": "리스본",
+"query": "Lisbon, Portugal",
+"tier": "메인"
+},
+{
+"id": "por-porto",
+"country": "포르투갈",
+"countryEn": "Portugal",
+"name": "포르투",
+"query": "Porto, Portugal",
+"tier": "뎁스"
+},
+{
+"id": "gre-athens",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "아테네",
+"query": "Athens, Greece",
+"tier": "메인"
+},
+{
+"id": "gre-fira",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "산토리니",
+"query": "Fira, Greece",
+"tier": "뎁스"
+},
+{
+"id": "hun-budapest",
+"country": "헝가리",
+"countryEn": "Hungary",
+"name": "부다페스트",
+"query": "Budapest, Hungary",
+"tier": "메인"
+},
+{
+"id": "net-amsterdam",
+"country": "네덜란드",
+"countryEn": "Netherlands",
+"name": "암스테르담",
+"query": "Amsterdam, Netherlands",
+"tier": "메인"
+},
+{
+"id": "uni-dubai",
+"country": "아랍에미리트",
+"countryEn": "United Arab Emirates",
+"name": "두바이",
+"query": "Dubai, United Arab Emirates",
+"tier": "메인"
+},
+{
+"id": "uni-abudhabi",
+"country": "아랍에미리트",
+"countryEn": "United Arab Emirates",
+"name": "아부다비",
+"query": "Abu Dhabi, United Arab Emirates",
+"tier": "뎁스"
+},
+{
+"id": "uzb-tashkent",
+"country": "우즈베키스탄",
+"countryEn": "Uzbekistan",
+"name": "타슈켄트",
+"query": "Tashkent, Uzbekistan",
+"tier": "메인"
+},
+{
+"id": "uzb-samarkand",
+"country": "우즈베키스탄",
+"countryEn": "Uzbekistan",
+"name": "사마르칸트",
+"query": "Samarkand, Uzbekistan",
+"tier": "뎁스"
+},
+{
+"id": "uzb-bukhara",
+"country": "우즈베키스탄",
+"countryEn": "Uzbekistan",
+"name": "부하라",
+"query": "Bukhara, Uzbekistan",
+"tier": "뎁스"
+},
+{
+"id": "kaz-almaty",
+"country": "카자흐스탄",
+"countryEn": "Kazakhstan",
+"name": "알마티",
+"query": "Almaty, Kazakhstan",
+"tier": "메인"
+},
+{
+"id": "egy-cairo",
+"country": "이집트",
+"countryEn": "Egypt",
+"name": "카이로",
+"query": "Cairo, Egypt",
+"tier": "메인"
+},
+{
+"id": "egy-luxor",
+"country": "이집트",
+"countryEn": "Egypt",
+"name": "룩소르",
+"query": "Luxor, Egypt",
+"tier": "뎁스"
+}
+]

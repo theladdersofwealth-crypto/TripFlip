@@ -1,0 +1,309 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "region": {
+    "schemaVersion": 1,
+    "id": "vie-nhatrang",
+    "kind": "region",
+    "regionId": "vie-nhatrang",
+    "fields": {
+      "name": {
+        "value": "냐짱",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q19491"
+        ]
+      },
+      "en": {
+        "value": "Nha Trang",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q19491"
+        ]
+      },
+      "lat": {
+        "value": 12.245,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q19491"
+        ]
+      },
+      "lon": {
+        "value": 109.19166666666666,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q19491"
+        ]
+      },
+      "wikidataId": {
+        "value": "Q19491",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q19491"
+        ]
+      }
+    },
+    "sources": [
+      {
+        "id": "wikidata:Q19491",
+        "kind": "wikidata",
+        "url": "https://www.wikidata.org/wiki/Q19491",
+        "license": "CC0-1.0",
+        "checkedAt": "2026-11-03",
+        "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2560022941. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+        "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+      }
+    ],
+    "aliases": [
+      "NT"
+    ],
+    "demo": false,
+    "replacesHash": "a23c55cab98e91f06e2b8dcd4373e7a786eafdf1d69500675a12c9256854e1c2"
+  },
+  "places": [
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q2277986",
+      "kind": "place",
+      "regionId": "vie-nhatrang",
+      "fields": {
+        "name": {
+          "value": "롱선사",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "en": {
+          "value": "Long Sơn Pagoda",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "lat": {
+          "value": 12.251601,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "lon": {
+          "value": 109.180765,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q2277986",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q2277986",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q2277986",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2478531583. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-nhatrang-656"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q600269",
+      "kind": "place",
+      "regionId": "vie-nhatrang",
+      "fields": {
+        "name": {
+          "value": "포 나가",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "en": {
+          "value": "Po Nagar",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "lat": {
+          "value": 12.26527778,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "lon": {
+          "value": 109.19555556,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q600269",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q600269",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q600269",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2424864625. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-nhatrang-655"
+      ],
+      "demo": false
+    }
+  ],
+  "restaurants": [],
+  "hotels": []
+}

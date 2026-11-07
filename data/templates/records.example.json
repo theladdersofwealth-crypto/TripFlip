@@ -1,0 +1,22 @@
+{
+  "records": [
+    {
+      "schemaVersion": 1,
+      "id": "replace-with-stable-place-id",
+      "kind": "place",
+      "regionId": "vie-nhatrang",
+      "demo": false,
+      "aliases": [],
+      "fields": {
+        "name": {"value": "실제 장소 이름을 입력하세요", "status": "unverified", "sourceIds": ["replace-with-source-id"], "method": null},
+        "lat": {"value": null, "status": "unknown", "sourceIds": ["replace-with-source-id"], "method": null},
+        "lon": {"value": null, "status": "unknown", "sourceIds": ["replace-with-source-id"], "method": null},
+        "openingHours": {"value": null, "status": "unknown", "sourceIds": ["replace-with-source-id"], "method": null},
+        "accessRestrictions": {"value": null, "status": "unknown", "sourceIds": ["replace-with-source-id"], "method": null}
+      },
+      "sources": [
+        {"id": "replace-with-source-id", "kind": "manual", "url": null, "path": null, "license": null, "checkedAt": null, "note": "양식 예시입니다. 실제 사실과 이용 조건을 확인한 뒤 교체하세요."}
+      ]
+    }
+  ]
+}

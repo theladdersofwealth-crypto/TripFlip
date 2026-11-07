@@ -1,0 +1,746 @@
+[
+ {
+  "id": "nt-ponagar",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "포나가르 참탑",
+  "en": "Po Nagar Cham Towers",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-longson",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "롱선사",
+  "en": "Long Son Pagoda",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-cathedral",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "나트랑 대성당",
+  "en": "Nha Trang Cathedral",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-honchong",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "혼쫑 곶",
+  "en": "Hon Chong Promontory",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-nightmarket",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "나트랑 야시장",
+  "en": "Nha Trang Night Market",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-vinwonders",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "빈원더스 나트랑",
+  "en": "VinWonders Nha Trang",
+  "tempGrade": "A"
+ },
+ {
+  "id": "nt-beach",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "나트랑 해변(쩐푸)",
+  "en": "Tran Phu Beach",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-honmun",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "혼문섬 스노클링",
+  "en": "Hon Mun Marine Park",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-islands",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "나트랑 4섬 투어",
+  "en": "Island Hopping",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-thapba",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "탑바 온천 머드배스",
+  "en": "Thap Ba Hot Spring",
+  "tempGrade": "A"
+ },
+ {
+  "id": "nt-iresort",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "아이리조트 머드배스",
+  "en": "I-Resort",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-dam",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "쩌담 시장",
+  "en": "Dam Market",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-baho",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "바호 폭포",
+  "en": "Ba Ho Waterfalls",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-yangbay",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "양베이 폭포",
+  "en": "Yang Bay Waterfall",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-baidai",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "바이다이 해변",
+  "en": "Bai Dai Beach",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-doclet",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "독렛 해변",
+  "en": "Doc Let Beach",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-kngolf",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "KN 골프링크스 깜라인",
+  "en": "KN Golf Links",
+  "tempGrade": "A"
+ },
+ {
+  "id": "nt-vingolf",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "빈펄 골프 나트랑",
+  "en": "Vinpearl Golf",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-laccanh",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "락깐 (숯불구이)",
+  "en": "Lac Canh",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-namcuong",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "판랑 남끄엉 사막",
+  "en": "Nam Cuong Sand Dunes",
+  "tempGrade": "B"
+ },
+ {
+  "id": "nt-poklong",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "포클롱가라이 참탑",
+  "en": "Po Klong Garai",
+  "tempGrade": "C"
+ },
+ {
+  "id": "nt-dalat",
+  "region": "NT",
+  "regionName": "나트랑",
+  "name": "달랏 쑤언흐엉 호수·시내",
+  "en": "Da Lat",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-peak",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "빅토리아 피크",
+  "en": "Victoria Peak",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-tst",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "침사추이 산책로·심포니 오브 라이트",
+  "en": "TST Promenade",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-starferry",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "스타페리",
+  "en": "Star Ferry",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-disney",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "홍콩 디즈니랜드",
+  "en": "Hong Kong Disneyland",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-oceanpark",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "오션파크",
+  "en": "Ocean Park",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-ngongping",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "옹핑 360·천단대불",
+  "en": "Ngong Ping 360",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-taio",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "타이오 어촌",
+  "en": "Tai O",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-manmo",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "만모사원",
+  "en": "Man Mo Temple",
+  "tempGrade": "C"
+ },
+ {
+  "id": "hk-wongtaisin",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "웡타이신 사원",
+  "en": "Wong Tai Sin Temple",
+  "tempGrade": "C"
+ },
+ {
+  "id": "hk-mplus",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "M+ 박물관",
+  "en": "M+",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-palace",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "홍콩 고궁박물관",
+  "en": "Hong Kong Palace Museum",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-temple",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "템플 스트리트 야시장",
+  "en": "Temple Street",
+  "tempGrade": "C"
+ },
+ {
+  "id": "hk-ladies",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "레이디스 마켓",
+  "en": "Ladies' Market",
+  "tempGrade": "C"
+ },
+ {
+  "id": "hk-midlevels",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "미드레벨 에스컬레이터·소호",
+  "en": "Mid-Levels / SoHo",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-repulse",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "리펄스 베이",
+  "en": "Repulse Bay",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-stanley",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "스탠리",
+  "en": "Stanley",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-dragonsback",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "드래곤스 백",
+  "en": "Dragon's Back",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-lantaupeak",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "란타우 피크",
+  "en": "Lantau Peak",
+  "tempGrade": "C"
+ },
+ {
+  "id": "hk-saikung",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "사이쿵 지질공원",
+  "en": "Sai Kung Geopark",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-harbourcity",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "하버시티",
+  "en": "Harbour City",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-citygate",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "시티게이트 아웃렛",
+  "en": "Citygate Outlets",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-lkf",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "란콰이퐁",
+  "en": "Lan Kwai Fong",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-kaukee",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "카우키 (소고기 국수)",
+  "en": "Kau Kee",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-lanfong",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "란퐁유엔 (밀크티)",
+  "en": "Lan Fong Yuen",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-timhowan",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "팀호완 (딤섬)",
+  "en": "Tim Ho Wan",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-senado",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "마카오 세나도 광장·성 바울 성당 유적",
+  "en": "Senado Square",
+  "tempGrade": "A"
+ },
+ {
+  "id": "hk-venetian",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "베네시안 마카오",
+  "en": "The Venetian Macao",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-macautower",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "마카오 타워",
+  "en": "Macau Tower",
+  "tempGrade": "B"
+ },
+ {
+  "id": "hk-coloane",
+  "region": "HK",
+  "regionName": "홍콩",
+  "name": "콜로안 빌리지",
+  "en": "Coloane Village",
+  "tempGrade": "C"
+ },
+ {
+  "id": "dn-bana",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "바나힐·골든브릿지",
+  "en": "Ba Na Hills",
+  "tempGrade": "A"
+ },
+ {
+  "id": "dn-mykhe",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "미케 해변",
+  "en": "My Khe Beach",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-hoian",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "호이안 올드타운",
+  "en": "Hoi An Ancient Town",
+  "tempGrade": "A"
+ },
+ {
+  "id": "dn-dragon",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "용다리 야경",
+  "en": "Dragon Bridge",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-marble",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "오행산",
+  "en": "Marble Mountains",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-linhung",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "린응사",
+  "en": "Linh Ung Pagoda",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-coconut",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "바구니배 코코넛 마을",
+  "en": "Cam Thanh Coconut Village",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-anbang",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "안방 해변",
+  "en": "An Bang Beach",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-pink",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "다낭 대성당(핑크성당)",
+  "en": "Da Nang Cathedral",
+  "tempGrade": "C"
+ },
+ {
+  "id": "dn-hanmarket",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "한시장",
+  "en": "Han Market",
+  "tempGrade": "C"
+ },
+ {
+  "id": "dn-golf",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "다낭 골프 리조트",
+  "en": "Da Nang Golf",
+  "tempGrade": "A"
+ },
+ {
+  "id": "dn-spa",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "다낭 마사지·스파",
+  "en": "Da Nang Spa",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-hue",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "후에 왕궁",
+  "en": "Hue Imperial City",
+  "tempGrade": "B"
+ },
+ {
+  "id": "dn-miquang",
+  "region": "DN",
+  "regionName": "다낭",
+  "name": "미꽝 (로컬 국수)",
+  "en": "Mi Quang",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-hontom",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "혼텀 케이블카·선월드",
+  "en": "Hon Thom Cable Car",
+  "tempGrade": "A"
+ },
+ {
+  "id": "pq-vinwonders",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "빈원더스 푸꾸옥",
+  "en": "VinWonders Phu Quoc",
+  "tempGrade": "A"
+ },
+ {
+  "id": "pq-safari",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "빈펄 사파리",
+  "en": "Vinpearl Safari",
+  "tempGrade": "A"
+ },
+ {
+  "id": "pq-sao",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "사오 해변",
+  "en": "Sao Beach",
+  "tempGrade": "A"
+ },
+ {
+  "id": "pq-longbeach",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "롱비치 선셋",
+  "en": "Long Beach",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-grandworld",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "그랜드월드",
+  "en": "Grand World",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-sunset",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "선셋타운·키스 브리지",
+  "en": "Sunset Town",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-nightmarket",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "즈엉동 야시장",
+  "en": "Duong Dong Night Market",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-snorkel",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "남부 섬 호핑 스노클링",
+  "en": "An Thoi Island Hopping",
+  "tempGrade": "A"
+ },
+ {
+  "id": "pq-prison",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "푸꾸옥 감옥",
+  "en": "Phu Quoc Prison",
+  "tempGrade": "C"
+ },
+ {
+  "id": "pq-pepper",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "후추 농장",
+  "en": "Pepper Farm",
+  "tempGrade": "C"
+ },
+ {
+  "id": "pq-golf",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "빈펄 골프 푸꾸옥",
+  "en": "Vinpearl Golf Phu Quoc",
+  "tempGrade": "B"
+ },
+ {
+  "id": "pq-seafood",
+  "region": "PQ",
+  "regionName": "푸꾸옥",
+  "name": "함닌 해산물 마을",
+  "en": "Ham Ninh Fishing Village",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-usj",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "유니버설 스튜디오 재팬",
+  "en": "Universal Studios Japan",
+  "tempGrade": "S"
+ },
+ {
+  "id": "os-castle",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "오사카성",
+  "en": "Osaka Castle",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-dotonbori",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "도톤보리",
+  "en": "Dotonbori",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-umeda",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "우메다 공중정원",
+  "en": "Umeda Sky Building",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-shinsekai",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "신세카이·츠텐카쿠",
+  "en": "Shinsekai",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-kuromon",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "구로몬 시장",
+  "en": "Kuromon Market",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-shinsaibashi",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "신사이바시",
+  "en": "Shinsaibashi",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-kaiyukan",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "가이유칸 수족관",
+  "en": "Kaiyukan",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-kiyomizu",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "교토 기요미즈데라",
+  "en": "Kiyomizu-dera (Kyoto)",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-fushimi",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "교토 후시미이나리",
+  "en": "Fushimi Inari (Kyoto)",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-nara",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "나라공원 사슴",
+  "en": "Nara Park",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-arashiyama",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "교토 아라시야마",
+  "en": "Arashiyama (Kyoto)",
+  "tempGrade": "A"
+ },
+ {
+  "id": "os-kobe",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "고베 하버랜드",
+  "en": "Kobe Harborland",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-rinku",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "린쿠 프리미엄 아웃렛",
+  "en": "Rinku Premium Outlets",
+  "tempGrade": "B"
+ },
+ {
+  "id": "os-arima",
+  "region": "OS",
+  "regionName": "오사카",
+  "name": "아리마 온천",
+  "en": "Arima Onsen",
+  "tempGrade": "B"
+ }
+]

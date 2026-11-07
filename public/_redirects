@@ -1,0 +1,2 @@
+# Cloudflare Pages: 저장된 여행 상세는 껍데기 페이지 하나로 처리
+/trip/* /trip/_ 200

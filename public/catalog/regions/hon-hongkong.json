@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "region": {
+    "schemaVersion": 1,
+    "id": "hon-hongkong",
+    "kind": "region",
+    "regionId": "hon-hongkong",
+    "fields": {
+      "name": {
+        "value": "홍콩",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q8646"
+        ]
+      },
+      "en": {
+        "value": "Hong Kong",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q8646"
+        ]
+      },
+      "lat": {
+        "value": 22.278333333333,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q8646"
+        ]
+      },
+      "lon": {
+        "value": 114.15861111111,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q8646"
+        ]
+      },
+      "wikidataId": {
+        "value": "Q8646",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q8646"
+        ]
+      }
+    },
+    "sources": [
+      {
+        "id": "wikidata:Q8646",
+        "kind": "wikidata",
+        "url": "https://www.wikidata.org/wiki/Q8646",
+        "license": "CC0-1.0",
+        "checkedAt": "2026-11-03",
+        "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2563803747. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+        "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+      }
+    ],
+    "aliases": [
+      "HK"
+    ],
+    "demo": false,
+    "replacesHash": "06588dc698d96226f91c4b158e31ba7dc026168f8aff6ae35e257cf34427af3a"
+  },
+  "places": [
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q17541",
+      "kind": "place",
+      "regionId": "hon-hongkong",
+      "fields": {
+        "name": {
+          "value": "빅토리아 피크",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "en": {
+          "value": "Victoria Peak",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "lat": {
+          "value": 22.275469444444,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "lon": {
+          "value": 114.14382777778,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q17541",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자연경관",
+            "사진촬영"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q17541",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q17541",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2517773244. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "hon-hongkong-865",
+        "hk-peak"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q605959",
+      "kind": "place",
+      "regionId": "hon-hongkong",
+      "fields": {
+        "name": {
+          "value": "홍콩 디즈니랜드",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "en": {
+          "value": "Hong Kong Disneyland",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "lat": {
+          "value": 22.313333333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "lon": {
+          "value": 114.04333333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q605959",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "테마파크"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q605959",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q605959",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2562318034. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "hon-hongkong-867",
+        "hk-disney"
+      ],
+      "demo": false
+    }
+  ],
+  "restaurants": [],
+  "hotels": []
+}

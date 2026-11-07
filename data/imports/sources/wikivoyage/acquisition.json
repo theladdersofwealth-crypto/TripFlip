@@ -1,0 +1,37 @@
+{
+  "osaka-kita.json": {
+    "sha256": "ef2df6f3984e9ff382af60db3da482357d46d08cb15aa171f3cd348dd49405c8",
+    "retrievedAt": "2026-11-04T09:28:45.554974+00:00",
+    "revision": 5413465
+  },
+  "hongkong-central.json": {
+    "sha256": "95522edf290cc6ddd2f1e9fe1b7b5791d2e4f6bf0ce0d0c7a10d8ca8c4078d65",
+    "retrievedAt": "2026-11-04T09:22:21.316262+00:00",
+    "revision": 5404181
+  },
+  "hongkong-kowloon.json": {
+    "sha256": "f519b2f0a365cfa6f334ea769b467e60d828258b90f356c31ba0fda73a022c8b",
+    "retrievedAt": "2026-11-04T09:28:45.631330+00:00",
+    "revision": 5404184
+  },
+  "nhatrang.json": {
+    "sha256": "29b8e76473b8e2c47a20838923a64c7e31be6a03e8a2dc3c3e731fd2d184a83f",
+    "retrievedAt": "2026-11-04T09:22:20.882739+00:00",
+    "revision": 5412606
+  },
+  "danang.json": {
+    "sha256": "33b4d059b3c4165afa06be36e952f9d8ab9829746e6e613f50678f313cad1978",
+    "retrievedAt": "2026-11-04T09:22:20.849088+00:00",
+    "revision": 5413233
+  },
+  "phuquoc.json": {
+    "sha256": "71d5163613b9f24cad4a2345602f15ec88e500f40d8c2674fa55b64c06a16b95",
+    "retrievedAt": "2026-11-04T09:22:21.196558+00:00",
+    "revision": 5414381
+  },
+  "osaka.json": {
+    "sha256": "0ec345a019dd34c56fb06456c922ebeded251f54dcabfe2f426157f26cad5f78",
+    "retrievedAt": "2026-11-04T09:22:21.450792+00:00",
+    "revision": 5413466
+  }
+}

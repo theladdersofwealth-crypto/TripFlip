@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "source": "Wikidata official wbgetentities API",
+  "checkedAt": "2026-11-03",
+  "responseFile": "wikidata-pilot-2026-11-03.json",
+  "sha256": "e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68",
+  "seedFile": "../wikidata-pilot.json",
+  "seedSha256": "857c98fb8d25c18a63a2ce7859eff2530ed89cea154d74bacacec8d2b4f8d99f",
+  "verificationScope": [
+    "entity identity",
+    "labels",
+    "Earth coordinates",
+    "CC0 structured data source"
+  ],
+  "excludedScope": [
+    "quality grade",
+    "hours",
+    "amenities",
+    "cleanliness",
+    "actual route duration"
+  ],
+  "note": "Exact original HTTP response bytes and request metadata are preserved; the auxiliary reserialized response remains in the local generated/raw archive.",
+  "originalResponseFile": "wikidata-pilot-2026-11-03.json",
+  "originalResponseSha256": "e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68"
+}

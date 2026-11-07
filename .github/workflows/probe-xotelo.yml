@@ -1,0 +1,34 @@
+name: Xotelo 점검
+
+# 수동 실행 전용. Xotelo 목록·가격·히트맵 기능이 되는지 확인해 data 브랜치 probe/ 에 남긴다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-branch
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: store
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/probe-xotelo.mjs store/probe
+      - name: 결과 커밋
+        working-directory: store
+        run: |
+          git config user.name "tripflip-bot"
+          git config user.email "tripflip-bot@users.noreply.github.com"
+          git add probe
+          git diff --cached --quiet || git commit -m "Xotelo 점검 $(date -u +%F)"
+          git pull --rebase
+          git push

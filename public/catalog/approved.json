@@ -1,0 +1,1521 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "records": [
+    {
+      "schemaVersion": 1,
+      "id": "hon-hongkong",
+      "kind": "region",
+      "regionId": "hon-hongkong",
+      "fields": {
+        "name": {
+          "value": "홍콩",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q8646"
+          ]
+        },
+        "en": {
+          "value": "Hong Kong",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q8646"
+          ]
+        },
+        "lat": {
+          "value": 22.278333333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q8646"
+          ]
+        },
+        "lon": {
+          "value": 114.15861111111,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q8646"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q8646",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q8646"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q8646",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q8646",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2563803747. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        }
+      ],
+      "aliases": [
+        "HK"
+      ],
+      "demo": false,
+      "replacesHash": "06588dc698d96226f91c4b158e31ba7dc026168f8aff6ae35e257cf34427af3a"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "jap-osaka",
+      "kind": "region",
+      "regionId": "jap-osaka",
+      "fields": {
+        "name": {
+          "value": "오사카시",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q35765"
+          ]
+        },
+        "en": {
+          "value": "Osaka",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q35765"
+          ]
+        },
+        "lat": {
+          "value": 34.69375,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q35765"
+          ]
+        },
+        "lon": {
+          "value": 135.5021111111111,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q35765"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q35765",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q35765"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q35765",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q35765",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2563559021. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        }
+      ],
+      "aliases": [
+        "OS"
+      ],
+      "demo": false,
+      "replacesHash": "3134dc2a1516f6c48b985810be539e8e4cbb142ba6a931a894fe984fd5b67c77"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "vie-danang",
+      "kind": "region",
+      "regionId": "vie-danang",
+      "fields": {
+        "name": {
+          "value": "다낭",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q25282"
+          ]
+        },
+        "en": {
+          "value": "Da Nang",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q25282"
+          ]
+        },
+        "lat": {
+          "value": 16.069444444444443,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q25282"
+          ]
+        },
+        "lon": {
+          "value": 108.20972222222223,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q25282"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q25282",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q25282"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q25282",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q25282",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2562338119. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        }
+      ],
+      "aliases": [
+        "DN"
+      ],
+      "demo": false,
+      "replacesHash": "a442385c4f80261354502cd805966995fd3bceda9dd5296980c2034012af5be6"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "vie-nhatrang",
+      "kind": "region",
+      "regionId": "vie-nhatrang",
+      "fields": {
+        "name": {
+          "value": "냐짱",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q19491"
+          ]
+        },
+        "en": {
+          "value": "Nha Trang",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q19491"
+          ]
+        },
+        "lat": {
+          "value": 12.245,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q19491"
+          ]
+        },
+        "lon": {
+          "value": 109.19166666666666,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q19491"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q19491",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q19491"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q19491",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q19491",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2560022941. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        }
+      ],
+      "aliases": [
+        "NT"
+      ],
+      "demo": false,
+      "replacesHash": "a23c55cab98e91f06e2b8dcd4373e7a786eafdf1d69500675a12c9256854e1c2"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "vie-phuquoc",
+      "kind": "region",
+      "regionId": "vie-phuquoc",
+      "fields": {
+        "name": {
+          "value": "푸꾸옥섬",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q146695"
+          ]
+        },
+        "en": {
+          "value": "Phú Quốc",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q146695"
+          ]
+        },
+        "lat": {
+          "value": 10.228888888889,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q146695"
+          ]
+        },
+        "lon": {
+          "value": 103.95722222222,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q146695"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q146695",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q146695"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q146695",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q146695",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2541716908. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        }
+      ],
+      "aliases": [
+        "PQ"
+      ],
+      "demo": false,
+      "replacesHash": "a4aa8032556476cd6e61f0cb58134cd6cb7c0d6eb75526102c27b4a032834e12"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q10796763",
+      "kind": "place",
+      "regionId": "vie-danang",
+      "fields": {
+        "name": {
+          "value": "미케 해변",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q10796763"
+          ]
+        },
+        "en": {
+          "value": "My Khe Beach",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q10796763"
+          ]
+        },
+        "lat": {
+          "value": 16.0704,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q10796763"
+          ]
+        },
+        "lon": {
+          "value": 108.2461,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q10796763"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q10796763",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q10796763"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "휴양"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "해변·섬"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q10796763",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q10796763",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2552647023. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-danang-643",
+        "dn-mykhe"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q1375103",
+      "kind": "place",
+      "regionId": "jap-osaka",
+      "fields": {
+        "name": {
+          "value": "유니버설 스튜디오 재팬",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "en": {
+          "value": "Universal Studios Japan",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "lat": {
+          "value": 34.6647,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "lon": {
+          "value": 135.433,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q1375103",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "테마파크"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q1375103",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q1375103",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2562301771. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "jap-osaka-578",
+        "os-usj"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q1749599",
+      "kind": "place",
+      "regionId": "vie-phuquoc",
+      "fields": {
+        "name": {
+          "value": "Phu Quoc National Park",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "en": {
+          "value": "Phu Quoc National Park",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "lat": {
+          "value": 10.325,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "lon": {
+          "value": 103.95,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q1749599",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1749599"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자연경관"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q1749599",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q1749599",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2316927060. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-phuquoc-674"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q17541",
+      "kind": "place",
+      "regionId": "hon-hongkong",
+      "fields": {
+        "name": {
+          "value": "빅토리아 피크",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "en": {
+          "value": "Victoria Peak",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "lat": {
+          "value": 22.275469444444,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "lon": {
+          "value": 114.14382777778,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q17541",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q17541"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자연경관",
+            "사진촬영"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q17541",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q17541",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2517773244. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "hon-hongkong-865",
+        "hk-peak"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q2277986",
+      "kind": "place",
+      "regionId": "vie-nhatrang",
+      "fields": {
+        "name": {
+          "value": "롱선사",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "en": {
+          "value": "Long Sơn Pagoda",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "lat": {
+          "value": 12.251601,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "lon": {
+          "value": 109.180765,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q2277986",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q2277986"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q2277986",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q2277986",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2478531583. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-nhatrang-656"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q321242",
+      "kind": "place",
+      "regionId": "jap-osaka",
+      "fields": {
+        "name": {
+          "value": "오사카성",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "en": {
+          "value": "Osaka Castle",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "lat": {
+          "value": 34.687222222222,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "lon": {
+          "value": 135.52583333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q321242",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q321242",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q321242",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2564217657. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "jap-osaka-579",
+        "os-castle"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q48078466",
+      "kind": "place",
+      "regionId": "vie-phuquoc",
+      "fields": {
+        "name": {
+          "value": "Hòn Thơm cable car",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "en": {
+          "value": "Hòn Thơm cable car",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "lat": {
+          "value": 10.027054,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "lon": {
+          "value": 104.007388,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q48078466",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q48078466"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "자체분류:케이블카"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q48078466",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q48078466",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2530912417. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-phuquoc-665"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q5305270",
+      "kind": "place",
+      "regionId": "vie-danang",
+      "fields": {
+        "name": {
+          "value": "롱교",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q5305270"
+          ]
+        },
+        "en": {
+          "value": "Dragon River Bridge",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q5305270"
+          ]
+        },
+        "lat": {
+          "value": 16.06111111,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q5305270"
+          ]
+        },
+        "lon": {
+          "value": 108.22666667,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q5305270"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q5305270",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q5305270"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "사진촬영"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q5305270",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q5305270",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2484989062. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-danang-646",
+        "dn-dragon"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q600269",
+      "kind": "place",
+      "regionId": "vie-nhatrang",
+      "fields": {
+        "name": {
+          "value": "포 나가",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "en": {
+          "value": "Po Nagar",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "lat": {
+          "value": 12.26527778,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "lon": {
+          "value": 109.19555556,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q600269",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q600269"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q600269",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q600269",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2424864625. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "vie-nhatrang-655"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q605959",
+      "kind": "place",
+      "regionId": "hon-hongkong",
+      "fields": {
+        "name": {
+          "value": "홍콩 디즈니랜드",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "en": {
+          "value": "Hong Kong Disneyland",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "lat": {
+          "value": 22.313333333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "lon": {
+          "value": 114.04333333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q605959",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q605959"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "테마파크"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q605959",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q605959",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2562318034. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "hon-hongkong-867",
+        "hk-disney"
+      ],
+      "demo": false
+    }
+  ]
+}

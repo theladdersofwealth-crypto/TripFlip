@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 1,
+  "dataVersion": "b8789d3c20af64424c2d",
+  "region": {
+    "schemaVersion": 1,
+    "id": "jap-osaka",
+    "kind": "region",
+    "regionId": "jap-osaka",
+    "fields": {
+      "name": {
+        "value": "오사카시",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q35765"
+        ]
+      },
+      "en": {
+        "value": "Osaka",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q35765"
+        ]
+      },
+      "lat": {
+        "value": 34.69375,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q35765"
+        ]
+      },
+      "lon": {
+        "value": 135.5021111111111,
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q35765"
+        ]
+      },
+      "wikidataId": {
+        "value": "Q35765",
+        "status": "verified",
+        "sourceIds": [
+          "wikidata:Q35765"
+        ]
+      }
+    },
+    "sources": [
+      {
+        "id": "wikidata:Q35765",
+        "kind": "wikidata",
+        "url": "https://www.wikidata.org/wiki/Q35765",
+        "license": "CC0-1.0",
+        "checkedAt": "2026-11-03",
+        "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2563559021. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+        "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+      }
+    ],
+    "aliases": [
+      "OS"
+    ],
+    "demo": false,
+    "replacesHash": "3134dc2a1516f6c48b985810be539e8e4cbb142ba6a931a894fe984fd5b67c77"
+  },
+  "places": [
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q1375103",
+      "kind": "place",
+      "regionId": "jap-osaka",
+      "fields": {
+        "name": {
+          "value": "유니버설 스튜디오 재팬",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "en": {
+          "value": "Universal Studios Japan",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "lat": {
+          "value": 34.6647,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "lon": {
+          "value": 135.433,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q1375103",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q1375103"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광",
+            "액티비티"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "테마파크"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q1375103",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q1375103",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2562301771. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "jap-osaka-578",
+        "os-usj"
+      ],
+      "demo": false
+    },
+    {
+      "schemaVersion": 1,
+      "id": "wikidata:Q321242",
+      "kind": "place",
+      "regionId": "jap-osaka",
+      "fields": {
+        "name": {
+          "value": "오사카성",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "en": {
+          "value": "Osaka Castle",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "lat": {
+          "value": 34.687222222222,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "lon": {
+          "value": 135.52583333333,
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "wikidataId": {
+          "value": "Q321242",
+          "status": "verified",
+          "sourceIds": [
+            "wikidata:Q321242"
+          ]
+        },
+        "concepts": {
+          "value": [
+            "관광"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification, not an objective quality rating."
+        },
+        "tags": {
+          "value": [
+            "역사·문화"
+          ],
+          "status": "estimated",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "Original planning classification."
+        },
+        "grade": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ],
+          "method": "No independent quality grade has been verified."
+        },
+        "stayMinutes": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "openingHours": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "accessRestrictions": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        },
+        "strollerAccessible": {
+          "value": null,
+          "status": "unknown",
+          "sourceIds": [
+            "tripflip:pilot-editorial"
+          ]
+        }
+      },
+      "sources": [
+        {
+          "id": "wikidata:Q321242",
+          "kind": "wikidata",
+          "url": "https://www.wikidata.org/wiki/Q321242",
+          "license": "CC0-1.0",
+          "checkedAt": "2026-11-03",
+          "note": "Checked retained official wbgetentities labels and Earth P625 claims on 2026-11-03; entity revision 2564217657. Exact response SHA256 e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68; request metadata in data/imports/sources/wikidata-pilot-2026-11-03.manifest.json. Verified means source-confirmed identity/coordinate only, not on-site inspection or current opening status.",
+          "path": "data/imports/sources/wikidata-pilot-2026-11-03.json"
+        },
+        {
+          "id": "tripflip:pilot-editorial",
+          "kind": "editorial",
+          "license": "OWNED",
+          "checkedAt": "2026-11-03",
+          "note": "Original TripFlip planning categories only; no claim of verified suitability, operating conditions or quality."
+        }
+      ],
+      "aliases": [
+        "jap-osaka-579",
+        "os-castle"
+      ],
+      "demo": false
+    }
+  ],
+  "restaurants": [],
+  "hotels": []
+}

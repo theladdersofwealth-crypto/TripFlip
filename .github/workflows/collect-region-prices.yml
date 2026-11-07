@@ -1,0 +1,43 @@
+name: 권역 물가 수집
+
+# 전 세계 권역 숙소 가격대(Xotelo)와 나라 물가(세계은행). 주 1회, 결과는 data 브랜치 prices/에만 둔다.
+on:
+  schedule:
+    - cron: "0 1 * * 1" # 매주 월 10:00 KST
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "권역 id 쉼표 구분 (비우면 전체)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-branch
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: store
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/collect-region-prices.mjs store/prices
+        env:
+          ONLY: ${{ inputs.only }}
+      - name: 결과 커밋
+        working-directory: store
+        run: |
+          git config user.name "tripflip-bot"
+          git config user.email "tripflip-bot@users.noreply.github.com"
+          git add prices
+          git diff --cached --quiet || git commit -m "권역 물가 $(date -u +%F)"
+          git pull --rebase
+          git push

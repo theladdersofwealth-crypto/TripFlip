@@ -1,0 +1,31 @@
+{
+  "source": "Wikidata official wbgetentities API",
+  "apiUrl": "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q19491%7CQ25282%7CQ146695%7CQ8646%7CQ35765%7CQ600269%7CQ2277986%7CQ10796763%7CQ5305270%7CQ48078466%7CQ1749599%7CQ17541%7CQ605959%7CQ321242%7CQ1375103%7CQ117326038&props=info%7Clabels%7Cclaims&languages=ko%7Cen&format=json",
+  "retrievedAt": "2026-11-03T15:16:41.507878+00:00",
+  "httpStatus": 200,
+  "contentType": "application/json; charset=utf-8",
+  "file": "wikidata-pilot-2026-11-03.json",
+  "bytes": 854995,
+  "sha256": "e06fef3dbf71fae79c82b0ae0af3ccaa075461fda501b4969af4d33768ab0c68",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+  "entityIds": [
+    "Q19491",
+    "Q25282",
+    "Q146695",
+    "Q8646",
+    "Q35765",
+    "Q600269",
+    "Q2277986",
+    "Q10796763",
+    "Q5305270",
+    "Q48078466",
+    "Q1749599",
+    "Q17541",
+    "Q605959",
+    "Q321242",
+    "Q1375103",
+    "Q117326038"
+  ],
+  "note": "Exact HTTP response body bytes, not reconstructed JSON. Data-source identity and coordinates only; no on-site or operating-status verification."
+}

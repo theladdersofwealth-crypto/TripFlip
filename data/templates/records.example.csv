@@ -1,0 +1,2 @@
+schemaVersion,id,kind,regionId,demo,aliases_json,fields_json,sources_json
+1,replace-with-stable-place-id,place,vie-nhatrang,false,[],"{""name"":{""value"":""실제 장소 이름을 입력하세요"",""status"":""unverified"",""sourceIds"":[""replace-with-source-id""]}}","[{""id"":""replace-with-source-id"",""kind"":""manual"",""license"":null,""checkedAt"":null,""url"":null,""note"":""입력 양식 예시""}]"

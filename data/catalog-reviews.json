@@ -1,0 +1,92 @@
+{
+  "vie-nhatrang": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "873223f655e380a138e996d53960bd95784e16d5bc6e5aa4f4766a76ea4ed148"
+  },
+  "vie-danang": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "ca7311ed6bb8d7955f37555196cf321eedab120be5670d55ec557f17333381dc"
+  },
+  "vie-phuquoc": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "0a51e00e9fa11f0329e55888cd0da8293cced1cb5ce9d4deff3454c60be16e8a"
+  },
+  "hon-hongkong": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "0d2849d47367458c82d9fc8e8c397e51ce237ad05cb86a9fc9a66ac3c988d884"
+  },
+  "jap-osaka": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "238d58abed4436dadd23b7118f526499a77bcfab29b6c01341ef846a9972555c"
+  },
+  "wikidata:Q600269": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "370d7c665ceeb37245f4a994a8f611b99b4ccb0b02830c09914b31cf98ad3d3c"
+  },
+  "wikidata:Q2277986": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "b2da1bfc59df49f74f209cba9fd4c4191e5e53426368655fc63e04b17b71e645"
+  },
+  "wikidata:Q10796763": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "ccb33e1b06e95e5addb8d80191e0199ef4e9f54b6a9ea0b7f3e831bf8be9986a"
+  },
+  "wikidata:Q5305270": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "6153d35a72d142fb5386015cd5771d6051a069676acb065953e758c49327b84d"
+  },
+  "wikidata:Q48078466": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "c034f39be61d947b9699cbf647bc3a9b9fe44770a6bec04e60bf17ad5bbd556d"
+  },
+  "wikidata:Q1749599": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "0c75a85a7456ecf18cfb54a5660953b0864e1df2b4d93ac839dcca0706acb1db"
+  },
+  "wikidata:Q17541": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "9833303e203af72f3628d93ff11fc956364c4cfaf2b112620b31478b4fd14e32"
+  },
+  "wikidata:Q605959": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "7ef2a032e3cd0b65cae4c853f199ebd46301ef4743288a63a62b562987fac834"
+  },
+  "wikidata:Q321242": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "25d5a498dda9e4731b0321b93369a0baa81722d547351db0af97db6c64fe6034"
+  },
+  "wikidata:Q1375103": {
+    "state": "approved",
+    "reviewer": "pilot_open_data (Wikidata API identity/coordinates only)",
+    "reviewedAt": "2026-11-03",
+    "recordHash": "452b2183c396de2d6939775680e32f2b628c9fcad16d0be808fdb8dc5ff3d8be"
+  }
+}

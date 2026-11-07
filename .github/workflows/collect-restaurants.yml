@@ -1,0 +1,39 @@
+name: 식당 목록 수집 (위키보이지)
+
+# 수동 실행. 위키보이지 Eat 항목 + OSM 식당 수를 data 브랜치 restaurants/ 에 남긴다.
+on:
+  workflow_dispatch:
+    inputs:
+      page: { description: "위키보이지 문서명", default: "Nha_Trang" }
+      lat: { description: "중심 위도", default: "12.2388" }
+      lng: { description: "중심 경도", default: "109.1967" }
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-branch
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: store
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/collect-wikivoyage-eat.mjs store/restaurants "${{ inputs.page }}" "${{ inputs.lat }}" "${{ inputs.lng }}"
+      - name: 결과 커밋
+        working-directory: store
+        run: |
+          git config user.name "tripflip-bot"
+          git config user.email "tripflip-bot@users.noreply.github.com"
+          git add restaurants
+          git diff --cached --quiet || git commit -m "식당 목록 수집 ${{ inputs.page }}"
+          git pull --rebase
+          git push
