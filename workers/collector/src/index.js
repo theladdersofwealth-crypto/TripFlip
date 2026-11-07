@@ -25,7 +25,7 @@ function months(now) {
 async function fetchMonth(token, destination, month) {
   const p = new URLSearchParams({ origin: ORIGIN, ...(destination ? { destination } : {}), departure_at: month, currency: "krw", market: "kr", sorting: "price", one_way: "false", limit: "1000", token });
   try {
-    const res = await fetch(`https://api.travelpayouts.com/aviasales/v3/prices_for_dates?${p}`);
+    const res = await fetch(`https://api.travelpayouts.com/aviasales/v3/prices_for_dates?${p}`, { signal: AbortSignal.timeout(20000) });
     const body = await res.json().catch(() => ({}));
     if (!res.ok || body.success === false) return { error: `${res.status} ${body.error ?? ""}`.trim() };
     return { rows: (body.data ?? []).map((t) => FIELDS.map((f) => t[f] ?? null)) };
@@ -68,7 +68,7 @@ async function rates(key, chkIn, chkOut, budget) {
   for (let i = 0; i < 2 && budget.left > 0; i++) {
     budget.left--;
     try {
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
+      const res = await fetch(url, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(15000) });
       const text = await res.text();
       let body = null;
       try { body = JSON.parse(text); } catch {}
@@ -82,9 +82,9 @@ async function rates(key, chkIn, chkOut, budget) {
   }
   return { ok: false, ...last };
 }
-async function collectHotelBatch(env, now, index) {
+async function collectHotelBatch(env, now, index, size = BATCH) {
   const { stays, jobs } = hotelJobs(now);
-  const slice = jobs.slice(index * BATCH, (index + 1) * BATCH);
+  const slice = jobs.slice(index * size, index * size + size);
   if (!slice.length) return null;
   const budget = { left: 48 };
   const rows = [];
@@ -139,6 +139,15 @@ export default {
   async fetch(req, env) {
     const u = new URL(req.url);
     const json = (v, s = 200) => new Response(JSON.stringify(v), { status: s, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } });
+    // 수동 실행(점검용): 헤더 x-run-key 가 시크릿 RUN_KEY 와 같을 때만
+    if (u.pathname === "/run") {
+      if (!env.RUN_KEY || req.headers.get("x-run-key") !== env.RUN_KEY) return json({ error: "권한 없음" }, 403);
+      const now = new Date();
+      const job = u.searchParams.get("job");
+      if (job === "flight") return json({ saved: await collectFlights(env, now) });
+      if (job === "hotel") return json({ saved: await collectHotelBatch(env, now, Number(u.searchParams.get("i") ?? 0), Number(u.searchParams.get("n") ?? BATCH)) });
+      return json({ error: "job=flight|hotel" }, 400);
+    }
     if (u.pathname === "/list") {
       const r = await env.DATA.list({ prefix: u.searchParams.get("prefix") ?? "", cursor: u.searchParams.get("cursor") ?? undefined });
       return json({ keys: r.keys.map((k) => k.name), cursor: r.list_complete ? null : r.cursor });
