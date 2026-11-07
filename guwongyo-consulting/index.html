@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>구원교 회계사 1:1 컨설팅</title>
+<meta name="description" content="구원교 공인회계사 1:1 컨설팅 예약 신청서 · 수험 · 취업 · 개업 상담">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="구원교회계사 컨설팅">
+<meta property="og:url" content="https://guwongyo-consulting.vercel.app/">
+<meta property="og:title" content="구원교 컨설팅 예약 신청서">
+<meta property="og:description" content="12년차 공인회계사 1:1 컨설팅 · 수험 · 취업 · 개업 상담 신청">
+<meta property="og:image" content="https://guwongyo-consulting.vercel.app/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="구원교 컨설팅 예약 신청서">
+<meta name="twitter:image" content="https://guwongyo-consulting.vercel.app/og-image.jpg">
+<style>
+:root{
+  --ink:#111317; --paper:#f4f0e8; --paper2:#e9e1d3; --gold:#b68a3d; --gold2:#d8bd83;
+  --line:#cec5b6; --muted:#6c675e; --navy:#071a35; --white:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Noto Sans KR",sans-serif;background:var(--paper);color:var(--ink);line-height:1.55}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.top{background:linear-gradient(135deg,#0c0d0e,#191817 58%,#111);color:#f7f2e9;overflow:hidden;border-bottom:1px solid #2f2d28}
+.nav{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12)}
+.brand{font-size:14px;letter-spacing:.13em;font-weight:900}
+.nav button{border:1px solid rgba(255,255,255,.3);background:transparent;color:#f5eee1;padding:10px 14px;font-weight:800}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:54px;align-items:center;padding:64px 0 68px}
+.eyebrow{display:inline-block;color:var(--gold2);font-size:12px;font-weight:900;letter-spacing:.12em;padding-bottom:7px;border-bottom:1px solid rgba(216,189,131,.5)}
+.hero h1{font-size:clamp(40px,4.2vw,62px);line-height:1.04;letter-spacing:-.055em;margin:26px 0 24px;font-weight:950}
+.hero h1 span,.hero h1 em{display:block;white-space:nowrap}
+.hero h1 em{font-style:normal;color:#d6b97e}
+.hero p{font-size:min(15.5px,calc((100vw - 500px)/44));color:#cbc5ba;margin:0;white-space:nowrap;letter-spacing:-.01em}
+@media(max-width:1080px){.hero p{font-size:15px;white-space:normal}}
+.profile-card{position:relative;border:1px solid rgba(255,255,255,.18);background:linear-gradient(180deg,#171716,#10100f);overflow:hidden;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px}
+.profile-photo{height:400px;overflow:hidden;background:#0c0c0b}
+.profile-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 18%}
+.profile-top{display:flex;justify-content:space-between;gap:12px;z-index:2;font-size:10px;letter-spacing:.14em;font-weight:900;color:#eee7da}
+.profile-top span{white-space:nowrap}.profile-top span:last-child{color:#d2b57a;text-align:right}
+.metrics{position:relative;z-index:3;width:100%;display:grid;grid-template-columns:repeat(3,auto);gap:8px}
+.metric{background:rgba(12,12,11,.82);border:1px solid rgba(255,255,255,.18);padding:13px 10px;min-width:0}
+.metric strong{display:block;color:#fff;font-size:19px;line-height:1.1}
+.metric span{display:block;color:#c8c1b5;font-size:11px;line-height:1.35;margin-top:5px;word-break:keep-all;white-space:nowrap;letter-spacing:-.02em}
+.career{background:#e8e0d3;border-bottom:1px solid var(--line)}
+.career-grid{display:grid;grid-template-columns:220px 1fr 1fr;align-items:stretch}
+.career-name{grid-row:span 2;align-self:center}
+.career-item.wide{grid-column:span 2;border-bottom:1px solid #c7bdad}
+.career-item span{white-space:nowrap}
+.career-item i{font-style:normal}
+.career-name,.career-item{padding:20px 18px}
+.career-name{font-size:17px;font-weight:950;padding-left:0}
+.career-name small{display:block;font-size:9px;letter-spacing:.15em;color:#8a744c;margin-top:4px}
+.career-item{border-left:1px solid #c7bdad;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.career-item b{font-size:11px;color:#9b793c}
+.career-item span{font-size:11px;color:#4e4942}
+section{padding:72px 0}
+.section-title{margin-bottom:28px}
+.section-title h2{margin:0;font-size:36px;letter-spacing:-.045em}
+.section-title p{margin:7px 0 0;color:var(--muted)}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid #beb4a5;border-bottom:1px solid #beb4a5}
+.product{padding:28px 26px;min-height:220px}
+.product+ .product{border-left:1px solid #c9c0b2}
+.product.best{background:#e8deca}
+.product-kicker{font-size:11px;font-weight:900;color:#9b793c;letter-spacing:.09em}
+.product h3{font-size:24px;margin:9px 0 3px}
+.price{font-size:31px;font-weight:950}
+.time{font-size:14px;font-weight:900;margin:7px 0 10px}
+.product p{color:#5f5r91;margin:0}
+.lab-card{margin-top:18px;border:1px solid #c5b79e;background:#fffaf0;display:grid;grid-template-columns:260px 1fr}
+.lab-head{padding:24px;background:#172238;color:#fff}
+.lab-head .lab-price{font-size:30px;font-weight:950;color:#f2d08c;margin-top:6px}
+.lab-body{padding:20px 24px}
+.lab-body ul{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;margin:0;padding:0;list-style:none}
+.lab-body li{font-size:13px;position:relative;padding-left:18px}
+.lab-body li:before{content:"✓";position:absolute;left:0;color:#9b793c;font-weight:950}
+.form-shell{background:#f8f5ef;border:1px solid #c9c0b2;max-width:930px;margin:auto}
+.form-head{background:#171717;color:#f3ede2;padding:24px}
+.form-head h2{margin:0 0 5px}
+.form-head p{margin:0;color:#cfc7b9;font-size:13px}
+.progress{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #d6cfc3}
+.progress span{padding:11px 8px;text-align:center;font-size:10px;font-weight:850;color:#8c867c;background:#eee9e0;border-right:1px solid #d8d0c3}
+.progress span:last-child{border-right:0}
+.progress span.on{background:#171717;color:#fff}
+.step{display:none;padding:28px}
+.step.active{display:block}
+.step h3{margin:0 0 18px;font-size:23px}
+.step-label{font-size:10px;letter-spacing:.12em;color:#9b793c;font-weight:950;margin-bottom:5px}
+.choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.choice,.subchoice,.product-choice{border:1px solid #c9c1b4;background:#fff;padding:16px;text-align:left;font-weight:850}
+.choice:hover,.choice.selected,.subchoice:hover,.subchoice.selected,.product-choice:hover,.product-choice.selected{border-color:#9d7938;background:#eee2cb}
+.choice small,.subchoice small,.product-choice small{display:block;color:#766f66;font-weight:600;margin-top:5px}
+.sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:900}
+.field input,.field select,.field textarea{border:1px solid #c8c0b3;background:#fff;padding:12px;border-radius:0}
+.field textarea{min-height:105px;resize:vertical}
+.actions{display:flex;gap:10px;margin-top:24px}
+.btn{border:0;padding:13px 18px;font-weight:900}
+.back{background:#ddd6ca}
+.next,.submit{background:#171717;color:#fff;margin-left:auto}
+.next:disabled,.submit:disabled{opacity:.4;cursor:not-allowed}
+.product-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lab-toggle{margin-top:12px;border:1px solid #c9c0b2;background:#fff;padding:14px;display:flex;gap:10px;align-items:flex-start}
+.lab-toggle b{display:block}
+.lab-toggle small{display:block;color:#716a60;margin-top:3px}
+.total{margin-top:12px;background:#171717;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;font-weight:900}
+.booking-note{font-size:12px;color:#6d665d;background:#ebe4d8;border-left:3px solid #a9813c;padding:10px 12px;margin:18px 0 12px}
+.calendar{border:1px solid #c9c1b4;background:#fff;padding:16px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav{width:36px;height:34px;border:1px solid #c9c1b4;background:#fff}
+.cal-week,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-week span{text-align:center;font-size:10px;font-weight:900;color:#8b8479}
+.cal-day{min-height:50px;border:1px solid transparent;background:#f6f3ed;color:#aaa39a;font-weight:850;position:relative}
+.cal-day.available{background:#fff;color:#222;border-color:#d4ccbf}
+.cal-day.available:after{content:"";position:absolute;width:5px;height:5px;border-radius:50%;background:#a9823d;right:6px;top:6px}
+.cal-day.selected{background:#eadfc9;border-color:#9a783b}
+.time-panel{margin-top:14px;border-top:1px solid #ddd5c8;padding-top:14px}
+.time-title{font-weight:900;margin-bottom:9px}
+.time-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.time-btn{border:1px solid #c9c1b4;background:#fff;padding:12px;text-align:left}
+.time-btn.selected{background:#eadfc9;border-color:#9a783b}
+.time-btn b{display:block}
+.time-btn span{display:block;font-size:10px;color:#766e64;margin-top:3px}
+.selected-slot{margin-top:10px;padding:12px;background:#e8e0d3;color:#5f584f;font-size:12px;font-weight:850}
+.selected-slot.ok{background:#171717;color:#fff}
+.summary{background:#fff;border:1px solid #d3cabb;padding:15px}
+.summary-row{display:flex;justify-content:space-between;gap:14px;padding:8px 0;border-bottom:1px dashed #ded7cb}
+.summary-row:last-child{border-bottom:0}
+.privacy{margin-top:15px;border:1px solid #c9c1b4;background:#fff}
+.privacy details summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:900;display:flex;justify-content:space-between}
+.privacy details summary::-webkit-details-marker{display:none}
+.privacy details summary span{font-size:10px;background:#171717;color:#fff;padding:3px 7px}
+.privacy-body{border-top:1px solid #ddd5c8;background:#faf8f4;padding:6px 16px 14px}
+.privacy-row{padding:10px 0;border-bottom:1px solid #e4ddd2}
+.privacy-row b{font-size:12px}
+.privacy-row p{font-size:12px;color:#676057;margin:4px 0 0}
+.privacy-check{border-top:1px solid #ddd5c8;padding:14px 16px;display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:800}
+.error{color:#af2525;font-weight:850;margin-top:10px}
+.success{text-align:center;padding:42px 24px}
+.hidden{display:none!important}
+.status-shell{max-width:930px;margin:30px auto 60px;background:#f8f5ef;border:1px solid #c9c0b2;padding:24px}
+.status-head{display:flex;justify-content:space-between;gap:14px;align-items:center}
+.status-head h2{margin:0}
+.status-box{background:#fff;border:1px solid #d1c8ba;padding:16px;margin-top:12px}
+.status-box h3{margin:0 0 5px}
+.portal-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:20px 0}
+.portal-step{text-align:center;padding:10px 6px;background:#e8e3da;color:#777067;font-size:11px;font-weight:850}
+.portal-step.on{background:#171717;color:#fff}
+.portal-step.done{background:#d9eadf;color:#2f6f4b}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slot{border:1px solid #d0c7b8;background:#fff;padding:12px}
+.slot button{width:100%;border:0;background:#171717;color:#fff;padding:10px;margin-top:8px;font-weight:850}
+.paybtn{display:inline-block;background:#171717;color:#fff;text-decoration:none;padding:12px 16px;font-weight:900}
+.small{font-size:11px;color:#736c62}
+
+.service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.service-card{background:#f8f5ef;border:1px solid #c9c0b2;padding:26px;min-height:260px;display:flex;flex-direction:column}.service-card.student{background:#e9dfcc;border-color:#b99a62}.service-kicker{font-size:10px;font-weight:950;letter-spacing:.12em;color:#987438}.service-card h3{margin:9px 0 10px;font-size:24px}.service-card p{margin:0;color:#5f5r91}.service-note{margin-top:auto;padding-top:18px;border-top:1px solid #d2c8b8;font-size:12px;font-weight:850;color:#554f46}.service-flow{margin-top:14px;border:1px solid #c9c0b2;background:#171717;color:#eee7dc;padding:14px 18px;display:flex;gap:13px;align-items:center;flex-wrap:wrap;font-size:12px}.service-flow b{color:#d7bb82}.service-flow i{font-style:normal;color:#8d857b}.type-price-head{margin-top:20px;border-top:1px solid #c9c0b2;border-bottom:1px solid #c9c0b2;padding:13px 0;display:flex;align-items:center;justify-content:space-between;gap:14px}.type-price-head b,.type-price-head span{display:block}.type-price-head span{font-size:11px;color:#756e64;margin-top:2px}.type-price-head strong{font-size:12px;color:#8d6c31}.manual-quote-card{margin-top:18px;border:1px solid #c9c0b2;background:#fff;padding:22px}.manual-quote-kicker{font-size:10px;letter-spacing:.12em;color:#987438;font-weight:950}.manual-quote-card h4{font-size:21px;margin:7px 0}.manual-quote-card p{color:#625c53;margin:0 0 12px}.lab-apply-preview{margin-top:10px;border:1px solid #c4b79f;background:#fffaf0;padding:16px}.lab-preview-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.lab-preview-head b{font-size:16px}.lab-preview-head span{font-size:11px;color:#746b5f;text-align:right}.lab-session-preview{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:13px 0}.lab-session-preview span{border:1px solid #d4c6ac;background:#fff;padding:10px;font-size:11px}.lab-session-preview b{display:block;font-size:12px}.lab-apply-preview ul{margin:0;padding-left:18px;display:grid;grid-template-columns:1fr 1fr;gap:5px 18px;font-size:11px;color:#655d52}.lab-portal{margin-top:14px;border:1px solid #bfae8e;background:#fffaf0;padding:16px}.lab-portal h3{margin:0 0 5px}.lab-status{display:flex;gap:8px;flex-wrap:wrap;margin:9px 0 14px}.lab-status span{font-size:10px;font-weight:850;background:#eee3ce;padding:5px 8px}.lab-res-list{display:grid;gap:7px;margin-bottom:13px}.lab-res-item{border:1px solid #d3c7b4;background:#fff;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center}.lab-res-item button{border:1px solid #bca982;background:#fff;padding:7px 9px;font-weight:850}.lab-slot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lab-slot{border:1px solid #d1c5b1;background:#fff;padding:12px}.lab-slot button{width:100%;border:0;background:#171717;color:#fff;padding:9px;margin-top:8px;font-weight:850}.quote-display{font-weight:950;color:#8b6a31}
+@media(max-width:820px){
+  .hero{grid-template-columns:1fr;gap:34px;padding:48px 0 54px}
+  .hero h1{font-size:clamp(36px,8.7vw,56px)}
+  .profile-photo{height:380px}
+  
+  .career-grid{grid-template-columns:1fr}
+  .career-name{grid-column:auto;grid-row:auto;padding-left:0}
+  .career-item,.career-item.wide{grid-column:auto;border-top:1px solid #c7bdad;border-left:0;border-bottom:0;padding:14px 0}
+  .career-item span{font-size:min(11px,2.75vw)}
+  .career-item .sep{display:none}
+  .career-item .now{display:block}
+  .lab-card{grid-template-columns:1fr}
+  .lab-body ul{grid-template-columns:1fr}
+  .choice-grid,.product-options,.service-grid{grid-template-columns:1fr}
+  .sub-grid,.fields,.slots,.lab-slot-grid{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .lab-session-preview,.lab-apply-preview ul{grid-template-columns:1fr}
+  .portal-steps{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  .wrap{padding:0 16px}
+  .nav{height:64px}
+  .brand{font-size:11px}
+  .hero h1{font-size:8vw;letter-spacing:-.045em}
+  .hero h1 span,.hero h1 em{white-space:nowrap}
+  .hero p{font-size:14px}
+  .profile-card{padding:14px;gap:10px}
+  .profile-photo{height:320px}
+  .profile-top{font-size:8px}
+  .metrics{gap:6px}
+  .metric{padding:10px 7px}
+  .metric strong{font-size:17px}
+  .metric span{font-size:9px}
+  section{padding:54px 0}
+  .section-title h2{font-size:30px}
+  .products{grid-template-columns:1fr}
+  .product+.product{border-left:0;border-top:1px solid #c9c0b2}
+  .step{padding:20px 16px}
+  .progress span{font-size:9px;padding:9px 3px}
+  .time-list{grid-template-columns:1fr}
+  .status-head{align-items:flex-start;flex-direction:column}
+}
+
+.submit-state{min-height:22px;margin-top:12px;font-size:13px;font-weight:850;color:#5f584d}.submit-state.working{color:#8a6b32}.submit-state.ok{color:#087656}.error{color:#b42318;font-weight:850;margin-top:8px}
+.lab-slot.selected{background:#eadfc9;border-color:#9a783b}.lab-slot-grid button.lab-slot{cursor:pointer;text-align:left}.service-card[data-startcat]{cursor:pointer;transition:transform .15s ease,border-color .15s ease}.service-card[data-startcat]:hover{transform:translateY(-2px);border-color:#9d7938}.service-card[data-startcat]:after{content:"신청 시작 →";display:block;margin-top:14px;font-weight:950;color:#8b6a31}</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="nav"><div class="brand">구원교회계사 컨설팅</div><button id="statusNav">신청현황</button></div>
+    <div class="hero">
+      <div>
+        <div class="eyebrow">수험부터 취업까지 · 1:1 컨설팅</div>
+        <h1><span>현재 상황이 고민된다면,</span><em>주저하지 말고 연락주세요.</em></h1>
+        <p>수험부터 취업, 회계사 커리어까지. 지금 상황에 맞는 현실적인 답과 실행 방향을 함께 정리합니다.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-top"><span>구원교회계사</span><span>ACCOUNTING · TAX · CAREER</span></div>
+        <div class="profile-photo"><img src="guwongyo-profile.jpg" alt="구원교 공인회계사"></div>
+        <div class="metrics">
+          <div class="metric"><strong>12년차</strong><span>회계사 경력</span></div>
+          <div class="metric"><strong>1:1</strong><span>상황별 맞춤 컨설팅</span></div>
+          <div class="metric"><strong>3가지</strong><span>수험 · 취업/개업 · 강의</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="career">
+  <div class="wrap career-grid">
+    <div class="career-name">구원교 공인회계사<small>CPA · TAX · CAREER</small></div>
+    <div class="career-item wide"><b>회계사 약력</b><span>前 안진회계법인, 한영회계법인, 국군재정관리단, 대주회계법인<i class="sep"> · </i><i class="now">現 태일회계법인</i></span></div>
+    <div class="career-item"><b>주요 경력</b><span>SK이노베이션, 남양유업, GS건설 등 대기업 감사업무 수행<br>NC소프트, 영원무역 등 내부회계관리제도 구축업무 수행</span></div>
+    <div class="career-item"><b>기타 경력</b><span>現 바른생각 스마트러닝 세법 강사<br>이나우스아카데미 K-IFRS 실무강의 강사</span></div>
+    
+  </div>
+</div>
+
+<main id="landing">
+<section class="service-intro">
+  <div class="wrap">
+    <div class="section-title"><h2>어떤 도움이 필요하신가요?</h2><p>상담 유형마다 진행 방식과 비용이 다릅니다. 먼저 유형을 선택한 뒤 필요한 내용만 확인하세요.</p></div>
+    <div class="service-grid">
+      <article class="service-card student" data-startcat="수험생" role="button" tabindex="0"><div class="service-kicker">STUDENT</div><h3>수험생 컨설팅</h3><p>회계사·세무사·노무사 수험부터 대기업 취업까지, 현재 위치를 진단하고 다음 행동을 구체화합니다.</p><div class="service-note">세부 분야 선택 후 평일/주말 상품과 비용 확인 · LAB 신청 가능</div></article>
+      <article class="service-card" data-startcat="회계사" role="button" tabindex="0"><div class="service-kicker">CAREER · OPEN</div><h3>취업 및 개업 컨설팅</h3><p>미지정 회계사의 진로, 개업 준비, 회계·세무 직렬과 대기업 재무·회계팀 취업 고민을 현재 상황에 맞춰 함께 정리합니다.</p><div class="service-note">상담 방식 · 소요시간 · 비용은 신청내용 검토 후 별도 안내</div></article>
+      <article class="service-card" data-startcat="강의" role="button" tabindex="0"><div class="service-kicker">LECTURE</div><h3>강의 등 기타문의</h3><p>회계·세무·노무·실무·커리어 주제의 강의와 특강을 기관·대상·목적에 맞춰 협의합니다.</p><div class="service-note">일정 · 인원 · 진행형태 · 비용은 별도 협의</div></article>
+    </div>
+    <div class="service-flow"><b>신청 흐름</b><span>상담 유형 선택</span><i>→</i><span>세부 분야 선택</span><i>→</i><span>신청내용 작성</span><i>→</i><span>유형별 조건 확인</span></div>
+  </div>
+</section>
+
+<section id="apply">
+<div class="wrap">
+<div class="form-shell">
+  <div id="formArea">
+    <div class="form-head"><h2>1:1 컨설팅 신청서</h2><p>신청 → 검토 → 승인 → 결제 → 일정 확정 순으로 진행됩니다.</p></div>
+    <div class="progress" id="progress"><span>1 유형</span><span>2 세부</span><span>3 정보</span><span>4 상담조건</span><span>5 확인</span></div>
+    <form id="form" novalidate>
+      <div class="step active" data-step="1">
+        <div class="step-label">STEP 1</div><h3>문의 유형을 선택해주세요</h3>
+        <div class="choice-grid" id="categoryChoices">
+          <button type="button" class="choice" data-cat="수험생"><b>수험생 컨설팅</b><small>수험 생활의 방향을 함께 잡습니다.</small></button>
+          <button type="button" class="choice" data-cat="회계사"><b>취업 및 개업 컨설팅</b><small>취업·개업·커리어 방향을 설계합니다.</small></button>
+          <button type="button" class="choice" data-cat="강의"><b>강의 등 기타문의</b><small>실무와 수험을 연결하는 강의</small></button>
+        </div>
+        <div class="actions"><button type="button" class="btn next" id="toStep2" disabled>다음</button></div>
+      </div>
+
+      <div class="step" data-step="2">
+        <div class="step-label">STEP 2</div><h3 id="subTitle">세부 분야를 선택해주세요</h3>
+        <div class="sub-grid" id="subChoices"></div>
+        <div class="actions"><button type="button" class="btn back" data-back>이전</button><button type="button" class="btn next" id="toStep3" disabled>다음</button></div>
+      </div>
+
+      <div class="step" data-step="3">
+        <div class="step-label">STEP 3</div><h3>현재 상황을 알려주세요</h3>
+        <div class="fields">
+          <div class="field"><label>이름 *</label><input name="name" required></div>
+          <div class="field"><label>연락처 *</label><input name="phone" required inputmode="tel"></div>
+          <div class="field"><label>이메일</label><input name="email" type="email"></div>
+          <div class="field"><label>연령대</label><select name="age_group"><option value="">선택</option><option>20대 초반</option><option>20대 중반</option><option>20대 후반</option><option>30대 초반</option><option>30대 중반</option><option>40대 이상</option></select></div>
+          <div id="dynamicFields" class="field full"></div>
+          <div class="field full"><label>현재 상황</label><textarea name="current_status" placeholder="현재 상황을 자유롭게 적어주세요."></textarea></div>
+          <div class="field full"><label>가장 큰 고민 / 문의 내용 *</label><textarea name="biggest_concern" required></textarea></div>
+          <div class="field full"><label>이번 상담·강의 문의에서 얻고 싶은 결과</label><textarea name="goal"></textarea></div>
+        </div>
+        <div class="actions"><button type="button" class="btn back" data-back>이전</button><button type="button" class="btn next" data-next>다음</button></div>
+      </div>
+
+      <div class="step" data-step="4">
+        <div class="step-label">STEP 4</div><h3 id="step4Title">질문과 상품·일정을 선택해주세요</h3>
+        <div class="fields">
+          <div class="field full"><label>반드시 답을 얻고 싶은 질문 1 *</label><textarea name="q1" required></textarea></div>
+          <div class="field full"><label>질문 2</label><textarea name="q2"></textarea></div>
+          <div class="field full"><label>질문 3</label><textarea name="q3"></textarea></div>
+        </div>
+        <div id="studentOptions" class="hidden">
+          <div class="type-price-head"><div><b>수험생 컨설팅 상품</b><span>수험생 대상 상품입니다.</span></div><strong>선택 후 금액 확인</strong></div>
+          <div class="product-options" id="productChoices">
+            <button type="button" class="product-choice" data-product="평일 핵심 컨설팅" data-base="180000"><b>평일 핵심 컨설팅</b><small>60분 · 180,000원 · 평일 일정만 선택</small></button>
+            <button type="button" class="product-choice" data-product="주말 심층 컨설팅" data-base="300000"><b>주말 심층 컨설팅</b><small>120분 · 300,000원 · 주말 일정만 선택</small></button>
+          </div>
+          <label class="lab-toggle"><input type="checkbox" id="labAdd"><span><b>LAB 이용권 추가 (+200,000원)</b><small>수험생 컨설팅 신청자만 이용 가능 · 평일 예약제 학습공간</small></span></label>
+          <div id="labApplyPreview" class="lab-apply-preview hidden">
+            <div class="lab-preview-head"><b>LAB 자리는 상담 후에 정합니다</b><span>지금은 이용권만 추가해 두세요. 결제가 끝나면 신청현황 화면에서 원하는 날짜와 타임을 직접 예약할 수 있습니다.</span></div>
+            <div class="lab-session-preview"><span><b>09:00–12:00</b> 1타임</span><span><b>12:00–15:00</b> 2타임</span><span><b>15:00–18:00</b> 3타임</span></div>
+            <ul><li>평일만 운영 · 주말/공휴일 휴무</li><li>1일 최대 2타임</li><li>동시 예약 최대 4타임</li><li>좌석 자유석</li><li>당일 취소는 노쇼 1회 처리</li><li>노쇼 2회 시 다음 주 1주 이용 제한</li></ul>
+          </div>
+          <div class="total"><span>예상 결제금액</span><strong id="totalPrice">상품을 선택해주세요</strong></div>
+          <div class="booking-note">상품을 선택하면 해당 상품에 맞는 상담 가능 날짜만 표시됩니다. 신청 단계에서는 <b>희망 일정</b>이며 승인·결제 후 최종 확정됩니다.</div>
+          <div class="calendar" id="calendar"><div class="small">상담 상품을 선택하면 캘린더가 열립니다.</div></div>
+          <input type="hidden" name="preferred_slot_id">
+          <div class="selected-slot" id="selectedSlot">선택된 일정이 없습니다.</div>
+        </div>
+        <div id="cpaOptions" class="hidden manual-quote">
+          <div class="manual-quote-card"><div class="manual-quote-kicker">CPA CAREER CONSULTING</div><h4>취업 및 개업 컨설팅 비용은 별도 안내됩니다.</h4><p>상담 분야, 고민 범위와 필요한 상담 깊이를 확인한 뒤 상담 방식·소요시간·비용·일정을 개별 안내합니다.</p><b>지금 단계에서는 결제 또는 시간 선택이 필요하지 않습니다.</b></div>
+        </div>
+        <div id="lectureOptions" class="hidden manual-quote">
+          <div class="manual-quote-card"><div class="manual-quote-kicker">LECTURE REQUEST</div><h4>강의 비용은 별도 안내됩니다.</h4><p>주제, 대상 인원, 시간, 온·오프라인 방식에 따라 견적이 달라집니다. 아래 내용을 남겨주시면 검토 후 연락드립니다.</p></div>
+          <div class="fields" style="margin-top:14px">
+            <div class="field full"><label>희망 강의 일정 / 시간대</label><input name="lecture_schedule" placeholder="예: 11월 셋째 주 평일 오후"></div>
+            <div class="field"><label>예상 인원</label><input name="lecture_audience" placeholder="예: 30명"></div>
+            <div class="field"><label>예산 또는 협의 범위</label><input name="lecture_budget" placeholder="선택 입력"></div>
+          </div>
+        </div>
+        <div class="actions"><button type="button" class="btn back" data-back>이전</button><button type="button" class="btn next" id="toStep5">다음</button></div>
+      </div>
+
+      <div class="step" data-step="5">
+        <div class="step-label">STEP 5</div><h3>최종 확인</h3>
+        <div class="summary" id="summary"></div>
+        <div class="privacy">
+          <details>
+            <summary>개인정보 수집·이용 안내 확인 <span>필수</span></summary>
+            <div class="privacy-body">
+              <div class="privacy-row"><b>수집·이용 목적</b><p>컨설팅 또는 강의 문의 접수, 내용 검토, 상담 관련 연락, 결제·예약·상담 진행 및 고객 문의 대응</p></div>
+              <div class="privacy-row"><b>필수 수집 항목</b><p>이름, 연락처, 문의 유형 및 세부 분야, 현재 상황, 주요 고민·문의 내용, 상담 질문, 선택 상품 및 희망 일정(해당 시)</p></div>
+              <div class="privacy-row"><b>선택 수집 항목</b><p>이메일, 연령대, 수험·경력 기간, 소속, 강의 예상인원·예산 등 신청자가 선택하여 입력한 정보</p></div>
+              <div class="privacy-row"><b>보유·이용 기간</b><p>상담·문의 목적 달성 후 1년까지 보관 후 파기합니다. 관계 법령에 따라 보존 의무가 있는 경우에는 해당 법정기간 동안 별도 보관합니다.</p></div>
+              <div class="privacy-row"><b>동의 거부 권리</b><p>필수 개인정보 수집·이용에 대한 동의를 거부할 수 있으나, 동의하지 않는 경우 신청 접수가 제한될 수 있습니다.</p></div>
+            </div>
+          </details>
+          <label class="privacy-check"><input type="checkbox" name="privacy_consent" required><span>위 개인정보 수집·이용 내용을 확인했으며 동의합니다. (필수)</span></label>
+        </div>
+        <input name="website" style="position:absolute;left:-9999px" tabindex="-1">
+        <div class="submit-state" id="submitState"></div><div class="error" id="error"></div>
+        <div class="actions"><button type="button" class="btn back" data-back>이전</button><button type="submit" class="btn submit" id="submit">신청서 제출</button></div>
+      </div>
+    </form>
+  </div>
+  <div id="success" class="success hidden"><h2>신청이 접수되었습니다.</h2><p>검토 후 승인·결제·일정 확정 상태를 이 페이지에서 확인할 수 있습니다.</p><button class="btn submit" id="openStatus">내 신청현황 보기</button><div class="small" id="portalLink" style="margin-top:12px;word-break:break-all"></div></div>
+</div>
+</div>
+</section>
+</main>
+
+<section id="portal" class="hidden">
+<div class="wrap">
+  <div class="status-shell">
+    <div class="status-head"><div><h2>내 신청현황</h2><div class="small" id="statusSub"></div></div><div><button class="btn back" id="backHome">홈</button> <button class="btn next" id="refresh">새로고침</button></div></div>
+    <div class="portal-steps"><div class="portal-step" data-stage="1">1 신청 접수</div><div class="portal-step" data-stage="2">2 승인·결제대기</div><div class="portal-step" data-stage="3">3 결제완료</div><div class="portal-step" data-stage="4">4 일정확정</div><div class="portal-step" data-stage="5">5 상담완료</div></div>
+    <div id="portalBody"><div class="status-box">불러오는 중...</div></div>
+  </div>
+</div>
+</section>
+
+<script>
+(()=>{
+const URL='https://ctqvefnqqrskjktrsfbz.supabase.co';
+const KEY='sb_publishable_eGS1sOpKys7An-lFBaad8A_s4tonzx1';
+const rpc=async(fn,args)=>{const r=await fetch(URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json','apikey':KEY},body:JSON.stringify(args)});if(!r.ok)throw new Error(await r.text());return r.json()};
+const form=document.getElementById('form');
+const steps=[...document.querySelectorAll('.step')];
+const progress=[...document.querySelectorAll('#progress span')];
+const qs=new URLSearchParams(location.search);
+let token=qs.get('status')||localStorage.getItem('gw_status_token')||'';
+let step=1, category='', subcategory='', product='', basePrice=0, slots=[], selectedSlot=null, labPreviewSlots=[], selectedLabPrefs=[], calView=new Date(); calView.setDate(1);
+const subs={
+ '수험생':['회계사 수험생','세무사 수험생','노무사 수험생','대기업 취업'],
+ '회계사':['미지정 회계사','개업 관련 문의','이직 및 커리어 고민 (회계직렬 취업, 세무대리인 준비생, 대기업 재무·회계팀 희망자 등)'],
+ '강의':['회계 강의','세무 강의','노무 강의','실무 · 커리어 특강']
+};
+const defaultQuestions=['반드시 답을 얻고 싶은 질문 1','질문 2','질문 3'];
+const cpaQuestions={
+ '미지정 회계사':['질문 1. 감사·택스·딜 중 어떤 분야를 하고 싶으신가요?','질문 2. 회계사로서 생각하는 최종 목표는 무엇인가요?','질문 3. 회계사의 실무에 대해 얼마나 알아보셨나요?'],
+ '개업 관련 문의':['질문 1. 현재 포지션에서 개업으로 바꾸려는 이유는 무엇인가요?','질문 2. 개업 후 주된 업무 영역을 무엇으로 삼고 싶으신가요? (예: 기장, 세무조정, 감사, 평가 등)','질문 3. 개업 형태는 어떻게 생각하시나요? (개인사무소, 등록제 법인 등 구체적으로 원하는 방향)'],
+ '이직 및 커리어 고민 (회계직렬 취업, 세무대리인 준비생, 대기업 재무·회계팀 희망자 등)':['질문 1. 현재 본인의 포지션은 어떤가요? (예: 취업 준비, 중견기업 회계팀 직원)','질문 2. 회계사무소/회계법인에 세무대리인으로 취업하려는 이유는 무엇인가요?','질문 3. 현재 회계/세무 업무 숙달 정도는 어떤가요?']
+};
+function askedQuestions(){const g=category==='회계사'&&cpaQuestions[subcategory];return ['q1','q2','q3'].map((n,i)=>{const v=val(n);return v&&g?g[i]+'\n→ '+v:v}).filter(Boolean)}
+function setStep(n){
+ step=n; steps.forEach(x=>x.classList.toggle('active',+x.dataset.step===n));
+ progress.forEach((x,i)=>x.classList.toggle('on',i===n-1));
+ if(n===3) renderDynamic();
+ if(n===4) configureStep4();
+ if(n===5) renderSummary();
+ window.scrollTo({top:document.getElementById('apply').offsetTop-20,behavior:'smooth'});
+}
+setStep(1);
+document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+ category=b.dataset.cat; subcategory=''; document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); document.getElementById('toStep2').disabled=false;
+});
+function renderSubChoices(){const box=document.getElementById('subChoices');box.innerHTML='';document.getElementById('subTitle').textContent=(category==='수험생'?'수험생 컨설팅':category==='회계사'?'취업 및 개업 컨설팅':'강의 등 기타문의')+' · 세부 분야를 선택해주세요';document.getElementById('toStep3').disabled=true;subs[category].forEach(label=>{const b=document.createElement('button');b.type='button';b.className='subchoice';b.textContent=label;b.onclick=()=>{subcategory=label;box.querySelectorAll('.subchoice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');document.getElementById('toStep3').disabled=false};box.appendChild(b)})}
+document.getElementById('toStep2').onclick=()=>{renderSubChoices();setStep(2)};
+document.querySelectorAll('[data-startcat]').forEach(card=>{const start=()=>{category=card.dataset.startcat;subcategory='';document.querySelectorAll('.choice').forEach(x=>{x.classList.toggle('selected',x.dataset.cat===category)});document.getElementById('toStep2').disabled=false;renderSubChoices();setStep(2)};card.onclick=start;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();start()}}});
+document.getElementById('toStep3').onclick=()=>setStep(3);
+document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>setStep(step-1));
+document.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>{if(validateCurrent())setStep(step+1)});
+function validateCurrent(){
+ let ok=true; document.querySelectorAll('.step.active [required]').forEach(x=>{if((x.type==='checkbox'&&!x.checked)||!String(x.value||'').trim()){x.reportValidity();ok=false}});
+ return ok;
+}
+function renderDynamic(){
+ const d=document.getElementById('dynamicFields');
+ if(category==='수험생') d.innerHTML='<label>수험 / 준비 기간</label><input name="experience_period" placeholder="예: 2년"><label style="margin-top:8px">현재 단계</label><input name="detail_stage" placeholder="예: 1차 준비 / 4유예">';
+ else if(category==='회계사') d.innerHTML='<label>합격연도 / 현재 연차</label><input name="experience_period" placeholder="예: 2024 합격 / 2년차"><label style="margin-top:8px">현재 소속</label><input name="detail_org" placeholder="미지정 / 로컬 / Big4 등">';
+ else d.innerHTML='<label>기관 / 회사명</label><input name="detail_org"><label style="margin-top:8px">희망 강의 주제</label><input name="detail_topic">';
+}
+function configureStep4(){
+ const isStudent=category==='수험생',isCpa=category==='회계사',isLecture=category==='강의';
+ document.getElementById('studentOptions').classList.toggle('hidden',!isStudent);
+ document.getElementById('cpaOptions').classList.toggle('hidden',!isCpa);
+ document.getElementById('lectureOptions').classList.toggle('hidden',!isLecture);
+ document.getElementById('step4Title').textContent=isStudent?'질문과 수험생 컨설팅 조건을 확인해주세요':(isCpa?'취업 및 개업 컨설팅 질문에 답해주세요':'강의 등 기타문의 내용을 알려주세요');
+ const qLabels=(isCpa&&cpaQuestions[subcategory])||defaultQuestions;['q1','q2','q3'].forEach((n,i)=>{const l=form.elements[n].closest('.field').querySelector('label');l.textContent=qLabels[i]+(i===0?' *':'')});
+ form.elements.q1.required=!isLecture;
+ const qFields=form.elements.q1.closest('.fields');qFields.classList.toggle('hidden',isLecture);
+ if(!isStudent){product='';basePrice=0;selectedSlot=null;selectedLabPrefs=[];if(form.elements.preferred_slot_id)form.elements.preferred_slot_id.value='';document.getElementById('labAdd').checked=false;document.getElementById('labApplyPreview').classList.add('hidden');}
+}
+document.querySelectorAll('.product-choice').forEach(b=>b.onclick=()=>{
+ product=b.dataset.product;basePrice=+b.dataset.base;selectedSlot=null;form.elements.preferred_slot_id.value='';
+ document.querySelectorAll('.product-choice').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');
+ updateTotal();loadCalendar();
+});
+document.getElementById('labAdd').onchange=()=>{const on=document.getElementById('labAdd').checked;updateTotal();document.getElementById('labApplyPreview').classList.toggle('hidden',!on);selectedLabPrefs=[];};
+async function loadLabApplyCalendar(){
+ const root=document.getElementById('labApplyCalendar');if(!root)return;root.innerHTML='<div class="small">LAB 가능 타임을 불러오는 중...</div>';try{labPreviewSlots=await rpc('get_lab_calendar',{p_from:iso(today),p_to:iso(max)});renderLabApplyCalendar()}catch(e){root.innerHTML='<div class="small">LAB 가능 타임을 불러오지 못했습니다.</div>'}
+}
+function renderLabApplyCalendar(){const root=document.getElementById('labApplyCalendar');if(!root)return;const list=labPreviewSlots.slice(0,42);if(!list.length){root.innerHTML='<div class="small">현재 공개된 LAB 타임이 없습니다.</div>';return}root.innerHTML=list.map(x=>{const sel=selectedLabPrefs.some(v=>v.id===x.id);return '<button type="button" class="lab-slot '+(sel?'selected':'')+'" data-labpref="'+x.id+'"><b>'+x.slot_date+' '+t(x.start_time)+'~'+t(x.end_time)+'</b><div class="small">잔여 '+x.remaining+' / '+x.capacity+' · 자유석</div><div style="margin-top:6px;font-weight:900">'+(sel?'선택됨':'희망 타임 선택')+'</div></button>'}).join('');root.querySelectorAll('[data-labpref]').forEach(b=>b.onclick=()=>{const x=labPreviewSlots.find(v=>v.id===b.dataset.labpref);if(!x)return;const i=selectedLabPrefs.findIndex(v=>v.id===x.id);if(i>=0)selectedLabPrefs.splice(i,1);else{if(selectedLabPrefs.length>=4){alert('LAB 희망 타임은 최대 4개까지 선택할 수 있습니다.');return}selectedLabPrefs.push(x)}renderLabApplyCalendar();renderLabPrefSummary()})}
+function renderLabPrefSummary(){const out=document.getElementById('labPrefSummary');if(!out)return;if(!selectedLabPrefs.length){out.className='selected-slot';out.textContent='선택한 LAB 희망 타임이 없습니다.';return}out.className='selected-slot ok';out.textContent='LAB 희망 타임 · '+selectedLabPrefs.map(x=>x.slot_date+' '+t(x.start_time)+'~'+t(x.end_time)).join(' / ')}
+function updateTotal(){
+ const el=document.getElementById('totalPrice'); if(!product){el.textContent='상품을 선택해주세요';return}
+ const price=basePrice+(document.getElementById('labAdd').checked?200000:0); el.textContent=price.toLocaleString()+'원';
+}
+const pad=n=>String(n).padStart(2,'0'), iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()), t=s=>String(s).slice(0,5);
+const today=new Date();today.setHours(0,0,0,0);const max=new Date(today);max.setDate(max.getDate()+62);
+async function loadCalendar(){
+ document.getElementById('calendar').innerHTML='<div class="small">가능 일정을 불러오는 중...</div>';
+ try{slots=await rpc('get_consulting_calendar',{p_from:iso(today),p_to:iso(max)});renderCalendar()}catch(e){document.getElementById('calendar').innerHTML='<div class="small">일정을 불러오지 못했습니다.</div>'}
+}
+function productSlot(s){
+ const d=new Date(s.slot_date+'T00:00:00').getDay();
+ return product==='평일 핵심 컨설팅' ? d>=1&&d<=5 : d===0||d===6;
+}
+function renderCalendar(){
+ const root=document.getElementById('calendar'),y=calView.getFullYear(),m=calView.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0);
+ const filtered=slots.filter(productSlot),by={}; filtered.forEach(s=>(by[s.slot_date]??=[]).push(s));
+ const prev=new Date(y,m-1,1),next=new Date(y,m+1,1),minMonth=new Date(today.getFullYear(),today.getMonth(),1),maxMonth=new Date(max.getFullYear(),max.getMonth(),1);
+ let h='<div class="cal-head"><button type="button" class="cal-nav" id="prevMonth" '+(prev<minMonth?'disabled':'')+'>‹</button><strong>'+y+'년 '+(m+1)+'월</strong><button type="button" class="cal-nav" id="nextMonth" '+(next>maxMonth?'disabled':'')+'>›</button></div><div class="cal-week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="cal-grid">';
+ for(let i=0;i<first.getDay();i++)h+='<button type="button" class="cal-day" disabled></button>';
+ for(let d=1;d<=last.getDate();d++){const dt=new Date(y,m,d),key=iso(dt),avail=(by[key]||[]).length>0&&! (dt<today||dt>max);h+='<button type="button" class="cal-day '+(avail?'available':'')+'" data-date="'+key+'" '+(avail?'':'disabled')+'>'+d+'</button>'}
+ h+='</div><div class="time-panel" id="timePanel"><div class="small">날짜를 선택해주세요.</div></div>';
+ root.innerHTML=h;
+ document.getElementById('prevMonth').onclick=()=>{calView=new Date(y,m-1,1);renderCalendar()};
+ document.getElementById('nextMonth').onclick=()=>{calView=new Date(y,m+1,1);renderCalendar()};
+ root.querySelectorAll('.cal-day.available').forEach(b=>b.onclick=()=>{root.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');renderTimes(b.dataset.date,by[b.dataset.date]||[])});
+}
+function renderTimes(date,list){
+ const panel=document.getElementById('timePanel'); const dd=new Date(date+'T00:00:00'); const label=(dd.getMonth()+1)+'월 '+dd.getDate()+'일 ('+['일','월','화','수','목','금','토'][dd.getDay()]+')';
+ panel.innerHTML='<div class="time-title">'+label+' 가능한 시간</div><div class="time-list">'+list.map(s=>'<button type="button" class="time-btn" data-id="'+s.id+'"><b>'+t(s.start_time)+' – '+t(s.end_time)+'</b><span>'+s.duration_minutes+'분 상담 · 잔여 '+s.remaining+'자리</span></button>').join('')+'</div>';
+ panel.querySelectorAll('.time-btn').forEach(b=>b.onclick=()=>{selectedSlot=list.find(s=>s.id===b.dataset.id);form.elements.preferred_slot_id.value=selectedSlot.id;panel.querySelectorAll('.time-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');const out=document.getElementById('selectedSlot');out.className='selected-slot ok';out.textContent='희망 일정 · '+label+' '+t(selectedSlot.start_time)+'~'+t(selectedSlot.end_time)});
+}
+document.getElementById('toStep5').onclick=()=>{
+ if(!validateCurrent())return;
+ if(category==='수험생'){
+   if(!product){alert('수험생 컨설팅 상품을 선택해주세요.');return}
+   if(!selectedSlot){alert('희망 상담 일정을 선택해주세요.');return}
+ }
+ setStep(5);
+};
+const val=n=>form.elements[n]?String(form.elements[n].value||'').trim():'';
+function priceNow(){return category==='수험생'?basePrice+(document.getElementById('labAdd').checked?200000:0):null}
+function renderSummary(){
+ const rows=[['문의 유형',category+' · '+subcategory],['신청자',val('name')]];
+ if(category==='수험생'){rows.push(['상품',product]);rows.push(['LAB',document.getElementById('labAdd').checked?'추가':'미추가']);rows.push(['예상 결제금액',priceNow().toLocaleString()+'원']);if(selectedSlot)rows.push(['희망 일정',selectedSlot.slot_date+' '+t(selectedSlot.start_time)+'~'+t(selectedSlot.end_time)]);if(document.getElementById('labAdd').checked)rows.push(['LAB 예약','상담·결제 후 신청현황에서 선택'])}
+ else if(category==='회계사'){rows.push(['비용','별도 안내']);rows.push(['일정','신청내용 검토 후 개별 협의'])}
+ else {rows.push(['비용','별도 안내']);rows.push(['진행 방식','강의 문의 후 개별 협의']);if(val('lecture_schedule'))rows.push(['희망 일정',val('lecture_schedule')])}
+ document.getElementById('summary').innerHTML=rows.map(r=>'<div class="summary-row"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('');
+}
+form.onsubmit=async e=>{
+ e.preventDefault(); const btn=document.getElementById('submit'),err=document.getElementById('error'),state=document.getElementById('submitState');err.textContent='';
+ if(!validateCurrent()){state.textContent='필수 동의 항목을 확인해주세요.';return;}
+ const requiredChecks=[['name','이름'],['phone','연락처'],['biggest_concern','가장 큰 고민']];
+ for(const [n,label] of requiredChecks){if(!val(n)){state.textContent=label+' 항목을 확인해주세요.';setStep(3);return;}}
+ if(category!=='강의'&&!val('q1')){state.textContent='질문 1을 입력해주세요.';setStep(4);return;}
+ if(category==='수험생'&&(!product||!selectedSlot)){state.textContent='수험생 컨설팅 상품과 희망 일정을 확인해주세요.';setStep(4);return;}
+ state.className='submit-state working';state.textContent='신청서를 저장하고 있습니다...';
+ btn.disabled=true;btn.textContent='제출 중...';
+ try{
+   const fd=new FormData(form),details={privacy_consent_version:'2026-10-29-v2'};
+   for(const [k,v] of fd.entries()) if(k.startsWith('detail_')) details[k]=v;
+   if(category==='수험생'){details.consulting_product=product;details.lab_preferred_slots=selectedLabPrefs.map(x=>({id:x.id,slot_date:x.slot_date,start_time:t(x.start_time),end_time:t(x.end_time)}));}else if(category==='강의'){details.lecture_schedule=val('lecture_schedule');details.lecture_audience=val('lecture_audience');details.lecture_budget=val('lecture_budget')}else details.quote_mode='별도 안내';
+   const payload={name:val('name'),phone:val('phone'),email:val('email'),age_group:val('age_group'),category,subcategory,current_status:val('current_status'),experience_period:val('experience_period'),goal:val('goal'),biggest_concern:val('biggest_concern'),questions:askedQuestions().filter(Boolean),preferred_times:category==='수험생'&&selectedSlot?[selectedSlot.slot_date+' '+t(selectedSlot.start_time)+'~'+t(selectedSlot.end_time)]:[],preferred_slot_id:category==='수험생'&&selectedSlot?selectedSlot.id:'',lab_interest:category==='수험생'&&document.getElementById('labAdd').checked?'LAB 추가':(category==='수험생'?'컨설팅만':'해당없음'),lab_preference:category==='수험생'&&document.getElementById('labAdd').checked?selectedLabPrefs.map(x=>x.slot_date+' '+t(x.start_time)+'~'+t(x.end_time)).join(' / '):'',details,privacy_consent:true,website:val('website'),marketing_source:new URLSearchParams(location.search).get('utm_source')||'direct'};
+   const out=await rpc('submit_consulting_application',{payload}); token=out.status_token;localStorage.setItem('gw_status_token',token);
+   state.className='submit-state ok';state.textContent='신청이 정상 접수되었습니다.';document.getElementById('formArea').classList.add('hidden');document.getElementById('success').classList.remove('hidden');const link=location.origin+'/?status='+token;document.getElementById('portalLink').textContent=link;document.getElementById('openStatus').onclick=showPortal;window.scrollTo({top:document.getElementById('apply').offsetTop-20,behavior:'smooth'});
+ }catch(x){state.className='submit-state';state.textContent='';err.textContent='신청 저장에 실패했습니다. 잠시 후 다시 시도해주세요.';btn.disabled=false;btn.textContent='신청서 제출'}
+};
+document.getElementById('statusNav').onclick=()=>token?showPortal():alert('이 기기에 저장된 신청내역이 없습니다.');
+document.getElementById('backHome').onclick=()=>{document.getElementById('portal').classList.add('hidden');document.getElementById('landing').classList.remove('hidden');history.replaceState(null,'',location.pathname)};
+document.getElementById('refresh').onclick=loadPortal;
+function stageOf(a,res){if(a.status==='상담완료')return 5;if(res&&res.length)return 4;if(a.payment_status==='결제완료')return 3;if(a.status==='승인완료'||a.payment_status==='결제대기')return 2;return 1}
+function paintStage(n){document.querySelectorAll('.portal-step').forEach(x=>{const s=+x.dataset.stage;x.classList.toggle('done',s<n);x.classList.toggle('on',s===n)})}
+async function showPortal(){if(!token)return;document.getElementById('landing').classList.add('hidden');document.getElementById('portal').classList.remove('hidden');history.replaceState(null,'','?status='+token);await loadPortal()}
+async function loadPortal(){
+ const body=document.getElementById('portalBody');body.innerHTML='<div class="status-box">불러오는 중...</div>';
+ try{
+  const d=await rpc('get_consulting_customer_portal',{p_token:token}); if(!d){body.innerHTML='<div class="status-box">신청내역을 찾을 수 없습니다.</div>';return}
+  const a=d.application,res=d.reservation||[],avail=d.available_slots||[];document.getElementById('statusSub').textContent=a.name+' · '+a.subcategory;paintStage(stageOf(a,res));
+  let html='<div class="status-box"><h3>현재 상태: '+a.status+'</h3><div>유형: <b>'+a.category+' · '+a.subcategory+'</b> · 비용: <b class="quote-display">'+(a.price_display||'별도 안내')+'</b></div></div>';
+  if(a.status==='신청'||a.status==='연락완료')html+='<div class="status-box"><h3>신청 검토 중</h3><div>신청 내용을 확인한 뒤 진행 방식과 다음 절차를 안내합니다.</div></div>';
+  if(a.payment_status==='결제대기')html+='<div class="status-box"><h3>승인 완료 · 결제대기</h3>'+(a.payment_url?'<a class="paybtn" href="'+a.payment_url+'" target="_blank" rel="noopener">결제하기</a>':'<div class="small">결제 안내 준비 중</div>')+'</div>';
+  if(a.category==='수험생'&&a.payment_status==='결제완료'&&!res.length)html+='<div class="status-box"><h3>결제 완료 · 상담 일정 선택</h3><div class="slots">'+(avail.length?avail.map(s=>'<div class="slot"><b>'+s.slot_date+' '+t(s.start_time)+'~'+t(s.end_time)+'</b><div class="small">잔여 '+s.remaining+' / '+s.capacity+'</div><button onclick="window.reserveSlot(\''+s.id+'\')">이 시간 예약</button></div>').join(''):'<div class="small">현재 공개된 일정이 없습니다.</div>')+'</div></div>';
+  if(res.length){const r=res[0];html+='<div class="status-box"><h3>상담 일정 확정</h3><b>'+r.slot_date+' '+t(r.start_time)+'~'+t(r.end_time)+'</b></div>'}
+  if(a.category==='회계사')html+='<div class="status-box"><h3>취업 및 개업 컨설팅 안내</h3><div>신청 내용을 검토한 뒤 상담 방식·소요시간·비용·일정을 별도로 안내합니다.</div></div>';
+  if(a.category==='강의')html+='<div class="status-box"><h3>강의 등 기타문의 안내</h3><div>강의 주제·인원·시간·진행방식을 확인한 뒤 견적과 일정을 별도로 안내합니다.</div></div>';
+  if(a.status==='상담완료')html+='<div class="status-box"><h3>상담 완료</h3></div>';
+  if(a.category==='수험생'&&a.lab_interest==='LAB 추가'){
+    try{const lab=await rpc('get_lab_customer_portal',{p_token:token});html+=renderLabPortal(lab)}catch(_){html+='<div class="lab-portal"><h3>LAB 자리 신청</h3><div class="small">LAB 예약 정보를 불러오지 못했습니다.</div></div>'}
+  }
+  body.innerHTML=html;
+ }catch(e){body.innerHTML='<div class="status-box">상태를 불러오지 못했습니다.</div>'}
+}
+function renderLabPortal(lab){
+ if(!lab||!lab.eligible)return '';
+ const m=lab.membership||{},rs=lab.reservations||[],av=lab.available_slots||[];
+ let h='<div class="lab-portal"><h3>LAB 자리 신청</h3><div class="small">수험생+LAB 신청자 전용 · 평일 09:00~18:00 · 3시간 단위</div><div class="lab-status"><span>멤버십 '+(m.status||'대기')+'</span><span>1일 최대 2타임</span><span>동시 예약 최대 4타임</span><span>자유석</span></div>';
+ if(m.starts_on)h+='<div class="small">유료 이용기간: <b>'+m.starts_on+' ~ '+m.ends_on+'</b></div>';
+ if(m.suspended_until)h+='<div class="error">노쇼 누적으로 '+m.suspended_until+'까지 LAB 예약이 제한됩니다.</div>';
+ if(rs.length){h+='<h4>예약한 LAB 타임</h4><div class="lab-res-list">'+rs.map(r=>'<div class="lab-res-item"><div><b>'+r.reserved_date+' '+(r.start_time?t(r.start_time)+'~'+t(r.end_time):r.session)+'</b><div class="small">'+r.status+' · 좌석 자유석</div></div>'+(r.status==='예약'?'<button onclick="window.cancelLab(\''+r.id+'\')">예약 취소</button>':'')+'</div>').join('')+'</div>'}
+ if(!lab.can_reserve){h+='<div class="booking-note">LAB 실제 자리 예약은 <b>결제 완료 후</b> 열립니다. 컨설팅 전·후 무료 2타임과 정규 이용기간 예약을 이 화면에서 진행합니다.</div></div>';return h}
+ h+='<h4>예약 가능한 자리</h4><div class="lab-slot-grid">'+(av.length?av.slice(0,30).map(s=>'<div class="lab-slot"><b>'+s.slot_date+' '+t(s.start_time)+'~'+t(s.end_time)+'</b><div class="small">잔여 '+s.remaining+' / '+s.capacity+' · 자유석</div><button onclick="window.reserveLab(\''+s.id+'\')">이 타임 신청</button></div>').join(''):'<div class="small">현재 예약 가능한 LAB 타임이 없습니다.</div>')+'</div></div>';
+ return h
+}
+window.reserveLab=async id=>{if(!confirm('이 LAB 타임을 신청할까요?'))return;try{await rpc('reserve_lab_slot',{p_token:token,p_slot_id:id});await loadPortal()}catch(e){const m=String(e.message||'');alert(m.includes('lab_max_four_future')?'동시에 예약할 수 있는 LAB 타임은 최대 4개입니다.':m.includes('lab_max_two_per_day')?'하루 최대 2타임까지 예약할 수 있습니다.':m.includes('lab_free_pass_used')?'컨설팅 전·후 무료 2타임을 모두 사용했습니다.':m.includes('lab_suspended')?'노쇼 누적으로 LAB 예약이 일시 제한되었습니다.':'LAB 예약을 처리하지 못했습니다.')}};
+window.cancelLab=async id=>{if(!confirm('LAB 예약을 취소할까요? 당일 취소는 노쇼 1회로 처리됩니다.'))return;try{await rpc('cancel_lab_reservation',{p_token:token,p_reservation_id:id});await loadPortal()}catch(e){alert('LAB 예약 취소를 처리하지 못했습니다.')}};
+window.reserveSlot=async id=>{if(!confirm('이 시간으로 예약할까요?'))return;try{await rpc('reserve_consulting_slot',{p_token:token,p_slot_id:id});await loadPortal()}catch(e){alert('예약할 수 없습니다.')}}; 
+if(qs.get('status'))showPortal();
+})();
+</script>
+</body>
+</html>

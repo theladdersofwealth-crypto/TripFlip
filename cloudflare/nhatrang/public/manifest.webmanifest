@@ -1,0 +1,14 @@
+{
+  "name": "나트랑플래너",
+  "short_name": "나트랑플래너",
+  "description": "나트랑 가족여행 일정 플래너",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1677ff",
+  "theme_color": "#1677ff",
+  "lang": "ko",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

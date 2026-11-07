@@ -1,0 +1,2580 @@
+{
+  "schemaVersion": 1,
+  "places": [
+    {
+      "id": "place-001",
+      "name": "아미아나 수영",
+      "sourceCategory": "리조트",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "resort"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "resort_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 0,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "오전"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-002",
+      "name": "아미아나 리조트 휴식",
+      "sourceCategory": "리조트",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "resort"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "resort_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.29541,
+        "lng": 109.23383,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "resort_site",
+        "sourceUrl": "https://mapcarta.com/32897060",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 0,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-003",
+      "name": "아미아나 머드배스",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 0,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-004",
+      "name": "롯데마트 나트랑 본점",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.25196,
+        "lng": 109.17718,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "shopping_center_building",
+        "sourceUrl": "https://mapcarta.com/W753496267",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-005",
+      "name": "롯데마트 골드코스트 + 몰",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.24823,
+        "lng": 109.19512,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "shopping_center_building",
+        "sourceUrl": "https://mapcarta.com/W1239587429",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-006",
+      "name": "Gold Coast 마사지 + 네일",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax",
+        "shopping"
+      ],
+      "subthemeIds": [
+        "spa",
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-007",
+      "name": "Sen Spa",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-008",
+      "name": "해양학박물관",
+      "sourceCategory": "실내",
+      "themeIds": [
+        "kids"
+      ],
+      "subthemeIds": [
+        "museum"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.2077,
+        "lng": 109.2149,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "institute_complex",
+        "sourceUrl": "https://nha-trang.org/institute-of-oceanography/",
+        "sourceLicense": "secondary_reference",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 30,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-009",
+      "name": "Do Theatre / Life Puppets",
+      "sourceCategory": "야간",
+      "themeIds": [
+        "night"
+      ],
+      "subthemeIds": [
+        "performance"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-010",
+      "name": "빈원더스 나트랑",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "kids"
+      ],
+      "subthemeIds": [
+        "themepark"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-011",
+      "name": "원숭이섬 + 오키드섬",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "kids",
+        "marine"
+      ],
+      "subthemeIds": [
+        "animals",
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-012",
+      "name": "양베이 가족 데이투어",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "kids"
+      ],
+      "subthemeIds": [
+        "animals"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 75,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-013",
+      "name": "판랑 사막 프라이빗투어",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 150,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-014",
+      "name": "나트랑 3섬 호핑",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 40,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-015",
+      "name": "혼땀 머드배스 + 비치",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa",
+        "beach"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 40,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-016",
+      "name": "빈펄 하버",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "city"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오후",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-017",
+      "name": "아쿠아필드",
+      "sourceCategory": "실내",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "city"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-018",
+      "name": "혼총 곶",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 30,
+        "maxMinutes": 90,
+        "basis": "short_landmark_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.27196,
+        "lng": 109.20598,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "museum_site_not_rock_entry",
+        "sourceUrl": "https://mapcarta.com/N4884705621",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 15,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-019",
+      "name": "포나가르 참탑",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "culture"
+      ],
+      "estimatedStay": {
+        "minMinutes": 30,
+        "maxMinutes": 90,
+        "basis": "short_landmark_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.26529,
+        "lng": 109.19514,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "archaeological_site",
+        "sourceUrl": "https://mapcarta.com/W146780347",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-020",
+      "name": "롱선사",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "culture"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.25126,
+        "lng": 109.18056,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "temple_footprint",
+        "sourceUrl": "https://mapcarta.com/W196896036",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-021",
+      "name": "나트랑 대성당",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "culture"
+      ],
+      "estimatedStay": {
+        "minMinutes": 30,
+        "maxMinutes": 90,
+        "basis": "short_landmark_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.24679,
+        "lng": 109.18813,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "cathedral_footprint",
+        "sourceUrl": "https://mapcarta.com/W162818208",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-022",
+      "name": "2/4 광장 + 침향탑",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 30,
+        "maxMinutes": 90,
+        "basis": "short_landmark_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.24056,
+        "lng": 109.19694,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "tower_footprint_not_entire_square",
+        "sourceUrl": "https://mapcarta.com/W232454020",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오후",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-023",
+      "name": "나트랑 야시장",
+      "sourceCategory": "야간",
+      "themeIds": [
+        "shopping",
+        "night"
+      ],
+      "subthemeIds": [
+        "market",
+        "night_market"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.23965,
+        "lng": 109.19579,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "night_market_feature_not_entrance",
+        "sourceUrl": "https://mapcarta.com/W196749901",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-024",
+      "name": "담시장",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "market"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-025",
+      "name": "쏨모이 시장",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "market"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-026",
+      "name": "나트랑 센터",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.2481,
+        "lng": 109.19583,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "mall_footprint",
+        "sourceUrl": "https://mapcarta.com/W650959852",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-027",
+      "name": "Vincom Tran Phu",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-028",
+      "name": "A&B Central Square",
+      "sourceCategory": "쇼핑",
+      "themeIds": [
+        "shopping"
+      ],
+      "subthemeIds": [
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "shopping_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오후",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-029",
+      "name": "Skylight",
+      "sourceCategory": "야간",
+      "themeIds": [
+        "night"
+      ],
+      "subthemeIds": [
+        "performance"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 1,
+      "accessibleTimeSlots": [
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-030",
+      "name": "Sailing Club",
+      "sourceCategory": "야간",
+      "themeIds": [
+        "night",
+        "relax"
+      ],
+      "subthemeIds": [
+        "performance",
+        "beach"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 1,
+      "accessibleTimeSlots": [
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-031",
+      "name": "Ana Marina",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 15,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-032",
+      "name": "Champa Island",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "marine",
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "island",
+        "culture",
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.26413,
+        "lng": 109.19157,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "hotel_building_inside_resort_not_entrance",
+        "sourceUrl": "https://mapcarta.com/W1242125203",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오후",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-033",
+      "name": "Nha Trang Xua",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "culture"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 30,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-034",
+      "name": "Truong Son 공예마을",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "kids"
+      ],
+      "subthemeIds": [
+        "creative"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-035",
+      "name": "Phu Vinh 고택마을",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "culture"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 30,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-036",
+      "name": "Cai River 전원 보트",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "marine",
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "island",
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 30,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-037",
+      "name": "100 Egg Mud Bath",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-038",
+      "name": "Galina Mud Bath",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-039",
+      "name": "Thap Ba Hot Spring",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax",
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "spa",
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-040",
+      "name": "I-Resort Mud Spa",
+      "sourceCategory": "스파",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "spa"
+      ],
+      "estimatedStay": {
+        "minMinutes": 60,
+        "maxMinutes": 150,
+        "basis": "spa_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-041",
+      "name": "Ba Ho 폭포",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.38225,
+        "lng": 109.13291,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "waterfall_not_parking_or_tourist_park_gate",
+        "sourceUrl": "https://mapcarta.com/N4082426389",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 1,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-042",
+      "name": "독렛 비치",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "beach"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 70,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-043",
+      "name": "디엡선",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.7183,
+        "lng": 109.3022,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "island_not_boat_pier",
+        "sourceUrl": "https://khanhhoa.org/diep-son-island/",
+        "sourceLicense": "secondary_reference",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 90,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-044",
+      "name": "빈히 + 항라이",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine",
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "island",
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 110,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-045",
+      "name": "타이안 포도밭",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 120,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-046",
+      "name": "남끄엉 사구",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 130,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-047",
+      "name": "수오이띠엔 양떼목장",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "kids",
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "animals",
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 55,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-048",
+      "name": "깜람 망고농장",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "kids"
+      ],
+      "subthemeIds": [
+        "animals"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 50,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-049",
+      "name": "Bai Dai",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "beach"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-050",
+      "name": "Ninh Van Bay",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "relax"
+      ],
+      "subthemeIds": [
+        "beach"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 50,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-051",
+      "name": "Robinson Beach",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "relax",
+        "marine"
+      ],
+      "subthemeIds": [
+        "beach",
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-052",
+      "name": "Hon Mun",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island",
+        "snorkeling"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.16764,
+        "lng": 109.30581,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "island_not_dive_area_or_pier",
+        "sourceUrl": "https://mapcarta.com/15494362",
+        "sourceLicense": "geonames_wikidata",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-053",
+      "name": "Hon Mot",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island",
+        "snorkeling"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.17756,
+        "lng": 109.27422,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "islet_not_boat_pier",
+        "sourceUrl": "https://mapcarta.com/16149774",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-054",
+      "name": "Hon Mieu + 어촌",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.19002,
+        "lng": 109.22643,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "islet_not_entrance_or_boat_pier",
+        "sourceUrl": "https://mapcarta.com/15495024",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 40,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-055",
+      "name": "Yen Island / Hon Noi",
+      "sourceCategory": "투어",
+      "themeIds": [
+        "marine"
+      ],
+      "subthemeIds": [
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": 12.04018,
+        "lng": 109.325,
+        "status": "independent_site_center_not_driving_destination",
+        "referenceKind": "islet_not_departure_pier",
+        "sourceUrl": "https://mapcarta.com/15489448",
+        "sourceLicense": "osm_odbl",
+        "checkedOn": "2026-11-06",
+        "routeReady": false
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 45,
+      "legacyFamilyFitScore5": 2,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Independent site/island reference only; not exact entrance or boarding point. Operating hours remain unverified."
+    },
+    {
+      "id": "place-056",
+      "name": "Monkey Island 단독",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "kids",
+        "marine"
+      ],
+      "subthemeIds": [
+        "animals",
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-057",
+      "name": "Orchid Island 단독",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "kids",
+        "marine"
+      ],
+      "subthemeIds": [
+        "animals",
+        "island"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-058",
+      "name": "Kong Forest",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "city"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 60,
+      "legacyFamilyFitScore5": 1,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-059",
+      "name": "Hon Ba",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 240,
+        "maxMinutes": 450,
+        "basis": "all_day_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 75,
+      "legacyFamilyFitScore5": 1,
+      "accessibleTimeSlots": [
+        "올데이"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-060",
+      "name": "Nha Trang Impression Submarine Area",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "city"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-061",
+      "name": "Kenh Ha / Galina Lake View",
+      "sourceCategory": "관광",
+      "themeIds": [
+        "sightseeing"
+      ],
+      "subthemeIds": [
+        "nature"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 35,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-062",
+      "name": "EcoKids Farm 롯데마트",
+      "sourceCategory": "실내",
+      "themeIds": [
+        "kids",
+        "shopping"
+      ],
+      "subthemeIds": [
+        "animals",
+        "mall"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 120,
+        "basis": "general_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 25,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "오전",
+        "오후"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-063",
+      "name": "Amiana Room Service",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 0,
+      "legacyFamilyFitScore5": 5,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-064",
+      "name": "Bacaro at Amiana",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 0,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-065",
+      "name": "IL MIO 2",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-066",
+      "name": "Champa Garden",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-067",
+      "name": "Nemo Restaurant",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-068",
+      "name": "Haidilao Nha Trang Center",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-069",
+      "name": "해산물 로컬식당 후보",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 3,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-070",
+      "name": "베트남 가정식 후보",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 20,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "점심",
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    },
+    {
+      "id": "place-071",
+      "name": "깜란 공항 전 저녁 후보",
+      "sourceCategory": "식사",
+      "themeIds": [
+        "dining"
+      ],
+      "subthemeIds": [
+        "restaurant"
+      ],
+      "estimatedStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "basis": "meal_heuristic",
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "openingHours": {
+        "value": null,
+        "status": "unverified"
+      },
+      "legacyTravelFromAmianaMinutes": 15,
+      "legacyFamilyFitScore5": 4,
+      "accessibleTimeSlots": [
+        "저녁"
+      ],
+      "sourceLastVerified": "unknown",
+      "sourceDataset": "data-review-2026-11-06",
+      "caution": "Coordinates and operating hours not verified; resort travel times are historical estimates."
+    }
+  ]
+}

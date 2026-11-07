@@ -1,0 +1,1642 @@
+{
+  "schemaVersion": 1,
+  "restaurants": [
+    {
+      "id": "restaurant-001",
+      "name": "Xóm Mới Garden Nha Trang",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "베트남 가정식·분짜·반쎄오",
+      "foodTags": [
+        "pho",
+        "bun_cha",
+        "banh_xeo",
+        "home_style"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "06:30~22:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d25170121-Reviews-Xom_M_i_Garden-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-002",
+      "name": "Ăn Thôi Nha Trang",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "중부 베트남·반쎄오·쌀국수",
+      "foodTags": [
+        "pho",
+        "bun_cha",
+        "banh_xeo"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:30~21:30 (공식 사이트 09:00~22:00 표기와 차이 있음)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d26358361-Reviews-An_Thoi-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-003",
+      "name": "Vị Việt Quán",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "베트남 가정식·그릴",
+      "foodTags": [
+        "home_style",
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:30~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=V%E1%BB%8B%20Vi%E1%BB%87t%20Qu%C3%A1n%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-004",
+      "name": "Mắm Restaurant - Hidden Vietnamese Flavors",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "베트남 가정식",
+      "foodTags": [
+        "home_style"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d27169330-Reviews-M_m_Restaurant_Hidden_Vietnamese_Flavors-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-005",
+      "name": "Là Nhà",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "베트남 가정식·로컬",
+      "foodTags": [
+        "home_style",
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=L%C3%A0%20Nh%C3%A0%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-006",
+      "name": "Phở Gấm Nha Trang",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "쌀국수",
+      "foodTags": [
+        "pho"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Ph%E1%BB%9F%20G%E1%BA%A5m%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-007",
+      "name": "Yến Bánh Căn Bánh Xèo",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "반쎄오·반깐",
+      "foodTags": [
+        "banh_xeo"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Y%E1%BA%BFn%20B%C3%A1nh%20C%C4%83n%20B%C3%A1nh%20X%C3%A8o%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-008",
+      "name": "Quán Bún Bò Huế 100",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "분보후에",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~22:00 (화요일 일부 플랫폼 14:00 종료 표기)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Qu%C3%A1n%20B%C3%BAn%20B%C3%B2%20Hu%E1%BA%BF%20100%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "하",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-009",
+      "name": "Bún Cá Nha Trang Hạnh Nhiên",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "나트랑 로컬·생선국수",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "05:30~13:00 / 저녁 영업시간 플랫폼 표기 상충",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=B%C3%BAn%20C%C3%A1%20Nha%20Trang%20H%E1%BA%A1nh%20Nhi%C3%AAn%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "하",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-010",
+      "name": "Bún Chả Pô Cô Hà Nội",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "분짜",
+      "foodTags": [
+        "bun_cha"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "06:00~21:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=B%C3%BAn%20Ch%E1%BA%A3%20P%C3%B4%20C%C3%B4%20H%C3%A0%20N%E1%BB%99i%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-011",
+      "name": "Nhatrang Local Food",
+      "cuisineId": "vietnamese",
+      "subgenreSource": "나트랑/중부 로컬음식",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Nhatrang%20Local%20Food%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중~상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-012",
+      "name": "JJ Seafood",
+      "cuisineId": "seafood",
+      "subgenreSource": "랍스터·새우·가족형 대형식당",
+      "foodTags": [
+        "lobster",
+        "hotpot"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~23:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d34350241-Reviews-JJ_Seafood-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-013",
+      "name": "Ngoc Trai Seafood Restaurant",
+      "cuisineId": "seafood",
+      "subgenreSource": "로컬 해산물·가족형 대형식당",
+      "foodTags": [
+        "lobster",
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:30~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d4209877-Reviews-Ngoc_Trai_Local_Seafood_Restaurant-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-014",
+      "name": "Costa Seafood Nha Trang",
+      "cuisineId": "seafood",
+      "subgenreSource": "고급 해산물",
+      "foodTags": [
+        "lobster"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "06:30~14:00 / 17:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://costaseafood.com.vn/",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-015",
+      "name": "Luong Son Cang Restaurant",
+      "cuisineId": "seafood",
+      "subgenreSource": "랍스터·새우·베트남식 해산물",
+      "foodTags": [
+        "banh_xeo",
+        "lobster"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d26575065-Reviews-Luong_Son_Cang_Restaurant-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중~상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-016",
+      "name": "Lai Seafood Nha Trang",
+      "cuisineId": "seafood",
+      "subgenreSource": "랍스터·새우·씨푸드 BBQ",
+      "foodTags": [
+        "lobster",
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "15:00~23:00 전후(플랫폼 표기 오류 있어 재확인)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Lai%20Seafood%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "하",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-017",
+      "name": "Lala Seafood Nha Trang",
+      "cuisineId": "seafood",
+      "subgenreSource": "로컬 해산물",
+      "foodTags": [
+        "lobster"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Lala%20Seafood%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-018",
+      "name": "CUI Seafood Restaurant",
+      "cuisineId": "seafood",
+      "subgenreSource": "해산물·베트남식·가족형",
+      "foodTags": [
+        "lobster"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d25219387-Reviews-CUI_Seafood_Restaurant-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-019",
+      "name": "Red Crab Seafood Grill",
+      "cuisineId": "seafood",
+      "subgenreSource": "씨푸드 BBQ·그릴",
+      "foodTags": [
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:30~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Red%20Crab%20Seafood%20Grill%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-020",
+      "name": "Ngon Gallery Nha Trang",
+      "cuisineId": "seafood",
+      "subgenreSource": "고급 씨푸드 뷔페",
+      "foodTags": [
+        "lobster",
+        "buffet"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "조식 / 11:30~13:45 / 17:00 이후(세션 운영; 당일 재확인)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Ngon%20Gallery%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-021",
+      "name": "Champa Garden Restaurant",
+      "cuisineId": "seafood",
+      "subgenreSource": "가족형 대형식당·해산물",
+      "foodTags": [
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "12~18분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Champa%20Garden%20Restaurant%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-022",
+      "name": "Hải sản Địa Phương Vien Ho",
+      "cuisineId": "seafood",
+      "subgenreSource": "로컬 해산물",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:00~02:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "12~18분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=H%E1%BA%A3i%20s%E1%BA%A3n%20%C4%90%E1%BB%8Ba%20Ph%C6%B0%C6%A1ng%20Vien%20Ho%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-023",
+      "name": "Thanh Sương Vinpearl Harbour",
+      "cuisineId": "seafood",
+      "subgenreSource": "빈펄 하버 해산물",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "차량 30~35분 + 케이블카 약 8~12분",
+      "sourceUrl": "https://vinwonders.com/vi/vinpearl-harbour-nha-trang/",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-024",
+      "name": "Veteran Restaurant",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "한국식 BBQ·돼지고기·소고기",
+      "foodTags": [
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.co.kr/Restaurant_Review-g293928-d28006367-Reviews-Veteran_Restaurant-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-025",
+      "name": "SEOUL BULGOGI",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "한식·불고기·구이",
+      "foodTags": [
+        "grill",
+        "korean"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=SEOUL%20BULGOGI%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-026",
+      "name": "왕뚜껑",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "한식 고기구이·돼지고기",
+      "foodTags": [
+        "grill",
+        "korean"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~14:30 / 16:30~24:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=%EC%99%95%EB%9A%9C%EA%BB%91%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-027",
+      "name": "Smoky Pit Meat Restaurant Texas BBQ",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "Texas BBQ·그릴",
+      "foodTags": [
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "12:00~24:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Smoky%20Pit%20Meat%20Restaurant%20Texas%20BBQ%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-028",
+      "name": "I'm Steak Restaurant",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "스테이크",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~14:00 / 16:30~21:30 추정",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=I%27m%20Steak%20Restaurant%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-029",
+      "name": "Parkhaus Nha Trang",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "독일식·소시지·그릴",
+      "foodTags": [
+        "grill",
+        "japanese"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Parkhaus%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-030",
+      "name": "Bogosov Burgers and Steaks",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "스테이크·버거",
+      "foodTags": [],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "17:00 이후(플랫폼 종료시각 표기 오류; 재확인)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Bogosov%20Burgers%20and%20Steaks%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "하",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-031",
+      "name": "Vườn Nướng Grill Garden 2",
+      "cuisineId": "meat_bbq",
+      "subgenreSource": "BBQ 뷔페·그릴",
+      "foodTags": [
+        "buffet",
+        "grill"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 60,
+        "maxMinutes": 100,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "17:00~22:00 전후(플랫폼 표기 오류)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=V%C6%B0%E1%BB%9Dn%20N%C6%B0%E1%BB%9Bng%20Grill%20Garden%202%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "하",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중~상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-032",
+      "name": "Dim Sum House 1",
+      "cuisineId": "asian",
+      "subgenreSource": "중식·딤섬",
+      "foodTags": [
+        "chinese"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~14:00 / 17:00~22:00 추정",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Dim%20Sum%20House%201%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-033",
+      "name": "Sanshin Sushi",
+      "cuisineId": "asian",
+      "subgenreSource": "일식·스시",
+      "foodTags": [
+        "japanese"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "13:00~22:00 추정",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Sanshin%20Sushi%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-034",
+      "name": "Sam Lor Thai Restaurant",
+      "cuisineId": "asian",
+      "subgenreSource": "태국식",
+      "foodTags": [
+        "thai"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~21:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Sam%20Lor%20Thai%20Restaurant%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중~상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-035",
+      "name": "Hotpot Story Vincom Trần Phú",
+      "cuisineId": "asian",
+      "subgenreSource": "핫팟",
+      "foodTags": [
+        "hotpot"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Hotpot%20Story%20Vincom%20Tr%E1%BA%A7n%20Ph%C3%BA%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-036",
+      "name": "Kichi-Kichi Lotte Mart Nha Trang",
+      "cuisineId": "asian",
+      "subgenreSource": "핫팟·뷔페",
+      "foodTags": [
+        "buffet",
+        "hotpot"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "20~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Kichi-Kichi%20Lotte%20Mart%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-037",
+      "name": "장터국밥",
+      "cuisineId": "asian",
+      "subgenreSource": "한식·국밥",
+      "foodTags": [
+        "korean"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00 (월요일 휴무 가능성 재확인)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=%EC%9E%A5%ED%84%B0%EA%B5%AD%EB%B0%A5%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-038",
+      "name": "Robata Restaurant - The Costa",
+      "cuisineId": "asian",
+      "subgenreSource": "일식·로바타",
+      "foodTags": [
+        "japanese"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "영업시간 미확인(더 코스타 공식 페이지 확인 필요)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://thecostanhatrang.com/en/dining",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "중~상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-039",
+      "name": "QooQoo Premium Buffet Gold Coast Nha Trang",
+      "cuisineId": "asian",
+      "subgenreSource": "한·일식 뷔페",
+      "foodTags": [
+        "buffet",
+        "japanese"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "평일 11:00~16:00 중심 / 주말 11:00~22:00 표기(저녁 운영일 재확인)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=QooQoo%20Premium%20Buffet%20Gold%20Coast%20Nha%20Trang%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-040",
+      "name": "Pizza 4P's Nha Trang",
+      "cuisineId": "western",
+      "subgenreSource": "피자·파스타",
+      "foodTags": [
+        "pizza",
+        "pasta"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~22:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d19085668-Reviews-Pizza_4P_s_Nha_Trang_NT-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-041",
+      "name": "The Home Pizza Nha Trang",
+      "cuisineId": "western",
+      "subgenreSource": "피자·파스타",
+      "foodTags": [
+        "pizza",
+        "pasta"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~22:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d34386910-Reviews-The_Home_Pizza_Nha_Trang-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-042",
+      "name": "Bottega 26",
+      "cuisineId": "western",
+      "subgenreSource": "이탈리안·피자",
+      "foodTags": [
+        "pizza",
+        "pasta",
+        "brunch"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "08:00~23:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Bottega%2026%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-043",
+      "name": "Pasta de Pasta",
+      "cuisineId": "western",
+      "subgenreSource": "파스타·이탈리안",
+      "foodTags": [
+        "pizza",
+        "pasta"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:30~22:30",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pasta%20de%20Pasta%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-044",
+      "name": "Pinsa De Roma Italian Restaurant",
+      "cuisineId": "western",
+      "subgenreSource": "피자·이탈리안",
+      "foodTags": [
+        "pizza",
+        "pasta"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "11:00~22:00 (금·토 23:00)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Pinsa%20De%20Roma%20Italian%20Restaurant%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-045",
+      "name": "Cafe Culture Brunch Club",
+      "cuisineId": "western",
+      "subgenreSource": "브런치·버거",
+      "foodTags": [
+        "brunch"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:00~15:30 (일 14:30)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Cafe%20Culture%20Brunch%20Club%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "하",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-046",
+      "name": "Farmhouse Cafe & Brunch",
+      "cuisineId": "western",
+      "subgenreSource": "브런치",
+      "foodTags": [
+        "brunch"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "08:00~19:00 (월 휴무 가능성)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Farmhouse%20Cafe%20%26%20Brunch%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-047",
+      "name": "Lousiane Brewhouse Vinpearl Harbour",
+      "cuisineId": "western",
+      "subgenreSource": "그릴·양식·브루하우스",
+      "foodTags": [
+        "grill",
+        "pizza"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 45,
+        "maxMinutes": 90,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:00~22:00 (공식 페이지 일부 08:00 표기)",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "차량 30~35분 + 케이블카 약 8~12분",
+      "sourceUrl": "https://vinwonders.com/en/vinpearl-harbour-nha-trang/",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "상",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-048",
+      "name": "Jesse Fruits & Cafe",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "과일·주스·카페",
+      "foodTags": [
+        "coffee"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Jesse%20Fruits%20%26%20Cafe%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-049",
+      "name": "Sweet Secret",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "브런치·디저트·베이커리",
+      "foodTags": [
+        "coffee",
+        "brunch"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "08:00~18:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "18~25분",
+      "sourceUrl": "https://www.tripadvisor.com/Restaurant_Review-g293928-d23328689-Reviews-Sweet_Secret-Nha_Trang_Khanh_Hoa_Province.html",
+      "lunchSuitabilitySource": "상",
+      "dinnerSuitabilitySource": "하",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-050",
+      "name": "Ivy Dessert - Gelato & Ice Cream",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "젤라또·아이스크림",
+      "foodTags": [
+        "icecream"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "13:00~22:00 추정",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Ivy%20Dessert%20-%20Gelato%20%26%20Ice%20Cream%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "하",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-051",
+      "name": "Sol Coffee & Desserts",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "카페·디저트",
+      "foodTags": [
+        "coffee"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "07:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "22~30분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Sol%20Coffee%20%26%20Desserts%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-052",
+      "name": "Xôi Coffee & Juice",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "과일·주스·카페",
+      "foodTags": [
+        "coffee"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "08:00~20:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=X%C3%B4i%20Coffee%20%26%20Juice%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-053",
+      "name": "FAcafe NhaTrang Specialty",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "스페셜티 카페",
+      "foodTags": [
+        "coffee"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "06:30~21:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=FAcafe%20NhaTrang%20Specialty%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "중",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-054",
+      "name": "Tiffins Desserts and Coffee",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "베이커리·디저트",
+      "foodTags": [
+        "coffee"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "06:30~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "12~18분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Tiffins%20Desserts%20and%20Coffee%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-055",
+      "name": "Dino's Shibuya Toast & Gelato",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "젤라또·토스트·디저트",
+      "foodTags": [
+        "icecream"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "09:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "15~20분",
+      "sourceUrl": "https://www.google.com/maps/search/?api=1&query=Dino%27s%20Shibuya%20Toast%20%26%20Gelato%20Nha%20Trang%20Vietnam",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "B",
+      "needsOperatingHoursCheck": true
+    },
+    {
+      "id": "restaurant-056",
+      "name": "Chạm - Cafe & Kem Bơ Đà Lạt",
+      "cuisineId": "cafe_dessert",
+      "subgenreSource": "아보카도 아이스크림·카페",
+      "foodTags": [
+        "coffee",
+        "icecream"
+      ],
+      "coordinates": {
+        "lat": null,
+        "lng": null,
+        "status": "unverified"
+      },
+      "estimatedMealStay": {
+        "minMinutes": 30,
+        "maxMinutes": 60,
+        "certainty": "planning_heuristic_not_verified"
+      },
+      "openingHoursRaw": "10:00~22:00",
+      "openingHoursStructured": null,
+      "sourceLastVerified": "2026-10-13",
+      "legacyDriveFromAmiana": "차량 30~35분 + 케이블카 약 8~12분",
+      "sourceUrl": "https://vinwonders.com/vi/vinpearl-harbour-nha-trang/",
+      "lunchSuitabilitySource": "중",
+      "dinnerSuitabilitySource": "중",
+      "childFriendlinessSource": "최상",
+      "confidenceSource": "A",
+      "needsOperatingHoursCheck": true
+    }
+  ]
+}

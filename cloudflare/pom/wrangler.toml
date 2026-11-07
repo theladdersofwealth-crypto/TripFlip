@@ -1,0 +1,19 @@
+name = "pom"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[assets]
+directory = "./public"
+run_worker_first = ["/api/*"]
+
+[triggers]
+crons = ["30 22 * * *"] # 매일 07:30 KST 이번 주 일정 푸시
+
+[[durable_objects.bindings]]
+name = "STORE"
+class_name = "Store"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Store"]

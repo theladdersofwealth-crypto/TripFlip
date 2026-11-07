@@ -1,0 +1,199 @@
+:root{--bg:#f4f7fd;--card:#fff;--text:#151d2d;--muted:#718094;--blue:#1676ef;--line:#e8edf5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit}button{border:0;background:none;cursor:pointer;color:inherit}a{color:inherit;text-decoration:none}
+.wrap{max-width:640px;margin:auto;min-height:100dvh;padding:16px 18px calc(116px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#fbfcff,#f3f6fc)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.top-brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:21px;letter-spacing:-.8px}
+.logo{display:grid;place-items:center;background:#e8f1ff;border-radius:14px;width:43px;height:43px;font-size:24px}
+.mini{font-size:12px;color:var(--muted);font-weight:650}
+.top-actions{display:flex;align-items:center;gap:9px}.icon-btn{display:grid;place-items:center;border:1px solid #e5ecf5;background:#fff;width:40px;height:40px;border-radius:13px;font-size:20px}
+.panel{background:var(--card);border:1px solid #e9eef6;border-radius:23px;box-shadow:0 9px 24px rgba(24,54,95,.045)}
+.month-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:18px 15px 13px}
+.month-head strong{font-size:24px;letter-spacing:-1px}
+.month-controls{display:flex;gap:6px;align-items:center}
+.month-controls button{background:#f3f7fd;border-radius:11px;min-width:37px;height:36px;padding:0 8px;font-weight:850}
+.weekdays,.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.weekdays{padding:0 10px 8px;text-align:center;color:#8390a4;font-size:12px;font-weight:750}
+.weekdays span:first-child{color:#fa6674}.weekdays span:last-child{color:#468dea}
+.grid{padding:0 10px 14px;gap:3px}
+.day{min-width:0;min-height:78px;border-radius:12px;padding:8px 3px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.day.outside{opacity:.28}.day.selected{background:#ebf3ff;outline:1px solid #cde3ff}.day:active{background:#dcecff}
+.day .number{display:grid;place-items:center;font-size:15px;font-weight:800;width:29px;height:29px;border-radius:50%}
+.day.today .number{background:var(--blue);color:#fff}.day.sunday .number{color:#eb5362}.day.saturday .number{color:#277bdc}.day.today.sunday .number,.day.today.saturday .number{color:#fff}
+.day-events{display:flex;flex-direction:column;gap:3px;width:100%;min-width:0}
+.mark{display:block;width:100%;text-align:left;border-radius:4px;padding:2px 3px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:750}
+.mark.family{background:#e7f2ff;color:#216ed6}.mark.work{background:#efe9ff;color:#784ac7}.mark.kids{background:#fff0dd;color:#ba7114}.mark.personal{background:#def7ed;color:#13876f}.mark.anniversary{background:#ffeaf1;color:#cb4977}
+.more{font-size:9px;color:#78879a;line-height:1}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin:24px 3px 12px;gap:12px}
+.section-title h2{font-size:20px;font-weight:850;margin:0;letter-spacing:-.5px}
+.section-title small{color:#7e8aa0;font-weight:700;font-size:12px}
+.event-row{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:15px;border-bottom:1px solid #f0f2f5}
+.event-row:last-child{border-bottom:0}
+.event-marker{width:5px;height:38px;border-radius:8px;flex:0 0 auto;background:#1676ef}
+.event-marker.work{background:#986de9}.event-marker.kids{background:#eb9e39}.event-marker.personal{background:#26b493}.event-marker.anniversary{background:#e85f90}
+.event-details{flex:1;min-width:0}.event-name{font-weight:800;font-size:15px;overflow-wrap:anywhere}.event-meta{font-size:12px;color:#8491a4;margin-top:5px}
+.empty{text-align:center;padding:32px 20px;color:#8290a3;font-size:13px;line-height:1.8}
+.fab{position:fixed;right:max(22px,calc((100vw - 600px)/2));bottom:calc(27px + env(safe-area-inset-bottom));padding:15px 23px;border-radius:18px;background:var(--blue);color:#fff;font-weight:850;box-shadow:0 8px 26px rgba(22,118,239,.30);z-index:4}
+.sync-note{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 0;font-size:12px;color:#7b8ba0}.sync-note button{font-weight:800;color:var(--blue)}
+.login-wrap{max-width:430px;margin:10vh auto 0;padding:27px}.login-wrap h2{font-size:22px;margin:12px 0 8px}.login-wrap p{line-height:1.7;font-size:13px;color:var(--muted)}
+.input{width:100%;min-width:0;padding:13px 14px;border:1px solid #dbe3ef;background:#fff;border-radius:12px;outline:none}
+.input:focus{border-color:var(--blue)}
+.primary{display:block;width:100%;padding:14px;background:var(--blue);border-radius:12px;color:#fff;font-weight:850;margin-top:14px}
+.error{color:#df3e57;font-size:12px;margin-top:9px}.hint{color:var(--muted);font-size:12px;line-height:1.6;margin-top:10px}
+.overlay{position:fixed;inset:0;background:rgba(7,23,53,.43);z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.modal{width:min(620px,100%);max-height:94dvh;overflow:auto;background:#fff;border-radius:23px 23px 0 0;padding:21px 20px calc(25px + env(safe-area-inset-bottom))}
+.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.modal-head h2{font-size:20px;margin:0}.modal-head button{font-size:22px}
+.field{margin:13px 0}.field label{display:block;font-size:12px;color:#60718a;font-weight:850;margin-bottom:7px}.field textarea{resize:vertical;min-height:80px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checkbox{display:flex;align-items:center;gap:8px;font-weight:750;font-size:14px;margin:13px 0}
+.modal-actions{display:flex;gap:10px}.modal-actions .primary{flex:1}
+.danger{padding:14px 18px;margin-top:14px;color:#e34c60;font-weight:800;background:#fff0f3;border-radius:12px}
+.small-link{font-size:12px;font-weight:800;color:var(--blue)}
+@media(max-width:380px){.wrap{padding:12px 10px calc(110px + env(safe-area-inset-bottom))}.day{min-height:69px;padding:6px 2px 3px}.grid{gap:1px;padding:0 7px 12px}.mark{font-size:8px}.top-brand{font-size:18px}.month-head strong{font-size:21px}.event-row{padding:13px}}
+
+#time-fields[hidden]{display:none}
+
+
+/* Natural-language quick entry, within calendar only */
+.natural-panel{background:linear-gradient(135deg,#f0f6ff 0%,#fff 72%);border:1px solid #dceaff;border-radius:21px;padding:16px;margin:15px 0 18px;box-shadow:0 7px 20px rgba(30,94,184,.045)}
+.natural-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.natural-head strong{display:block;font-size:16px;letter-spacing:-.4px;font-weight:900}
+.natural-head small{display:block;margin-top:4px;color:#68819c;font-size:11px;font-weight:650}
+.natural-free{font-size:11px;font-weight:850;color:#0b75a1;background:#dff7ff;border-radius:20px;padding:5px 9px}
+.natural-input{display:block;width:100%;min-height:79px;padding:12px 13px;resize:vertical;border:1px solid #cbdced;background:#fff;border-radius:13px;outline:none;font-size:14px;line-height:1.55;color:#152336}
+.natural-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(22,118,239,.10)}
+.natural-input::placeholder{color:#97a9bc}
+.natural-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.natural-foot span{font-size:11px;color:#7890a6;line-height:1.3}
+.natural-foot button{white-space:nowrap;background:var(--blue);border-radius:11px;padding:10px 13px;color:#fff;font-size:13px;font-weight:800}
+.natural-foot button:disabled{opacity:.5}
+.natural-examples{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}
+.natural-examples button{font-size:10px;background:#fff;border:1px solid #dbe7f5;border-radius:10px;color:#59758f;padding:7px 9px;text-align:left}
+.natural-error,.natural-success{margin:11px 0 0;font-size:12px;line-height:1.55;font-weight:700}
+.natural-error{color:#cc3452}.natural-success{color:#058a62}
+.natural-review{background:#fff4db;border-radius:11px;color:#976322;padding:11px 13px;font-size:12px;line-height:1.6}
+.agenda-panel{overflow:hidden;margin-bottom:24px}
+.agenda-group+.agenda-group{border-top:1px solid #e9eff7}
+.agenda-day{width:100%;padding:13px 15px 7px;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.agenda-day strong{font-size:14px;font-weight:850;color:#263952}
+.agenda-day span{font-size:11px;color:#8b99a9}
+.agenda-items{padding:0 7px 6px}
+.agenda-event{display:flex;align-items:center;gap:11px;padding:10px 9px;width:100%;min-width:0;text-align:left;border-radius:11px}
+.agenda-event:active{background:#f0f6ff}
+.agenda-event .event-marker{height:32px}
+.agenda-event-copy{flex:1;min-width:0;display:block}
+.agenda-event-copy strong{display:block;overflow-wrap:anywhere;font-size:14px;font-weight:800;line-height:1.4}
+.agenda-event-copy small{display:block;margin-top:5px;font-size:11px;color:#7f90a2;line-height:1.4;overflow-wrap:anywhere}
+.agenda-arrow{color:#a5b2c3;font-size:20px;flex:none}
+.day{min-height:88px}
+.mark{font-size:10px;padding:3px}
+@media(max-width:380px){
+  .natural-panel{padding:12px}
+  .natural-head strong{font-size:15px}
+  .natural-foot{align-items:stretch;flex-wrap:wrap}
+  .natural-foot button{flex:1}
+  .day{min-height:78px}
+  .mark{font-size:8px;padding:2px}
+}
+
+
+/* 2026-11-04: compact, readable iPhone calendar. Prevent horizontal clipping. */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+#calendar-app{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+.wrap{width:100%;min-width:0;max-width:640px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));overflow-x:clip}
+.top,.top-brand,.top-actions,.month-head,.month-controls,.section-title,.natural-foot{min-width:0}
+.top-brand{flex:1 1 auto;overflow:hidden;font-size:19px;white-space:nowrap}
+.top-brand>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.top-brand .mini{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-actions{flex:0 0 auto}
+.top-actions .icon-btn{width:38px;height:38px;flex:0 0 auto;font-size:19px}
+.top .logo{flex:0 0 auto;width:39px;height:39px;font-size:21px}
+.sync-note{min-width:0;gap:10px}
+.sync-note span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-note button{white-space:nowrap;flex:0 0 auto}
+.panel,.natural-panel{max-width:100%;min-width:0}
+.natural-input{font-size:16px}
+.natural-foot button{font-size:14px}
+.calendar-month{overflow:hidden}
+.month-head{padding:14px 12px 12px}
+.month-head strong{font-size:21px;white-space:nowrap;letter-spacing:-.7px;flex:0 1 auto}
+.month-controls{flex:0 0 auto;gap:5px}
+.month-controls button{min-width:33px;height:35px;padding:0 7px}
+.weekdays{padding:0 8px 5px;color:#64738a;font-size:13px}
+.grid{padding:0 8px 12px;gap:2px;min-width:0}
+.day{min-width:0;min-height:62px;padding:5px 1px 4px;gap:3px;overflow:hidden;border-radius:9px}
+.day .number{font-size:16px;width:27px;height:27px;flex:0 0 auto}
+.day-events{overflow:hidden;min-width:0;gap:2px}
+.mark{display:block;max-width:100%;font-size:10px;line-height:1.35;padding:2px 3px;border-radius:4px;text-align:center;font-weight:850}
+.more{font-size:10px;font-weight:850;color:#5b6b83;text-align:center}
+.agenda-jump{display:flex;justify-content:center;align-items:center;gap:7px;width:calc(100% - 22px);margin:0 11px 12px;background:#eef5ff;border-radius:12px;color:#1767c6;font-size:14px;font-weight:850;min-height:44px}
+.agenda-jump span{font-size:20px}
+.section-title{flex-wrap:wrap;gap:6px;margin:19px 3px 10px}
+.section-title h2{font-size:19px;min-width:0;overflow-wrap:anywhere}
+.section-title small{font-size:13px;white-space:nowrap;color:#65758c}
+.event-row{padding:15px 13px;align-items:center}
+.event-name{font-size:16px;line-height:1.5}
+.event-meta{font-size:13px;color:#667890}
+.agenda-day{padding:14px 14px 9px}
+.agenda-day strong{font-size:16px}
+.agenda-day span{font-size:13px;color:#677a91}
+.agenda-event{padding:12px 10px;gap:12px}
+.agenda-event-copy strong{font-size:16px;line-height:1.5;color:#1c2b41}
+.agenda-event-copy small{font-size:13px;line-height:1.5;color:#596d85}
+.agenda-event .event-marker{height:39px;width:5px}
+@media(max-width:380px){
+  .wrap{padding-left:10px;padding-right:10px}
+  .top-brand{font-size:17px}
+  .top-brand .mini{font-size:10px}
+  .top-actions{gap:5px}
+  .top-actions .icon-btn{width:34px;height:34px}
+  .month-head strong{font-size:19px}
+  .month-controls button{min-width:31px;height:34px;padding:0 5px}
+  .day{min-height:59px;padding:4px 1px 3px}
+  .day .number{font-size:15px;width:26px;height:26px}
+  .mark{font-size:9px;padding:2px}
+  .more{font-size:9px}
+}
+
+
+/* Calendar opt-in daily briefing and the full Monday-Sunday list */
+.push-panel{background:#fff;border:1px solid #dce6f3;border-radius:18px;padding:14px 15px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0 8px}
+.push-intro{flex:1 1 190px;min-width:0}
+.push-intro strong{display:block;font-weight:900;color:#18293f;font-size:15px;line-height:1.4}
+.push-intro small{display:block;color:#728198;font-size:11px;line-height:1.7;margin-top:4px}
+.push-panel>button{flex:0 0 auto;background:#1676ef;color:#fff;padding:11px 13px;border-radius:11px;font-size:13px;font-weight:850;white-space:nowrap}
+.push-panel>button:disabled{opacity:.55}
+.push-feedback{flex:1 0 100%;font-weight:750;font-size:12px;line-height:1.5;color:#306995;margin:1px 0 0}
+.week-summary{background:#fff;border:1px solid #e3eaf5;border-radius:19px;padding:0 5px;margin:15px 0 17px;box-shadow:0 7px 18px rgba(25,61,105,.035)}
+.week-summary-head{display:flex;justify-content:space-between;align-items:center;gap:9px;padding:15px 10px 11px}
+.week-summary-head h2{font-size:17px;font-weight:900;letter-spacing:-.5px;margin:0;white-space:nowrap}
+.week-summary-head>span{color:#65809e;font-size:12px;font-weight:800;white-space:nowrap}
+.week-summary-list{padding:0 4px 6px}
+.week-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;min-width:0;padding:10px 7px;border-top:1px solid #f1f3f8}
+.week-date{width:50px;flex:0 0 50px;color:#3b6085;font-size:12px;font-weight:850}
+.week-row .event-marker{height:37px;flex:0 0 5px}
+.week-detail{display:block;min-width:0;flex:1}
+.week-detail strong{display:block;overflow-wrap:anywhere;font-size:15px;font-weight:850;line-height:1.45;color:#203149}
+.week-detail small{display:block;font-size:12px;color:#71849a;line-height:1.45;margin-top:4px}
+.week-empty{padding:20px 12px;color:#71849a;font-size:13px;text-align:center}
+@media(max-width:380px){.push-panel{padding:13px 10px;gap:8px}.push-intro{flex-basis:175px}.push-intro strong{font-size:14px}.push-panel>button{font-size:12px;padding:9px}.week-summary-head h2{font-size:15px}.week-summary-head>span{font-size:11px}.week-date{width:43px;flex-basis:43px}.week-detail strong{font-size:14px}}
+
+/* 일요일 시작 달력: 일·공휴일 빨강, 토 파랑, 평일 검정 */
+.weekdays span{color:#191f28}.weekdays span:first-child{color:#eb5362}.weekdays span:last-child{color:#277bdc}
+.day .number{color:#191f28}.day.sunday .number,.day.holiday .number{color:#eb5362}.day.saturday .number{color:#277bdc}
+.day.outside .number{opacity:.35}
+.day.today .number,.day.today.sunday .number,.day.today.saturday .number{color:#fff}
+.holiday-name{display:block;font-size:9px;font-weight:800;color:#eb5362;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3}
+
+.cal-icon{display:inline-block;vertical-align:-0.2em}.week-summary-head h2{display:flex;align-items:center;gap:6px}
+
+/* Push diagnostics: server-verified registration plus on-device test. */
+.push-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex:0 0 auto}
+.push-actions button{font-size:12px;font-weight:850;padding:10px 11px;border-radius:11px;white-space:nowrap;min-height:40px}
+.push-actions #push-toggle{background:#1676ef;color:#fff}
+.push-actions #push-test{background:#e8f3ff;color:#155fc2;border:1px solid #bedbff}
+.push-actions button:disabled{opacity:.55}
+.push-actions button[hidden]{display:none}
+.push-feedback:empty{display:none}
+@media(max-width:380px){.push-actions{width:100%}.push-actions button{flex:1;min-width:0}}

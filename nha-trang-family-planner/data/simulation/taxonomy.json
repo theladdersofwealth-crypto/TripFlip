@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "themes": [
+    {
+      "id": "relax",
+      "label": "휴양",
+      "subthemes": [
+        {
+          "id": "resort",
+          "label": "리조트·휴식"
+        },
+        {
+          "id": "spa",
+          "label": "스파·힐링"
+        },
+        {
+          "id": "beach",
+          "label": "해변"
+        }
+      ]
+    },
+    {
+      "id": "sightseeing",
+      "label": "관광",
+      "subthemes": [
+        {
+          "id": "city",
+          "label": "시내 관광"
+        },
+        {
+          "id": "culture",
+          "label": "역사·문화"
+        },
+        {
+          "id": "nature",
+          "label": "자연·전망"
+        }
+      ]
+    },
+    {
+      "id": "kids",
+      "label": "키즈체험",
+      "subthemes": [
+        {
+          "id": "animals",
+          "label": "동물·농장"
+        },
+        {
+          "id": "museum",
+          "label": "박물관·교육"
+        },
+        {
+          "id": "themepark",
+          "label": "테마파크"
+        },
+        {
+          "id": "creative",
+          "label": "공예·체험"
+        }
+      ]
+    },
+    {
+      "id": "shopping",
+      "label": "쇼핑",
+      "subthemes": [
+        {
+          "id": "mall",
+          "label": "쇼핑몰·마트"
+        },
+        {
+          "id": "market",
+          "label": "시장"
+        }
+      ]
+    },
+    {
+      "id": "marine",
+      "label": "해양체험",
+      "subthemes": [
+        {
+          "id": "island",
+          "label": "섬·보트"
+        },
+        {
+          "id": "snorkeling",
+          "label": "스노클링"
+        }
+      ]
+    },
+    {
+      "id": "night",
+      "label": "야간활동",
+      "subthemes": [
+        {
+          "id": "night_market",
+          "label": "야시장"
+        },
+        {
+          "id": "performance",
+          "label": "공연·야경"
+        }
+      ]
+    },
+    {
+      "id": "dining",
+      "label": "식사·카페",
+      "subthemes": [
+        {
+          "id": "restaurant",
+          "label": "식당"
+        },
+        {
+          "id": "cafe",
+          "label": "카페"
+        }
+      ]
+    }
+  ],
+  "cuisines": [
+    {
+      "id": "vietnamese",
+      "label": "베트남식"
+    },
+    {
+      "id": "seafood",
+      "label": "해산물"
+    },
+    {
+      "id": "meat_bbq",
+      "label": "고기·BBQ"
+    },
+    {
+      "id": "asian",
+      "label": "아시아식"
+    },
+    {
+      "id": "western",
+      "label": "양식"
+    },
+    {
+      "id": "cafe_dessert",
+      "label": "카페·디저트"
+    }
+  ],
+  "source": "legacy_labels_normalized"
+}

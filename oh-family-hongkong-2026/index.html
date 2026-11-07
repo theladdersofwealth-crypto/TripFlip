@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07101d">
+  <title>OH Family · Hong Kong 2026</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <link rel="stylesheet" href="/v3.css">
+</head>
+<body>
+<header>
+  <b>HK</b>
+  <span>OH FAMILY <small>HONG KONG · MACAU 2026</small></span>
+  <div class="head-actions"><button id="edit">편집</button></div>
+</header>
+<main>
+  <section class="hero">
+    <div>
+      <small>PRIVATE FAMILY TRAVEL PLANNER</small>
+      <h1>기본 일정은 그대로.<br><em>현장에서는 다시 고른다.</em></h1>
+      <p>방문 지역 → 장소 → 순서를 직접 선택하면 지도·타임라인·동선이 즉시 다시 그려지는 가족여행 플래너.</p>
+      <div class="hero-actions"><button data-view="plan">방문지 선택</button><button class="secondary" data-view="map">지도 보기</button></div>
+    </div>
+    <aside>
+      <b>4박 6일</b>
+      <span>Ocean Park Marriott</span>
+      <span>ZE861 · 10/22 20:10</span>
+      <span>ZE862 · 10/27 00:05</span>
+    </aside>
+  </section>
+
+  <nav>
+    <button class="on" data-view="home">OVERVIEW</button>
+    <button data-view="plan">PLANNER</button>
+    <button data-view="map">MAP</button>
+    <button data-view="time">TIMELINE</button>
+    <button data-view="route">ROUTE</button>
+    <button data-view="ops">TRIP OPS</button>
+  </nav>
+
+  <section id="home" class="view on">
+    <div class="title"><h2>우리 일정</h2><p>확정본을 기본값으로 저장해두고, 날짜별로 현장 선택만 바꾼다.</p></div>
+    <div id="days" class="days"></div>
+    <div class="twocol">
+      <article><h3>출발 전 체크</h3><div id="checks"></div></article>
+      <article><h3>운영 원칙</h3><div id="rules"></div></article>
+    </div>
+  </section>
+
+  <section id="plan" class="view">
+    <div class="title"><h2>방문지역 · 장소 선택</h2><p>지역부터 켜고 끈 뒤 장소를 고른다. 선택 결과는 지도와 시간표에 즉시 반영.</p></div>
+    <div class="tabs" id="ptabs"></div>
+    <div class="planner">
+      <aside class="plan-side">
+        <div id="meta"></div>
+        <h4>1. 방문 지역</h4>
+        <div id="regions" class="chips"></div>
+        <div class="side-actions"><button id="add">＋ 장소 추가</button><button id="reset">이 날 기본값</button></div>
+      </aside>
+      <article class="plan-main">
+        <div class="filters"><button class="on" data-f="all">전체</button><button data-f="visit">관광</button><button data-f="meal">식사</button><button data-f="rest">휴식</button><button data-f="selected">선택됨</button></div>
+        <div id="places" class="places"></div>
+      </article>
+      <aside class="selected-side">
+        <h4>2. 오늘 선택한 동선 <i id="count"></i></h4>
+        <div id="selected"></div>
+        <button class="map-cta" data-view="map">지도에서 확인 →</button>
+      </aside>
+    </div>
+  </section>
+
+  <section id="map" class="view">
+    <div class="title"><h2>실제 지도 기반 동선</h2><p>선택 장소는 컬러, 후보는 회색. 마커를 눌러 방문 여부를 바로 바꿀 수 있다.</p></div>
+    <div class="tabs" id="mtabs"></div>
+    <div class="map-layout">
+      <aside class="map-summary">
+        <div id="mapMeta"></div>
+        <h4>방문 지역</h4><div id="mapRegions" class="chips"></div>
+        <h4>선택 장소</h4><div id="mapSelected" class="map-selected"></div>
+        <p class="map-note">※ 지도 선은 실제 도로 내비 경로가 아니라 방문 순서를 빠르게 보는 연결선이야.</p>
+      </aside>
+      <div class="map-card"><div id="leafletMap"></div><div class="map-legend"><span><i class="sel-dot"></i>선택</span><span><i class="cand-dot"></i>후보</span><span><i class="anchor-dot"></i>고정 거점</span></div></div>
+    </div>
+  </section>
+
+  <section id="time" class="view">
+    <div class="title"><h2>실전 타임라인</h2><p>고정 이동 + 현재 선택한 장소를 시간순으로 합친다.</p></div>
+    <div class="tabs" id="ttabs"></div><div id="timeline" class="timeline"></div>
+  </section>
+
+  <section id="route" class="view">
+    <div class="title"><h2>동선 보드</h2><p>선택한 방문 순서를 한 줄로 빠르게 확인.</p></div>
+    <div class="tabs" id="rtabs"></div><div id="routebox" class="route"></div>
+  </section>
+
+  <section id="ops" class="view">
+    <div class="title"><h2>여행 운영 정보</h2><p>가족끼리 공유해도 되는 실전 정보만.</p></div>
+    <div id="opscards" class="ops"></div>
+  </section>
+</main>
+
+<dialog id="dlg"><form id="form">
+  <h3>장소 편집</h3><input id="pid" type="hidden">
+  <label>장소명<input id="pn" required></label>
+  <label>지역<input id="pr" required></label>
+  <div class="form2"><label>시간<input id="pt"></label><label>체류<input id="pd"></label></div>
+  <div class="form2"><label>종류<select id="py"><option value="visit">관광</option><option value="meal">식사</option><option value="rest">휴식</option></select></label><label>아이콘<input id="pi"></label></div>
+  <label>메모<textarea id="pm"></textarea></label>
+  <details><summary>지도 위치 직접 지정</summary><div class="form2"><label>위도<input id="plat" inputmode="decimal"></label><label>경도<input id="plng" inputmode="decimal"></label></div></details>
+  <div class="dialog-actions"><button type="button" id="cancel">취소</button><button>저장</button></div>
+</form></dialog>
+<div id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="/v3.js"></script>
+</body></html>
