@@ -1,0 +1,16 @@
+# 가격 수집 전용 Worker (무료 플랜 안에서만). 앱 Worker "tripflip"과 분리.
+name = "tripflip-collector"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+# 무료 플랜: 크론 최대 5개, 호출당 외부 요청 50회 → 숙소는 5분마다 40건씩 나눠 수집
+[triggers]
+crons = [
+  "0 0,6,12,18 * * *", # 항공권 (09·15·21·03시 KST)
+  "*/5 0-2 * * *"      # 숙소 (09:30 KST부터 5분 간격 묶음)
+]
+
+[[kv_namespaces]]
+binding = "DATA"
+id = "__KV_ID__"
