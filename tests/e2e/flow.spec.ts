@@ -93,19 +93,20 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "알차게 · 3곳", exact: true }).click();
-  await page.getByRole("button", { name: /^반영하기/ }).click();
-  await expect(page.getByText("추천 정확도 80%", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /^3단계로 더 정확하게/ }).click();
+  // 2단계가 끝나면 같은 팝업에서 3단계로 바로 이어진다.
+  await page.getByRole("button", { name: /^3단계 이어서 입력/ }).click();
+  await expect(page.getByRole("dialog", { name: "3단계 · 예산·숙소" })).toBeVisible();
+  await expect(page.getByText("추천 정확도 80%", { exact: true })).toBeAttached();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
   await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
   await page.getByRole("button", { name: "저렴", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("가성비");
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("3");
-  await page.getByRole("button", { name: /^반영하기/ }).click();
-  await expect(page.getByText("추천 정확도 100%", { exact: true })).toBeVisible();
+  const findNow = page.getByRole("button", { name: "여행지 찾기 · 정확도 100%" });
+  await expect(findNow).toBeVisible();
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("family-mobile.png"), fullPage: true });
-  await page.getByRole("button", { name: /^여행지 추천받기/ }).click();
+  await findNow.click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("성인 4명 · 자녀 2명", { exact: true })).toBeVisible();
   const query = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}"));
@@ -188,8 +189,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "보통 · 2곳", exact: true }).click();
-  await page.getByRole("button", { name: /^반영하기/ }).click();
-  await page.getByRole("button", { name: /^여행지 추천받기/ }).click();
+  await page.getByRole("button", { name: /이대로 여행지 찾기/ }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.goto("/r/NT");
   await expect(page.locator(".day-card")).toHaveCount(4);
