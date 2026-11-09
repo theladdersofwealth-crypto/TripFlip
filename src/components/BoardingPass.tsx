@@ -13,10 +13,10 @@ export function BoardingPass({ q, members, days, interests }: { q: RegionQuery; 
   const adults = members.length - kids.length;
   const okDays = Number.isFinite(days) && days > 0;
   const slots: Slot[] = [
-    { n: "①", k: "PASSENGER · 누구와", v: `${members.length}명`, sub: kids.length ? `성인 ${adults} · 자녀 ${kids.length}` : `성인 ${adults}`, target: "step-who" },
-    { n: "②", k: "DATE · 언제", v: okDays ? `${days - 1}박 ${days}일` : "날짜 선택", sub: okDays ? `${fmtDate(q.startDate)} ~ ${fmtDate(q.endDate)}` : "출발·귀국일", target: "step-when" },
-    { n: "③", k: "VIBE · 여행취향", v: interests.slice(0, 2).join(" + ") + (interests.length > 2 ? ` 외 ${interests.length - 2}` : ""), sub: `하루 ${q.perDay}곳`, target: "step-vibe" },
-    { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "step-budget" },
+    { n: "①", k: "PASSENGER · 누구와", v: `${members.length}명`, sub: kids.length ? `성인 ${adults} · 자녀 ${kids.length}` : `성인 ${adults}`, target: "step-1" },
+    { n: "②", k: "DATE · 언제", v: okDays ? `${days - 1}박 ${days}일` : "날짜 선택", sub: okDays ? `${fmtDate(q.startDate)} ~ ${fmtDate(q.endDate)}` : "출발·귀국일", target: "step-1" },
+    { n: "③", k: "VIBE · 여행취향", v: interests.slice(0, 2).join(" + ") + (interests.length > 2 ? ` 외 ${interests.length - 2}` : ""), sub: `하루 ${q.perDay}곳`, target: "step-1" },
+    { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "step-3" },
   ];
   return (
     <section className="boarding-pass" aria-label="여행 조건 요약">
