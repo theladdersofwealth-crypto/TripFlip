@@ -10,6 +10,7 @@ async function noHorizontalOverflow(page: Page) {
 test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
+  await page.getByRole("button", { name: /PASSENGER/ }).click();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByRole("button", { name: "+ 자녀", exact: true }).click();
   const submit = page.getByRole("button", { name: /^여행지 추천받기/ });
@@ -17,8 +18,11 @@ test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", 
   await expect(page.getByRole("alert").filter({ hasText: "자녀의 만 나이" })).toBeVisible();
   await page.getByLabel("3번째 구성원 나이", { exact: true }).fill("21");
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
+  await page.getByRole("button", { name: "완료", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(submit).toBeEnabled();
 
+  await page.getByRole("button", { name: /DATE/ }).click();
   await page.getByRole("button", { name: "가능한 기간이 있어요", exact: true }).click();
   await page.getByLabel("여행 가능 시작일", { exact: true }).fill("2027-05-07");
   await page.getByLabel("여행 가능 마지막 날", { exact: true }).fill("2027-05-20");
@@ -26,6 +30,10 @@ test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", 
   await page.getByLabel(/기준 일정 ·/).selectOption("2027-05-10");
   await expect(page.getByText("기준 일정 10박 11일", { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
+  // 휴대폰 뒤로가기로도 팝업이 닫힌다.
+  await page.goBack();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page).toHaveURL(/\/$/);
   await submit.click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("성인 3명", { exact: true })).toBeVisible();
@@ -49,8 +57,11 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   });
 
   await page.goto("/");
+  await page.getByRole("button", { name: /DATE/ }).click();
   await page.getByLabel("출발일", { exact: true }).fill("2027-05-07");
   await page.getByLabel("귀국일", { exact: true }).fill("2027-05-17");
+  await page.getByRole("button", { name: "완료", exact: true }).click();
+  await page.getByRole("button", { name: /PASSENGER/ }).click();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByLabel("2번째 구성원 관계", { exact: true }).selectOption("spouse");
   await page.getByRole("button", { name: "+ 자녀", exact: true }).click();
@@ -72,25 +83,25 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await memberCards.nth(4).getByLabel("긴 도보·계단이 부담스러워요", { exact: true }).check();
 
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
-  const travelStyle = page.locator("section").filter({ has: page.getByRole("heading", { name: "어떤 여행인가요?", exact: true }) });
+  await page.getByRole("button", { name: "완료", exact: true }).click();
+  await page.getByRole("button", { name: /VIBE/ }).click();
+  const travelStyle = page.getByRole("dialog");
   await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
   await travelStyle.getByRole("button", { name: "액티비티", exact: true }).click();
+  await page.getByRole("button", { name: "완료", exact: true }).click();
   await expect(page.getByText("추천 정확도 60%", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
-  await expect(page.getByText("추천 정확도 80%", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "알차게 · 3곳", exact: true }).click();
-  // 이전 단계로 돌아가도 1단계 입력이 그대로 남아 있어야 한다.
-  await page.getByRole("button", { name: "이전 단계", exact: true }).click();
-  await expect(travelStyle.getByRole("button", { name: "액티비티", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
-  await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: /^반영하기/ }).click();
+  await expect(page.getByText("추천 정확도 80%", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /^3단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
   await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
   await page.getByRole("button", { name: "저렴", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("가성비");
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("3");
+  await page.getByRole("button", { name: /^반영하기/ }).click();
   await expect(page.getByText("추천 정확도 100%", { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("family-mobile.png"), fullPage: true });
@@ -171,10 +182,13 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
+  await page.getByRole("button", { name: /DATE/ }).click();
   await page.getByLabel("출발일", { exact: true }).fill("2027-06-01");
   await page.getByLabel("귀국일", { exact: true }).fill("2027-06-04");
+  await page.getByRole("button", { name: "완료", exact: true }).click();
   await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "보통 · 2곳", exact: true }).click();
+  await page.getByRole("button", { name: /^반영하기/ }).click();
   await page.getByRole("button", { name: /^여행지 추천받기/ }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.goto("/r/NT");
@@ -205,9 +219,10 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
 test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼쳐서 확인한다", async ({ page }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "구성원 설정", exact: true })).toBeVisible();
-  await expect(page.locator(".party-member")).toHaveCount(0);
-  await expect(page.locator("#step-2, #step-3")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /PASSENGER/ })).toBeVisible();
+  // 입력은 아래로 늘어놓지 않고 팝업으로만 연다.
+  await expect(page.getByRole("button", { name: "구성원 설정", exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("출발일", { exact: true })).toHaveCount(0);
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("simple-home-mobile.png"), fullPage: true });
   await page.goto("/r/NT");

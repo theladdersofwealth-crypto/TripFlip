@@ -5,6 +5,7 @@ import { Icon } from "@/components/Icon";
 import { CompanionChooser } from "@/components/CompanionChooser";
 import { DateEditor } from "@/components/DateEditor";
 import { BoardingPass } from "@/components/BoardingPass";
+import { Sheet } from "@/components/ui";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept } from "@/data/regionsV1";
 import { loadQuery, saveQuery } from "@/lib/flow";
@@ -21,22 +22,23 @@ const STAYS: StayTier[] = ["가성비", "가심비", "프리미엄", "하이엔�
 const FLIGHTS: { v: number | null; label: string }[] = [{ v: 5, label: "5시간" }, { v: 8, label: "8시간" }, { v: 12, label: "12시간" }, { v: null, label: "상관없음" }];
 
 const STEP_PCT = [60, 20, 20];
-const STEP_NAMES = ["기본", "일정 스타일", "예산·숙소"];
+type Pop = "who" | "when" | "vibe" | "s2" | "s3";
+const POP_TITLE: Record<Pop, string> = { who: "누구랑 가나요?", when: "여행 날짜", vibe: "어떤 여행인가요?", s2: "2단계 · 일정 스타일", s3: "3단계 · 예산·숙소" };
 
 export default function Home() {
   const router = useRouter();
   const [q, setQ] = useState<RegionQuery | null>(null);
   const [pending, startTransition] = useTransition();
   const [flying, setFlying] = useState(false);
-  const [stage, setStage] = useState<1 | 2 | 3>(1);
-  const [reached, setReached] = useState<1 | 2 | 3>(1);
+  const [pop, setPop] = useState<Pop | null>(null);
+  const [done, setDone] = useState({ s2: false, s3: false });
   useEffect(() => {
     const saved = loadQuery();
     setQ(normalizeParty({ ...saved, interests: saved.interests?.length ? saved.interests : [saved.main, ...saved.subs] }));
   }, []);
   useEffect(() => {
-    // 휴대폰 뒤로가기(제스처)도 이전 단계로 가게
-    const onPop = (e: PopStateEvent) => { setStage((e.state?.tfStage as 1 | 2 | 3) ?? 1); window.scrollTo({ top: 0 }); };
+    // 팝업은 휴대폰 뒤로가기(제스처)로도 닫히게
+    const onPop = (e: PopStateEvent) => setPop((e.state?.tfPop as Pop) ?? null);
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
@@ -50,17 +52,16 @@ export default function Home() {
   const partyError = !hasAdult ? "성인 구성원을 한 명 이상 입력해 주세요." : members.some((m) => m.relationship === "child" && m.age === null) ? "자녀의 만 나이를 입력해 주세요." : null;
   const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "전체 예산은 0보다 큰 금액으로 입력해 주세요." : null;
   const error = dateError || partyError || budgetError;
-  const accuracy = STEP_PCT.slice(0, reached).reduce((a, b) => a + b, 0);
+  const accuracy = STEP_PCT[0] + (done.s2 ? STEP_PCT[1] : 0) + (done.s3 ? STEP_PCT[2] : 0);
   const patch = (next: Partial<RegionQuery>) => setQ({ ...q, ...next });
-  const stage1Error = dateError || partyError;
-  const moveTo = (to: 1 | 2 | 3) => {
-    const n = Math.min(to, reached + 1) as 1 | 2 | 3; // 단계는 건너뛰지 않음
-    if (n > stage && stage === 1 && stage1Error) return;
-    if (n > stage) history.pushState({ ...history.state, tfStage: n }, "");
-    setStage(n);
-    if (n > reached) setReached(n);
-    window.scrollTo({ top: 0 });
+  const openPop = (p: Pop) => { history.pushState({ ...history.state, tfPop: p }, ""); setPop(p); };
+  const closePop = () => { if (history.state?.tfPop) history.back(); else setPop(null); };
+  const finishPop = () => {
+    if (pop === "s2" || pop === "s3") setDone({ ...done, [pop]: true });
+    closePop();
   };
+  const popError = pop === "who" ? partyError : pop === "when" ? dateError : pop === "s3" ? budgetError : null;
+  const nextStep: Pop | null = !done.s2 ? "s2" : !done.s3 ? "s3" : null;
   const toggleInterest = (c: Concept) => {
     const next = interests.includes(c) ? interests.filter((s) => s !== c) : [...interests, c];
     if (!next.length) return;
@@ -75,40 +76,39 @@ export default function Home() {
   };
   return (
     <main className="container page discovery-form" style={{ maxWidth: 560 }}>
-      {stage > 1 && <button type="button" className="back-btn" onClick={() => history.back()}><Icon name="back" />이전 단계</button>}
-      {stage === 1 && <>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
-      <p className="small muted form-intro">1단계만 해도 추천돼요. 2·3단계를 더하면 더 정확해져요.</p>
-      <BoardingPass q={q} members={members} days={days} interests={interests} onSlot={(t) => moveTo(t === "step-3" ? 3 : 1)} />
-      </>}
-      <div className="stepper" role="list" aria-label="입력 단계">{STEP_NAMES.map((name, i) => <button key={name} type="button" role="listitem" className={`stepper-dot ${stage === i + 1 ? "on" : ""} ${reached > i ? "reached" : ""}`} aria-current={stage === i + 1 ? "step" : undefined} disabled={i + 1 > reached} onClick={() => moveTo((i + 1) as 1 | 2 | 3)}><b>{i + 1}</b>{name}</button>)}</div>
+      <p className="small muted form-intro">칸을 눌러 바꿔요. 1단계만 해도 추천되고, 2·3단계를 더하면 더 정확해져요.</p>
+      <BoardingPass q={q} members={members} days={days} interests={interests} hint="칸을 누르면 바꿀 수 있어요." onSlot={(t) => openPop(t as Pop)} />
       <div className="accuracy" aria-label={`추천 정확도 ${accuracy}%`}>
         <div className="accuracy-head"><b>추천 정확도 {accuracy}%</b><span className="xs muted">{accuracy < 100 ? "단계를 더할수록 더 정확해져요" : "모든 단계 반영 완료"}</span></div>
         <div className="accuracy-bar"><span style={{ width: `${accuracy}%` }} /></div>
       </div>
-      {stage === 1 && <section className="q-block step-card" id="step-1">
-        <span className="step-badge">1단계 · 기본 · 정확도 {STEP_PCT[0]}%</span>
-        <p className="xs muted">이것만 해도 바로 추천받을 수 있어요.</p>
-        <h2>누구랑 가나요?</h2>
+      <div className="step-rows">
+        <div className="step-row done"><b>1</b><span>기본 · 누구와·언제·경험</span><em>✓ {STEP_PCT[0]}%</em></div>
+        <button type="button" className={`step-row ${done.s2 ? "done" : ""}`} onClick={() => openPop("s2")}><b>2</b><span>일정 스타일 · 비행시간·하루 강도</span><em>{done.s2 ? "✓ 반영" : `+${STEP_PCT[1]}%`}</em></button>
+        <button type="button" className={`step-row ${done.s3 ? "done" : ""}`} onClick={() => openPop("s3")}><b>3</b><span>예산·숙소 · 예산·숙소·물가·객실</span><em>{done.s3 ? "✓ 반영" : `+${STEP_PCT[2]}%`}</em></button>
+      </div>
+      {pop && <Sheet open onClose={closePop} title={POP_TITLE[pop]}>
+        <div className="pop-body">
+          {pop === "who" && <>
         <CompanionChooser members={members} error={partyError} onChange={(next) => setQ(normalizeParty({ ...q, members: next, ...(next.length !== members.length ? { roomCount: null } : {}) }))} />
+          </>}
+          {pop === "when" && <>
         <DateEditor query={q} onChange={setQ} />
         {dateError ? <p className="small form-error" role="alert">{dateError}</p> : <p className="small muted">기준 일정 {days - 1}박 {days}일</p>}
-        <h2>어떤 여행인가요?</h2>
+          </>}
+          {pop === "vibe" && <>
         <span className="label">원하는 경험 · 여러 개 선택</span>
         <div className="chips">{CONCEPTS.map((c) => <button key={c} type="button" className={`toggle-chip ${interests.includes(c) ? "on" : ""}`} aria-pressed={interests.includes(c)} onClick={() => toggleInterest(c)}>{c}</button>)}</div>
-      </section>}
-      {stage === 2 && <section className="q-block step-card" id="step-2">
-        <span className="step-badge">2단계 · 일정 스타일 · +{STEP_PCT[1]}%</span>
-        <h2>일정은 어떻게 짤까요?</h2>
+          </>}
+          {pop === "s2" && <>
         <span className="label">희망 비행시간 (인천 출발 편도, 이내)</span>
         <div className="seg sm">{FLIGHTS.map((f) => <button key={f.label} type="button" className={(q.maxFlightHours ?? null) === f.v ? "on" : ""} aria-pressed={(q.maxFlightHours ?? null) === f.v} onClick={() => patch({ maxFlightHours: f.v })}>{f.label}</button>)}</div>
         <p className="xs muted">넘는 곳은 빼지 않고 순위 맨 뒤로 보내요.</p>
         <span className="label">하루 관광 강도</span>
         <div className="seg sm">{INTENSITY.map((it) => <button key={it.v} type="button" className={q.perDay === it.v ? "on" : ""} aria-pressed={q.perDay === it.v} onClick={() => patch({ perDay: it.v })}>{it.label}</button>)}</div>
-      </section>}
-      {stage === 3 && <section className="q-block step-card" id="step-3">
-        <span className="step-badge">3단계 · 예산·숙소 · +{STEP_PCT[2]}%</span>
-        <h2>예산과 숙소는요?</h2>
+          </>}
+          {pop === "s3" && <>
         <span className="label">일행 전체 여행 예산</span>
         <div className="chips">
           <button type="button" className={`toggle-chip ${q.totalBudgetKrw == null ? "on" : ""}`} aria-pressed={q.totalBudgetKrw == null} onClick={() => patch({ totalBudgetKrw: null })}>아직 미정</button>
@@ -122,9 +122,12 @@ export default function Home() {
         <label className="field"><span className="label">검색할 객실 수</span><select className="input" aria-label="검색할 객실 수" value={q.roomCount ?? ""} onChange={(e) => patch({ roomCount: e.target.value ? Number(e.target.value) : null })}><option value="">미정 · {rooms.rooms}객실로 추정</option>{Array.from({ length: 20 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}객실</option>)}</select></label>
         <label className="check-row small"><input type="checkbox" checked={q.pet} onChange={(e) => patch({ pet: e.target.checked })} />반려동물 동반</label>
         <p className="xs muted">객실 정원·아동 요금·반려동물 정책은 숙소마다 달라요.</p>
-      </section>}
+          </>}
+          <button type="button" className="btn btn-primary btn-block" disabled={!!popError} onClick={finishPop}>{pop === "s2" || pop === "s3" ? `반영하기 (+${STEP_PCT[pop === "s2" ? 1 : 2]}%)` : "완료"}</button>
+        </div>
+      </Sheet>}
       <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
-        {stage < 3 && <button type="button" className="btn btn-block next-step" disabled={!!stage1Error} onClick={() => moveTo((stage + 1) as 2 | 3)}>{stage + 1}단계로 더 정확하게 (+{STEP_PCT[stage]}%) →</button>}
+        {nextStep && <button type="button" className="btn btn-block next-step" onClick={() => openPop(nextStep)}>{nextStep === "s2" ? 2 : 3}단계로 더 정확하게 (+{STEP_PCT[nextStep === "s2" ? 1 : 2]}%) →</button>}
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 정확도 ${accuracy}%`}</button>
       </div>
       {flying && (
