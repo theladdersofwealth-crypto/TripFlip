@@ -5,7 +5,6 @@ import { Icon } from "@/components/Icon";
 import { CompanionChooser } from "@/components/CompanionChooser";
 import { DateEditor } from "@/components/DateEditor";
 import { BoardingPass } from "@/components/BoardingPass";
-import { Sheet } from "@/components/ui";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept } from "@/data/regionsV1";
 import { loadQuery, saveQuery } from "@/lib/flow";
@@ -60,6 +59,20 @@ export default function Home() {
     if (pop === "s2" || pop === "s3") setDone({ ...done, [pop]: true });
     closePop();
   };
+  // 2단계 반영 후 같은 팝업에서 바로 3단계로 이어감
+  const continueToS3 = () => {
+    setDone({ ...done, s2: true });
+    history.replaceState({ ...history.state, tfPop: "s3" }, "");
+    setPop("s3");
+  };
+  // 팝업에서 바로 여행지 찾기
+  const searchNow = () => {
+    if (error) return;
+    if (pop === "s2" || pop === "s3") setDone({ ...done, [pop]: true });
+    history.replaceState({ ...history.state, tfPop: null }, "");
+    setPop(null);
+    go();
+  };
   const popError = pop === "who" ? partyError : pop === "when" ? dateError : pop === "s3" ? budgetError : null;
   const nextStep: Pop | null = !done.s2 ? "s2" : !done.s3 ? "s3" : null;
   const toggleInterest = (c: Concept) => {
@@ -88,7 +101,9 @@ export default function Home() {
         <button type="button" className={`step-row ${done.s2 ? "done" : ""}`} onClick={() => openPop("s2")}><b>2</b><span>일정 스타일 · 비행시간·하루 강도</span><em>{done.s2 ? "✓ 반영" : `+${STEP_PCT[1]}%`}</em></button>
         <button type="button" className={`step-row ${done.s3 ? "done" : ""}`} onClick={() => openPop("s3")}><b>3</b><span>예산·숙소 · 예산·숙소·물가·객실</span><em>{done.s3 ? "✓ 반영" : `+${STEP_PCT[2]}%`}</em></button>
       </div>
-      {pop && <Sheet open onClose={closePop} title={POP_TITLE[pop]}>
+      {pop && <div className="center-modal-back" onClick={closePop}>
+        <div className="center-modal" role="dialog" aria-modal="true" aria-label={POP_TITLE[pop]} onClick={(e) => e.stopPropagation()}>
+        <div className="center-modal-head"><h3>{POP_TITLE[pop]}</h3><button type="button" className="icon-btn" onClick={closePop} aria-label="닫기"><Icon name="x" /></button></div>
         <div className="pop-body">
           {pop === "who" && <>
         <CompanionChooser members={members} error={partyError} onChange={(next) => setQ(normalizeParty({ ...q, members: next, ...(next.length !== members.length ? { roomCount: null } : {}) }))} />
@@ -123,9 +138,17 @@ export default function Home() {
         <label className="check-row small"><input type="checkbox" checked={q.pet} onChange={(e) => patch({ pet: e.target.checked })} />반려동물 동반</label>
         <p className="xs muted">객실 정원·아동 요금·반려동물 정책은 숙소마다 달라요.</p>
           </>}
-          <button type="button" className="btn btn-primary btn-block" disabled={!!popError} onClick={finishPop}>{pop === "s2" || pop === "s3" ? `반영하기 (+${STEP_PCT[pop === "s2" ? 1 : 2]}%)` : "완료"}</button>
         </div>
-      </Sheet>}
+        <div className="center-modal-foot">
+          {pop === "s2" && <>
+            <button type="button" className="btn btn-primary btn-block" onClick={continueToS3}>3단계 이어서 입력 (+{STEP_PCT[2]}%) →</button>
+            <button type="button" className="btn btn-block" disabled={!!error} onClick={searchNow}><Icon name="plane" /> 이대로 여행지 찾기 · 정확도 {STEP_PCT[0] + STEP_PCT[1] + (done.s3 ? STEP_PCT[2] : 0)}%</button>
+          </>}
+          {pop === "s3" && <button type="button" className="btn btn-primary btn-block" disabled={!!error} onClick={searchNow}><Icon name="plane" /> 여행지 찾기 · 정확도 {STEP_PCT[0] + (done.s2 ? STEP_PCT[1] : 0) + STEP_PCT[2]}%</button>}
+          {pop !== "s2" && pop !== "s3" && <button type="button" className="btn btn-primary btn-block" disabled={!!popError} onClick={finishPop}>완료</button>}
+        </div>
+        </div>
+      </div>}
       <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
         {nextStep && <button type="button" className="btn btn-block next-step" onClick={() => openPop(nextStep)}>{nextStep === "s2" ? 2 : 3}단계로 더 정확하게 (+{STEP_PCT[nextStep === "s2" ? 1 : 2]}%) →</button>}
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 정확도 ${accuracy}%`}</button>
