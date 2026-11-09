@@ -1,6 +1,7 @@
 "use client";
 import { useMemo } from "react";
 import Link from "next/link";
+import { BackButton } from "@/components/AppShell";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
 import { TEMP_GRADE } from "@/data/regionsV1";
@@ -34,6 +35,7 @@ export default function ResultsPage() {
   const who = [`성인 ${q.adults}명`, q.children.length ? `자녀 ${q.children.length}명` : "", q.pet ? "반려동물" : ""].filter(Boolean).join(" · ");
   return (
     <main className="container page" style={{ maxWidth: 560 }}>
+      <BackButton href="/" label="조건 선택" />
       <div className="between">
         <h1 style={{ fontSize: 24, fontWeight: 900 }}>추천 여행지</h1>
         <Link href="/" className="btn btn-sm">조건 수정</Link>

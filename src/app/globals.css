@@ -527,7 +527,11 @@ p { margin: 0; }
 .accuracy-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; color: var(--navy); }
 .accuracy-bar { margin-top: 8px; height: 8px; border-radius: 99px; background: #fff; overflow: hidden; }
 .accuracy-bar span { display: block; height: 100%; background: var(--teal); border-radius: 99px; transition: width .3s ease; }
-.step-toggle { all: unset; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; width: 100%; cursor: pointer; }
-.step-toggle:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; border-radius: 8px; }
-.step-cta { align-self: flex-start; font-size: 13px; font-weight: 800; color: var(--teal-dark); }
-.step-body { display: flex; flex-direction: column; gap: 12px; }
+.stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
+.stepper-dot { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-size: 12px; font-weight: 700; color: var(--muted); }
+.stepper-dot b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 99px; background: var(--line); color: #fff; font-size: 11px; }
+.stepper-dot.reached b { background: var(--teal); }
+.stepper-dot.on { border-color: var(--teal); color: var(--navy); background: var(--teal-50); }
+.stepper-dot:disabled { opacity: .6; }
+.discovery-form .back-btn { margin-top: 8px; }
+.next-step { margin-bottom: 8px; }
