@@ -8,7 +8,7 @@ type Slot = { n: string; k: string; v: string; sub: string; target: string };
 const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 // 보딩패스 시안: 지금 고른 조건 4가지를 한 장에 요약하고, 칸을 누르면 해당 입력으로 이동
-export function BoardingPass({ q, members, days, interests }: { q: RegionQuery; members: TravelMember[]; days: number; interests: string[] }) {
+export function BoardingPass({ q, members, days, interests, onSlot }: { q: RegionQuery; members: TravelMember[]; days: number; interests: string[]; onSlot?: (target: string) => void }) {
   const kids = members.filter((m) => m.relationship === "child");
   const adults = members.length - kids.length;
   const okDays = Number.isFinite(days) && days > 0;
@@ -30,7 +30,7 @@ export function BoardingPass({ q, members, days, interests }: { q: RegionQuery; 
       </div>
       <div className="ticket-slots-grid">
         {slots.map((s) => (
-          <button key={s.target} type="button" className="ticket-slot" onClick={() => go(s.target)}>
+          <button key={s.k} type="button" className="ticket-slot" onClick={() => (onSlot ? onSlot(s.target) : go(s.target))}>
             <span className="slot-k">{s.n} {s.k}</span>
             <span className="slot-v">{s.v}</span>
             <span className="slot-sub">{s.sub}</span>
