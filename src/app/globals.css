@@ -124,6 +124,9 @@ p { margin: 0; }
 
 .toggle-chip { min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 15px; font-weight: 600; color: var(--muted); }
 .toggle-chip.on { border-color: var(--navy); background: var(--navy); color: #fff; }
+.toggle-chip.also { border-color: var(--teal); background: var(--teal-50); color: var(--navy); }
+.toggle-chip.main { position: relative; padding-right: 10px; }
+.main-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 99px; background: var(--teal); color: #fff; font-size: 11px; font-weight: 800; vertical-align: 1px; }
 
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--soft); border-radius: 12px; padding: 4px; gap: 4px; }
 .seg button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; font-weight: 700; font-size: 15px; color: var(--muted); padding: 0 6px; }

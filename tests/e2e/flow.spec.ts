@@ -88,6 +88,9 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   const travelStyle = page.getByRole("dialog");
   await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
   await travelStyle.getByRole("button", { name: "액티비티", exact: true }).click();
+  // 처음 고른 테마에만 "메인" 표시
+  await expect(travelStyle.locator(".toggle-chip.main")).toHaveText(/^휴양메인$/);
+  await expect(travelStyle.locator(".main-tag")).toHaveCount(1);
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await expect(page.getByText("추천 정확도 60%", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);

@@ -114,7 +114,9 @@ export default function Home() {
           </>}
           {pop === "vibe" && <>
         <span className="label">원하는 경험 · 여러 개 선택</span>
-        <div className="chips">{CONCEPTS.map((c) => <button key={c} type="button" className={`toggle-chip ${interests.includes(c) ? "on" : ""}`} aria-pressed={interests.includes(c)} onClick={() => toggleInterest(c)}>{c}</button>)}</div>
+        <p className="xs muted">처음 고른 테마가 메인이에요. 메인을 바꾸려면 눌러서 끈 뒤 다시 고르세요.</p>
+        <div className="chips">{CONCEPTS.map((c) => { const on = interests.includes(c); const isMain = interests[0] === c; return <button key={c} type="button" aria-label={c} className={`toggle-chip ${on ? "on" : ""} ${on && !isMain ? "also" : ""} ${isMain ? "main" : ""}`} aria-pressed={on} onClick={() => toggleInterest(c)}>{c}{isMain && <span className="main-tag" aria-hidden>메인</span>}</button>; })}</div>
+        <p className="small"><b>메인 테마 · {interests[0]}</b>{interests.length > 1 && <span className="muted"> + {interests.slice(1).join(" · ")}</span>}</p>
           </>}
           {pop === "s2" && <>
         <span className="label">희망 비행시간 (인천 출발 편도, 이내)</span>

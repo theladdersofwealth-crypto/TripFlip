@@ -15,7 +15,7 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
   const slots: Slot[] = [
     { n: "①", k: "PASSENGER · 누구와", v: `${members.length}명`, sub: kids.length ? `성인 ${adults} · 자녀 ${kids.length}` : `성인 ${adults}`, target: "who" },
     { n: "②", k: "DATE · 언제", v: okDays ? `${days - 1}박 ${days}일` : "날짜 선택", sub: okDays ? `${fmtDate(q.startDate)} ~ ${fmtDate(q.endDate)}` : "출발·귀국일", target: "when" },
-    { n: "③", k: "VIBE · 여행취향", v: interests.slice(0, 2).join(" + ") + (interests.length > 2 ? ` 외 ${interests.length - 2}` : ""), sub: `하루 ${q.perDay}곳`, target: "vibe" },
+    { n: "③", k: "VIBE · 여행취향", v: `메인 ${interests[0] ?? "-"}`, sub: [interests.length > 1 ? `+ ${interests.slice(1, 3).join("·")}${interests.length > 3 ? ` 외 ${interests.length - 3}` : ""}` : null, `하루 ${q.perDay}곳`].filter(Boolean).join(" · "), target: "vibe" },
     { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "s3" },
   ];
   return (
