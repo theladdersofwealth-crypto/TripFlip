@@ -86,9 +86,15 @@ export function coreInterests(q: RegionQuery): Concept[] {
   return unique(explicit.length ? explicit : [q.main, ...q.subs]);
 }
 
-export function conceptWeight(concepts: Concept[], q: RegionQuery): 0 | 0.5 | 1 {
-  if (q.interests?.length || q.members?.some((m) => m.preferences.length))
-    return concepts.some((c) => coreInterests(q).includes(c)) ? 1 : 0;
+/** 메인 > 서브1 > 서브2 > 서브3… 순서 비중. 구성원 개인 취향만 해당하면 0.5 */
+export const ORDER_WEIGHT = [1, 0.8, 0.65, 0.5, 0.4];
+export function conceptWeight(concepts: Concept[], q: RegionQuery): number {
+  if (q.interests?.length || q.members?.some((m) => m.preferences.length)) {
+    const order = q.interests ?? [];
+    const idx = order.findIndex((c) => concepts.includes(c));
+    if (idx >= 0) return ORDER_WEIGHT[Math.min(idx, ORDER_WEIGHT.length - 1)];
+    return concepts.some((c) => coreInterests(q).includes(c)) ? 0.5 : 0;
+  }
   return concepts.includes(q.main) ? 1 : concepts.some((c) => q.subs.includes(c)) ? 0.5 : 0;
 }
 

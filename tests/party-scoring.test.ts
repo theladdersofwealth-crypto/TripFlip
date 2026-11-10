@@ -33,11 +33,13 @@ test("예전 자녀 나이대를 실제 나이로 만들어 저장하지 않는�
   assert.equal(m.childBand, "유아");
 });
 
-test("동등하게 선택한 핵심 취향은 같은 가중치로 반영된다", () => {
-  const q = query({ interests: ["휴양", "액티비티"] });
+test("메인 > 서브1 > 서브2 순서대로 가중치가 줄어든다", () => {
+  const q = query({ interests: ["휴양", "액티비티", "관광"] });
   assert.equal(conceptWeight(["휴양"], q), 1);
-  assert.equal(conceptWeight(["액티비티"], q), 1);
-  assert.equal(conceptWeight(["관광"], q), 0);
+  assert.equal(conceptWeight(["액티비티"], q), 0.8);
+  assert.equal(conceptWeight(["관광"], q), 0.65);
+  assert.equal(conceptWeight(["액티비티", "휴양"], q), 1, "여러 테마에 걸치면 가장 앞 순서로");
+  assert.equal(conceptWeight(["관광"], query({ interests: ["휴양", "액티비티"] })), 0);
   assert.equal(conceptWeight(["액티비티"], query()), 0.5, "예전 저장 조건은 기존 메인/서브 비율을 유지한다");
 });
 

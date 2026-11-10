@@ -75,10 +75,12 @@ export default function Home() {
   };
   const popError = pop === "who" ? partyError : pop === "when" ? dateError : pop === "s3" ? budgetError : null;
   const nextStep: Pop | null = !done.s2 ? "s2" : !done.s3 ? "s3" : null;
-  const toggleInterest = (c: Concept) => {
-    const next = interests.includes(c) ? interests.filter((s) => s !== c) : [...interests, c];
-    if (!next.length) return;
-    setQ({ ...q, interests: next, main: next[0], subs: next.slice(1) });
+  const setInterests = (next: Concept[]) => setQ({ ...q, interests: next, main: next[0], subs: next.slice(1) });
+  // 메인은 한 번 눌러 바꾸고, 서브는 누른 순서대로 1·2·3… (다시 누르면 빠지고 뒤 번호가 당겨짐)
+  const pickMain = (c: Concept) => setInterests([c, ...interests.slice(1).filter((s) => s !== c)]);
+  const toggleSub = (c: Concept) => {
+    const subs = interests.slice(1);
+    setInterests([interests[0], ...(subs.includes(c) ? subs.filter((s) => s !== c) : [...subs, c])]);
   };
   const go = () => {
     if (error || pending || flying) return;
@@ -113,10 +115,13 @@ export default function Home() {
         {dateError ? <p className="small form-error" role="alert">{dateError}</p> : <p className="small muted">기준 일정 {days - 1}박 {days}일</p>}
           </>}
           {pop === "vibe" && <>
-        <span className="label">원하는 경험 · 여러 개 선택</span>
-        <p className="xs muted">처음 고른 테마가 메인이에요. 메인을 바꾸려면 눌러서 끈 뒤 다시 고르세요.</p>
-        <div className="chips">{CONCEPTS.map((c) => { const on = interests.includes(c); const isMain = interests[0] === c; return <button key={c} type="button" aria-label={c} className={`toggle-chip ${on ? "on" : ""} ${on && !isMain ? "also" : ""} ${isMain ? "main" : ""}`} aria-pressed={on} onClick={() => toggleInterest(c)}>{c}{isMain && <span className="main-tag" aria-hidden>메인</span>}</button>; })}</div>
-        <p className="small"><b>메인 테마 · {interests[0]}</b>{interests.length > 1 && <span className="muted"> + {interests.slice(1).join(" · ")}</span>}</p>
+        <span className="label">메인 테마 · 1개</span>
+        <p className="xs muted">여행지를 고를 때 가장 크게 반영해요. 누르면 바로 바뀌어요.</p>
+        <div className="chips">{CONCEPTS.map((c) => { const isMain = interests[0] === c; return <button key={c} type="button" aria-label={`메인 ${c}`} className={`toggle-chip ${isMain ? "on main" : ""}`} aria-pressed={isMain} onClick={() => pickMain(c)}>{c}</button>; })}</div>
+        <span className="label" style={{ marginTop: 14, display: "block" }}>서브 테마 · 누른 순서대로</span>
+        <p className="xs muted">서브1 → 서브2 → 서브3 순서로 반영 비중이 줄어요. 다시 누르면 빠져요.</p>
+        <div className="chips">{CONCEPTS.filter((c) => c !== interests[0]).map((c) => { const n = interests.indexOf(c); return <button key={c} type="button" aria-label={c} className={`toggle-chip ${n > 0 ? "on also" : ""}`} aria-pressed={n > 0} onClick={() => toggleSub(c)}>{n > 0 && <span className="sub-num" aria-hidden>{n}</span>}{c}</button>; })}</div>
+        <p className="small"><b>메인 · {interests[0]}</b>{interests.slice(1).map((c, i) => <span key={c} className="muted"> · 서브{i + 1} {c}</span>)}</p>
           </>}
           {pop === "s2" && <>
         <span className="label">희망 비행시간 (인천 출발 편도, 이내)</span>
