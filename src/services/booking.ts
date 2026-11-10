@@ -1,8 +1,19 @@
 import type { RegionV1 } from "@/data/regionsV1";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
+import { HOTELS } from "@/data/worldHotels";
+import type { HotelRow } from "@/data/worldHotels";
+import { PILOT_TWIN_OF } from "@/services/regionScore";
 
 export const STAY_TIERS: StayTier[] = ["가성비", "가심비", "프리미엄", "하이엔드"];
+
+/** 권역 내 품질 기준(4.5↑·후기 300↑) 통과 숙소를 가격 순으로 나눈 숙소 수준별 후보(평점 순 최대 3곳) */
+const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], 가심비: [0.3, 0.7], 프리미엄: [0.7, 0.9], 하이엔드: [0.9, 1.01] };
+export function hotelCandidates(regionId: string, tier: StayTier): HotelRow[] {
+  const sorted = [...(HOTELS[PILOT_TWIN_OF[regionId] ?? regionId] ?? [])].filter((h) => h[1] >= 4.5 && h[2] >= 300).sort((a, b) => a[3] + a[4] - b[3] - b[4]);
+  const [from, to] = TIER_RANGE[tier];
+  return sorted.filter((_, i) => i / sorted.length >= from && i / sorted.length < to).sort((a, b) => b[1] - a[1] || b[2] - a[2]).slice(0, 3);
+}
 
 /** 정확한 나이가 없는 기존 연령대 정보는 외부 예약처에 임의 나이로 전달하지 않는다. */
 export function childAgesForBooking(q: RegionQuery): number[] | null {

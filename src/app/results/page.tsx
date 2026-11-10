@@ -7,7 +7,10 @@ import { Icon } from "@/components/Icon";
 import { TEMP_GRADE } from "@/data/regionsV1";
 import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
-import { scoreRegions, tripDays } from "@/services/regionScore";
+import { PILOT_TWIN_OF, scoreRegions, tripDays } from "@/services/regionScore";
+import type { RegionResult } from "@/services/regionScore";
+import { hotelCandidates } from "@/services/booking";
+import { HOTEL_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
 import { useLivePrices } from "@/lib/livePrices";
 
 const HERO = ["#102f54,#00838c", "#1d497d,#00acb8", "#0b3a5b,#0ca678", "#3b2f63,#00838c", "#5a3a1a,#d9822b", "#102f54,#7a4fb5"];
@@ -27,6 +30,25 @@ function priceNote(s?: { flight: string; hotel: string; updatedAt: string | null
   if (!s || !s.updatedAt || (s.flight !== "live" && s.hotel !== "live")) return "예상 경비는 10/31 수집 가격과 식비 가정으로 계산했어요.";
   const d = new Date(s.updatedAt);
   return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
+}
+
+const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString()}만원`;
+/** 경비 내역 + 숙소 수준에 맞는 숙소 예시 */
+function StayLine({ r, tier }: { r: RegionResult; tier: Parameters<typeof hotelCandidates>[1] }) {
+  const s = r.stay;
+  const hotels = hotelCandidates(r.region.id, tier);
+  const estimated = !hotels.length && s.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
+  const parts = [
+    s.flightKrw != null ? `✈️ 항공 1인 왕복 약 ${man(s.flightKrw)}` : "✈️ 항공 미확인",
+    s.hotelNightUsd != null ? `🏨 ${tier} 1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "🏨 숙소 가격 미확인",
+    s.foodPerDayUsd != null ? `🍽️ 식비 1인 하루 약 ${man(s.foodPerDayUsd * KRW_PER_USD)}` : "",
+  ].filter(Boolean);
+  return <div className="stay-line">
+    <span className="small bold">경비 내역</span>
+    <span className="xs">{parts.join(" · ")}</span>
+    {hotels.length ? <span className="xs"><b>{tier} 숙소 예</b> · {hotels.map((h) => `${h[0]} ★${h[1]}`).join(" / ")}</span>
+      : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
+  </div>;
 }
 
 export default function ResultsPage() {
@@ -75,6 +97,7 @@ export default function ResultsPage() {
               <div><span>일정 준비</span><b className={r.readiness.ready ? "ok" : "warn"}>{r.readiness.ready ? "바로 가능" : "보완 필요"}</b></div>
             </div>
             <span className="xs muted">{r.stay.nights}박 · {r.stay.rooms}객실{r.stay.roomEstimated ? " 가정" : " 검색 조건"} · 항공·숙소·식비 예상</span>
+            <StayLine r={r} tier={q.stay} />
             <span className="small bold">추천 이유</span>
             <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
             <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>
