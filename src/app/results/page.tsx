@@ -8,6 +8,7 @@ import { TEMP_GRADE } from "@/data/regionsV1";
 import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
+import { useLivePrices } from "@/lib/livePrices";
 
 const HERO = ["#102f54,#00838c", "#1d497d,#00acb8", "#0b3a5b,#0ca678", "#3b2f63,#00838c", "#5a3a1a,#d9822b", "#102f54,#7a4fb5"];
 function heroBg(country: string) {
@@ -22,10 +23,17 @@ function budgetLine(total: number | null, budget: number | null | undefined) {
   return diff >= 0 ? `${diff.toLocaleString()}만원 여유` : `${(-diff).toLocaleString()}만원 초과`;
 }
 
+function priceNote(s?: { flight: string; hotel: string; updatedAt: string | null }) {
+  if (!s || !s.updatedAt || (s.flight !== "live" && s.hotel !== "live")) return "예상 경비는 10/31 수집 가격과 식비 가정으로 계산했어요.";
+  const d = new Date(s.updatedAt);
+  return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
+}
+
 export default function ResultsPage() {
   const router = useRouter();
   const q = useFlowQuery();
-  const results = useMemo(() => (q ? scoreRegions(q) : []), [q]);
+  const priceVersion = useLivePrices();
+  const results = useMemo(() => (q ? scoreRegions(q) : []), [q, priceVersion]);
   if (!q) return null;
   const ranked = results.filter((r) => r.status === "ranked").slice(0, 10);
   const others = results.filter((r) => (r.status === "데이터 부족" || r.status === "조건 충족 장소 없음") && !r.region.tier);
@@ -80,6 +88,7 @@ export default function ResultsPage() {
       </div>
       <div className="stack" style={{ marginTop: 18, gap: 6 }}>
         <Link href="/data-status" className="xs" style={{ color: "var(--teal-dark)" }}>데이터 출처와 확인 상태 보기</Link>
+        <p className="xs faint">{priceNote(ranked[0]?.stay.priceSource)}</p>
         {TEMP_GRADE && <p className="xs faint">장소 등급과 적합도는 추정값이에요. 자료의 양과 확인 수준은 지역마다 달라요.</p>}
         <p className="xs faint">날씨 표시는 월별 기후 경향이며 여행일의 실제 예보가 아니에요. 경비에는 현지 교통비·입장료 등이 포함되지 않아요.</p>
         {excludedBudget > 0 && <p className="xs faint">선택한 지역 물가 또는 예산 상한을 벗어난 {excludedBudget}개 권역은 결과에서 제외했어요. 실제 예약 가격은 달라질 수 있어요.</p>}

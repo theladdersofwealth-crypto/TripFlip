@@ -10,6 +10,7 @@ import type { Board, Condition, DayWeather, SlotKey } from "@/services/planner";
 import { MEAL_STYLES, REST, boardKey, byId, candidates, cellLabel, companionsOf, completeBoard, emptyBoard, isSpecial, optimize, slotsForDay, travelMin } from "@/services/planner";
 import type { MealStyle } from "@/services/planner";
 import { scoreRegions } from "@/services/regionScore";
+import { useLivePrices } from "@/lib/livePrices";
 
 const CONDITIONS: Condition[] = ["보통", "피곤", "매우 피곤"];
 const WEATHERS: DayWeather[] = ["맑음", "비", "강풍"];
@@ -28,7 +29,8 @@ function BoardInner() {
   const plan = sp.get("plan");
   const router = useRouter();
   const q = useFlowQuery(plan);
-  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id]);
+  const priceVersion = useLivePrices();
+  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
   const [board, setBoard] = useState<Board | null>(null);
   const [pick, setPick] = useState<{ di: number; slot: SlotKey } | null>(null);
   const [toast, setToast] = useState("");

@@ -9,6 +9,7 @@ import type { DayPrefs, Transport } from "@/lib/flow";
 import { buildTimetable, fmtDate } from "@/services/itineraryV1";
 import { boardKey, emptyBoard, toDayPlan } from "@/services/planner";
 import { scoreRegions } from "@/services/regionScore";
+import { useLivePrices } from "@/lib/livePrices";
 
 const times = (from: string, to: string) => {
   const out: string[] = [];
@@ -31,7 +32,8 @@ function DayInner() {
     savePrefs(id, next, plan);
   };
 
-  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id]);
+  const priceVersion = useLivePrices();
+  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
   const days = useMemo(() => {
     if (!q) return [];
     const b = loadBoard(id, boardKey(id, q), plan) ?? emptyBoard(id, q);
