@@ -94,7 +94,7 @@ export interface RegionQuery {
 export interface ScoredPlace {
   place: PlaceV1;
   score: number;
-  weight: 1 | 0.5;
+  weight: number;
 }
 
 export interface RegionResult {

@@ -99,11 +99,15 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await page.getByRole("button", { name: /VIBE/ }).click();
   const travelStyle = page.getByRole("dialog");
+  // 메인은 한 번 눌러 바꾸고(기본 메인 관광 → 휴양), 서브는 누른 순서대로 번호가 붙는다.
+  await expect(travelStyle.getByRole("button", { name: "메인 관광", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await travelStyle.getByRole("button", { name: "메인 휴양", exact: true }).click();
+  await expect(travelStyle.getByText("메인 · 휴양", { exact: true })).toBeVisible();
   await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
   await travelStyle.getByRole("button", { name: "액티비티", exact: true }).click();
-  // 처음 고른 테마에만 "메인" 표시
-  await expect(travelStyle.locator(".toggle-chip.main")).toHaveText(/^휴양메인$/);
-  await expect(travelStyle.locator(".main-tag")).toHaveCount(1);
+  await expect(travelStyle.locator(".sub-num")).toHaveText(["1", "2"]);
+  await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
+  await expect(travelStyle.locator(".sub-num")).toHaveText(["1"]);
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await expect(page.getByText("추천 정확도 60%", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);

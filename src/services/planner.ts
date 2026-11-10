@@ -117,7 +117,7 @@ export function evaluate(p: PlaceV1, q: RegionQuery, day: Pick<BoardDay, "condit
   const exp = (p.grade == null ? 0 : GRADE_SCORE[p.grade] / 5) * 30;
   const comp = fit.factor * 25;
   const weight = conceptWeight(p.concepts, q);
-  const concept = weight === 1 ? 15 : weight === 0.5 ? 10 : 4;
+  const concept = weight > 0 ? Math.round(5 + 10 * weight) : 4; // 메인 15 · 서브 순서대로 줄어듦
   const tm = travelMin(p);
   const move = tm <= 20 ? 15 : tm <= 40 ? 12 : tm <= 60 ? 8 : tm <= 100 ? 4 : 0;
   const rain = rainFit(p);
