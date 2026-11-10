@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { STORAGE_FAIL_EVENT } from "@/lib/flow";
+import { trackPage } from "@/lib/analytics";
 import { Icon } from "./Icon";
 import { useTripStore } from "@/store/TripStore";
 
@@ -20,6 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener(STORAGE_FAIL_EVENT, on);
     return () => window.removeEventListener(STORAGE_FAIL_EVENT, on);
   }, []);
+  useEffect(() => { trackPage(path); }, [path]);
   const isActive = (href: string) => (href === "/" ? !path.startsWith("/my-trips") : path.startsWith(href));
   return (
     <>

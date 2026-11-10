@@ -13,6 +13,7 @@ import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore
 import type { StayTier } from "@/services/regionScore";
 import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
+import { track } from "@/lib/analytics";
 
 
 export default function BookPage() {
@@ -45,6 +46,7 @@ export default function BookPage() {
   const save = () => {
     if (!savePlan(makePlan())) { setError("이 브라우저에 저장하지 못했어요. 파일로 내려받아 보관해 주세요."); return; }
     saveQuery(nextQuery);
+    track("save", id);
     router.push("/my-trips");
   };
 
@@ -59,7 +61,7 @@ export default function BookPage() {
         <label className="field"><span className="label">항공 선호</span><select className="input" aria-label="항공 선호" value={flightPreference} onChange={(e) => setFlightPreference(e.target.value as typeof flightPreference)}><option value="any">상관없음</option><option value="lowcost">저가항공 우선</option><option value="fullservice">일반 항공사 우선</option></select></label>
         <p className="xs muted">선호는 계획에 저장돼요. 실제 항공사·수하물·도착시간은 예약처에서 비교해 주세요.</p>
         {unknownAges && <p className="xs muted">자녀 나이가 미확인이에요. 예약처에서 정확한 나이와 인원을 다시 입력해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={flightSearchUrl(r.region, q)} target="_blank" rel="noopener noreferrer">스카이스캐너에서 검색 <Icon name="link" /></a>
+        <a className="btn btn-teal btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너에서 검색 <Icon name="link" /></a>
         <label className="check-row"><input type="checkbox" checked={booked.flight} onChange={(e) => setBooked((v) => ({ ...v, flight: e.target.checked }))} />항공권 예약 완료 (직접 확인)</label>
       </section>
       <section className={`book-card ${booked.hotel ? "done" : ""}`}>
@@ -72,10 +74,10 @@ export default function BookPage() {
         <p className="xs muted">객실 정원·침대·자녀 추가요금은 숙소별로 확인해야 해요. 현재 자료의 종합 평점은 청결 세부평점을 보장하지 않아요.</p>
         {hotels.length > 0 ? <div className="stack" style={{ gap: 8 }}>
           <span className="small bold">기존 자료의 비교 후보 · {selectedTier}</span>
-          {hotels.map(([name, rating, reviews, lo, hi]) => <a key={name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, name)} target="_blank" rel="noopener noreferrer"><span><b className="small">{name}</b><span className="xs muted" style={{ display: "block" }}>종합 ★ {rating} · 후기 {reviews.toLocaleString()} · 과거 1박 ${lo}~${hi}</span></span><Icon name="link" size={16} /></a>)}
+          {hotels.map(([name, rating, reviews, lo, hi]) => <a key={name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, name)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer"><span><b className="small">{name}</b><span className="xs muted" style={{ display: "block" }}>종합 ★ {rating} · 후기 {reviews.toLocaleString()} · 과거 1박 ${lo}~${hi}</span></span><Icon name="link" size={16} /></a>)}
           <p className="xs faint">2026-10-31 수집 자료의 가격대예요. 날짜별 실시간 요금·청결 기준·정원은 재확인이 필요해요.</p>
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} target="_blank" rel="noopener noreferrer">아고다에서 검색 <Icon name="link" /></a>
+        <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">아고다에서 검색 <Icon name="link" /></a>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
     </div>

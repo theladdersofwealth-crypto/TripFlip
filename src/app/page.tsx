@@ -10,6 +10,7 @@ import type { Concept } from "@/data/regionsV1";
 import { loadQuery, saveQuery } from "@/lib/flow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
+import { track } from "@/lib/analytics";
 import type { IntensityV1, PriceLevel, RegionQuery, StayTier } from "@/services/regionScore";
 
 const INTENSITY: { v: IntensityV1; label: string }[] = [
@@ -85,6 +86,7 @@ export default function Home() {
   const go = () => {
     if (error || pending || flying) return;
     saveQuery(normalizeParty(q));
+    track("search");
     setFlying(true); // 비행기 회전 로딩(형님 흐름 ②)을 보여준 뒤 결과로 이동
     router.prefetch("/results");
     setTimeout(() => startTransition(() => router.push("/results")), 1800);
