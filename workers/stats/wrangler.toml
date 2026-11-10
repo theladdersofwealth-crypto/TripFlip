@@ -1,0 +1,15 @@
+# 관리자 통계 전용 Worker (무료 플랜). 앱이 보내는 익명 이벤트를 Durable Object(SQLite)에 모은다.
+# 저장: 기기별 무작위 번호(앱이 만든 것)·단계·권역·날짜(KST)만. 이름·IP·위치 저장 안 함.
+# 비밀값: ADMIN_KEY (관리자 페이지 비밀번호) — wrangler secret put ADMIN_KEY
+name = "tripflip-stats"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[[durable_objects.bindings]]
+name = "STATS"
+class_name = "Stats"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Stats"]

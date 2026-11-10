@@ -569,3 +569,21 @@ p { margin: 0; }
 .sub-num { display: inline-grid; place-items: center; width: 18px; height: 18px; margin-right: 6px; border-radius: 99px; background: var(--teal); color: #fff; font-size: 11px; font-weight: 800; }
 .toggle-chip.on.main { background: var(--navy); border-color: var(--navy); color: #fff; }
 .stay-line { display: flex; flex-direction: column; gap: 3px; text-align: left; padding: 8px 10px; border-radius: 10px; background: var(--teal-50); }
+
+/* 관리자 통계 (/admin) */
+.admin-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+@media (min-width: 640px) { .admin-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.admin-tile { display: flex; flex-direction: column; gap: 2px; }
+.admin-tile b { font-size: 26px; font-weight: 900; color: var(--navy); font-variant-numeric: tabular-nums; }
+.admin-bars { display: flex; align-items: flex-end; gap: 2px; height: 140px; margin-top: 12px; border-bottom: 1px solid var(--line); }
+.admin-bar { flex: 1; height: 100%; display: flex; align-items: flex-end; padding: 0; border: 0; background: transparent; cursor: pointer; min-width: 0; }
+.admin-bar span { display: block; width: 100%; min-height: 1px; background: var(--teal); border-radius: 4px 4px 0 0; }
+.admin-bar.on span, .admin-bar:hover span { background: var(--navy); }
+.admin-axis { display: flex; gap: 2px; margin: 4px 0 6px; }
+.admin-axis span { flex: 1; min-width: 0; text-align: center; white-space: nowrap; overflow: visible; }
+.admin-track { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; margin-top: 4px; }
+.admin-track span { display: block; height: 100%; background: var(--teal); border-radius: 5px; }
+.admin-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.admin-table th, .admin-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.admin-table th:first-child, .admin-table td:first-child { text-align: left; }
+.admin-table th { font-size: 12px; color: var(--muted); font-weight: 700; }
