@@ -45,3 +45,12 @@ test("평균가가 있으면 예상 경비에 쓰고, 없으면 앱 자료로 �
   assert.ok(after.hotelNightUsd! >= 30 && after.hotelNightUsd! <= 80);
   setLiveSummary(null);
 });
+
+test("숙소 목록이 없는 권역도 숙소 수준에 따라 1박 가격이 달라진다", () => {
+  setLiveSummary(null);
+  const region = REGIONS_V1.find((r) => r.id === "NT")!;
+  const world = { ...region, id: "vie-halong", country: "베트남" };
+  const cheap = estimateTripCost(world, { ...q, stay: "가성비" }).hotelNightUsd!;
+  const high = estimateTripCost(world, { ...q, stay: "하이엔드" }).hotelNightUsd!;
+  assert.ok(high > cheap * 3, `${cheap} → ${high}`);
+});

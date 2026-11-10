@@ -138,16 +138,19 @@ export interface RegionResult {
 const MAX_SCORE = 5.5;
 
 const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], 가심비: [0.3, 0.7], 프리미엄: [0.7, 0.9], 하이엔드: [0.9, 1.01] };
+const TIER_FACTOR: Record<StayTier, number> = { 가성비: 0.67, 가심비: 1, 프리미엄: 1.67, 하이엔드: 2.78 };
 
 /** 예약 화면과 같은 권역 내 가격 순 구간. 시설의 실제 서비스 등급을 보증하지 않는다. */
 function hotelPrice(key: string, tier: StayTier): number | null {
   const prices = liveHotelPrices(key) ?? (HOTELS[key] ?? [])
     .filter((h) => h[1] >= 4.5 && h[2] >= 300 && h[3] > 0 && h[4] >= h[3])
     .map((h) => (h[3] + h[4]) / 2).sort((a, b) => a - b);
-  if (!prices.length) return HOTEL_MEDIAN_USD[key] ?? null;
+  // 숙소 목록이 없는 권역은 중간값에 숙소 수준 배수를 곱한다(목록 있는 51개 권역의 수준별 중간값 ÷ 전체 중간값)
+  const byTier = () => HOTEL_MEDIAN_USD[key] != null ? Math.round(HOTEL_MEDIAN_USD[key] * TIER_FACTOR[tier]) : null;
+  if (!prices.length) return byTier();
   const [from, to] = TIER_RANGE[tier];
   const selected = prices.filter((_, i) => i / prices.length >= from && i / prices.length < to);
-  if (!selected.length) return HOTEL_MEDIAN_USD[key] ?? null;
+  if (!selected.length) return byTier();
   const mid = Math.floor(selected.length / 2);
   return selected.length % 2 ? selected[mid] : (selected[mid - 1] + selected[mid]) / 2;
 }

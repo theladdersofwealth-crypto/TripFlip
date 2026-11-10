@@ -9,19 +9,11 @@ import { downloadPlan } from "@/lib/planDownload";
 import { roomEstimate } from "@/lib/travelParty";
 import { fmtDate } from "@/services/itineraryV1";
 import { boardKey, emptyBoard } from "@/services/planner";
-import { PILOT_TWIN_OF, estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
+import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
 import type { StayTier } from "@/services/regionScore";
-import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelSearchUrl } from "@/services/booking";
-import { HOTELS } from "@/data/worldHotels";
+import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
-import type { HotelRow } from "@/data/worldHotels";
 
-const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], 가심비: [0.3, 0.7], 프리미엄: [0.7, 0.9], 하이엔드: [0.9, 1.01] };
-function hotelCandidates(regionId: string, tier: StayTier): HotelRow[] {
-  const sorted = [...(HOTELS[PILOT_TWIN_OF[regionId] ?? regionId] ?? [])].filter((h) => h[1] >= 4.5 && h[2] >= 300).sort((a, b) => a[3] + a[4] - b[3] - b[4]);
-  const [from, to] = TIER_RANGE[tier];
-  return sorted.filter((_, i) => i / sorted.length >= from && i / sorted.length < to).sort((a, b) => b[1] - a[1] || b[2] - a[2]).slice(0, 3);
-}
 
 export default function BookPage() {
   const { id } = useParams<{ id: string }>();
