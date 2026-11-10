@@ -7,6 +7,15 @@ async function noHorizontalOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+/** 달력 하나에서 시작일 → 끝일 순서로 누른다 (필요하면 다음 달로 넘긴다) */
+async function pickRange(page: import("@playwright/test").Page, start: string, end: string) {
+  for (const d of [start, end]) {
+    const day = page.getByRole("button", { name: d, exact: true });
+    for (let i = 0; i < 24 && !(await day.isVisible()); i++) await page.getByRole("button", { name: "다음 달", exact: true }).click();
+    await day.click();
+  }
+}
+
 test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
@@ -24,8 +33,7 @@ test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", 
 
   await page.getByRole("button", { name: /DATE/ }).click();
   await page.getByRole("button", { name: "가능한 기간이 있어요", exact: true }).click();
-  await page.getByLabel("여행 가능 시작일", { exact: true }).fill("2027-05-07");
-  await page.getByLabel("여행 가능 마지막 날", { exact: true }).fill("2027-05-20");
+  await pickRange(page, "2027-05-07", "2027-05-20");
   await page.getByLabel("희망 숙박 수", { exact: true }).fill("10");
   await page.getByLabel(/기준 일정 ·/).selectOption("2027-05-10");
   await expect(page.getByText("기준 일정 10박 11일", { exact: true })).toBeVisible();
@@ -64,8 +72,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   await page.goto("/");
   await page.getByRole("button", { name: /DATE/ }).click();
-  await page.getByLabel("출발일", { exact: true }).fill("2027-05-07");
-  await page.getByLabel("귀국일", { exact: true }).fill("2027-05-17");
+  await pickRange(page, "2027-05-07", "2027-05-17");
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await page.getByRole("button", { name: /PASSENGER/ }).click();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
@@ -193,8 +200,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
   await page.getByRole("button", { name: /DATE/ }).click();
-  await page.getByLabel("출발일", { exact: true }).fill("2027-06-01");
-  await page.getByLabel("귀국일", { exact: true }).fill("2027-06-04");
+  await pickRange(page, "2027-06-01", "2027-06-04");
   await page.getByRole("button", { name: "완료", exact: true }).click();
   await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "보통 · 2곳", exact: true }).click();
@@ -232,7 +238,7 @@ test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼
   await expect(page.getByRole("button", { name: /PASSENGER/ })).toBeVisible();
   // 입력은 아래로 늘어놓지 않고 팝업으로만 연다.
   await expect(page.getByRole("button", { name: "구성원 설정", exact: true })).toHaveCount(0);
-  await expect(page.getByLabel("출발일", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "다음 달", exact: true })).toHaveCount(0);
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("simple-home-mobile.png"), fullPage: true });
   await page.goto("/r/NT");

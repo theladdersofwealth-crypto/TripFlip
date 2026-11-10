@@ -2,6 +2,7 @@
 import type { RegionQuery } from "@/services/regionScore";
 import { calendarDays, tripWindows } from "@/lib/travelDates";
 import type { TravelWindow } from "@/lib/travelDates";
+import { RangeCalendar } from "@/components/RangeCalendar";
 
 export function DateEditor({ query, onChange }: { query: RegionQuery; onChange: (query: RegionQuery) => void }) {
   const window = query.dateWindow;
@@ -20,17 +21,11 @@ export function DateEditor({ query, onChange }: { query: RegionQuery; onChange: 
         <button type="button" className={window ? "on" : ""} aria-pressed={!!window} onClick={() => updateWindow({})}>가능한 기간이 있어요</button>
       </div>
       {window ? <>
-        <div className="grid-2" style={{ marginTop: 10 }}>
-          <label className="field"><span className="label">여행 가능 시작일</span><input className="input" type="date" value={window.earliest} onChange={(e) => updateWindow({ earliest: e.target.value })} /></label>
-          <label className="field"><span className="label">여행 가능 마지막 날</span><input className="input" type="date" min={window.earliest} value={window.latest} onChange={(e) => updateWindow({ latest: e.target.value })} /></label>
-        </div>
+        <div style={{ marginTop: 10 }}><RangeCalendar start={window.earliest} end={window.latest} startLabel="가능 시작" endLabel="가능 마지막" onChange={(earliest, latest) => updateWindow({ earliest, latest })} /></div>
         <label className="field"><span className="label">희망 숙박 수</span><input className="input" type="number" min={1} max={29} value={Number.isFinite(window.nights) ? window.nights : ""} onChange={(e) => updateWindow({ nights: Number(e.target.value) })} /></label>
         {candidates.length > 0 && <label className="field"><span className="label">기준 일정 · {candidates.length}가지 중 선택</span><select className="input" value={query.startDate} onChange={(e) => { const selected = candidates.find((o) => o.startDate === e.target.value); if (selected) onChange({ ...query, ...selected }); }}>{candidates.map((o) => <option key={o.startDate} value={o.startDate}>{o.startDate} ~ {o.endDate}</option>)}</select></label>}
         <p className="xs muted">선택한 기준 일정으로 추천해요. 날짜별 최저가 검색은 포함하지 않아요.</p>
-      </> : <div className="grid-2" style={{ marginTop: 10 }}>
-        <label className="field"><span className="label">출발일</span><input className="input" type="date" value={query.startDate} onChange={(e) => onChange({ ...query, startDate: e.target.value })} /></label>
-        <label className="field"><span className="label">귀국일</span><input className="input" type="date" value={query.endDate} min={query.startDate} onChange={(e) => onChange({ ...query, endDate: e.target.value })} /></label>
-      </div>}
+      </> : <div style={{ marginTop: 10 }}><RangeCalendar start={query.startDate} end={query.endDate} onChange={(startDate, endDate) => onChange({ ...query, startDate, endDate })} /></div>}
     </section>
   );
 }
