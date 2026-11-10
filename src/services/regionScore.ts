@@ -7,6 +7,7 @@ import { openDuring } from "@/data/seasonal";
 import { WORLD_WEATHER, WORLD_WEATHER_SOURCE } from "@/data/worldWeather";
 import { COUNTRY_PRICE_LEVEL, FLIGHT_KRW, FOOD_USD_US, HOTEL_MEDIAN_USD, KRW_PER_USD } from "@/data/worldPrices";
 import { HOTELS } from "@/data/worldHotels";
+import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
 import { DINING_PLACES } from "@/data/dining";
 import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, personalFit, plannedVisitCount, roomEstimate } from "@/lib/travelParty";
@@ -129,6 +130,8 @@ export interface RegionResult {
     hotelNightUsd: number | null;
     foodPerDayUsd: number | null;
     budgetStatus: "unset" | "within" | "over" | "unknown";
+    /** 항공·숙소 가격이 최근 수집 평균(live)인지, 앱에 들어 있는 10/31 자료(static)인지 */
+    priceSource: { flight: "live" | "static"; hotel: "live" | "static"; updatedAt: string | null };
   };
 }
 
@@ -138,7 +141,7 @@ const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], �
 
 /** 예약 화면과 같은 권역 내 가격 순 구간. 시설의 실제 서비스 등급을 보증하지 않는다. */
 function hotelPrice(key: string, tier: StayTier): number | null {
-  const prices = (HOTELS[key] ?? [])
+  const prices = liveHotelPrices(key) ?? (HOTELS[key] ?? [])
     .filter((h) => h[1] >= 4.5 && h[2] >= 300 && h[3] > 0 && h[4] >= h[3])
     .map((h) => (h[3] + h[4]) / 2).sort((a, b) => a - b);
   if (!prices.length) return HOTEL_MEDIAN_USD[key] ?? null;
@@ -159,7 +162,9 @@ export function estimateTripCost(region: RegionV1, input: RegionQuery): RegionRe
   const hotelNightUsd = hotelPrice(key, q.stay);
   const level = COUNTRY_PRICE_LEVEL[region.country];
   const foodPerDayUsd = level == null ? null : FOOD_USD_US * level;
-  const flightKrw = FLIGHT_KRW[key] ?? null;
+  const liveFlight = liveFlightKrw(key, q.startDate);
+  const flightKrw = liveFlight ?? FLIGHT_KRW[key] ?? null;
+  const priceSource = { flight: liveFlight != null ? "live" as const : "static" as const, hotel: liveHotelPrices(key) ? "live" as const : "static" as const, updatedAt: liveSummary()?.updatedAt ?? null };
   const usd = hotelNightUsd != null && foodPerDayUsd != null ? hotelNightUsd * rooms / people + foodPerDayUsd : null;
   const partyTotalKrw = hotelNightUsd != null && foodPerDayUsd != null && flightKrw != null && days >= 2
     ? Math.round(flightKrw * people + (hotelNightUsd * rooms * nights + foodPerDayUsd * people * days) * KRW_PER_USD) : null;
@@ -167,7 +172,7 @@ export function estimateTripCost(region: RegionV1, input: RegionQuery): RegionRe
   const budget = q.totalBudgetKrw != null && Number.isFinite(q.totalBudgetKrw) && q.totalBudgetKrw > 0 ? q.totalBudgetKrw : null;
   const budgetStatus = budget == null ? "unset" : partyTotalKrw == null ? "unknown" : partyTotalKrw <= budget ? "within" : "over";
   // 과거 가격대와 식비 가정의 합계. 수집값이 있어도 해당 날짜의 예약 견적은 아니다.
-  return { usd, flightKrw, totalKrw, partyTotalKrw, tier: null, estimated: true, rooms, roomEstimated, nights, hotelNightUsd, foodPerDayUsd, budgetStatus };
+  return { usd, flightKrw, totalKrw, partyTotalKrw, tier: null, estimated: true, rooms, roomEstimated, nights, hotelNightUsd, foodPerDayUsd, budgetStatus, priceSource };
 }
 
 /** 지역 물가는 나라 물가 수준으로 구분한다. 인원·객실·항공비에 따라 물가가 바뀌지 않는다. */

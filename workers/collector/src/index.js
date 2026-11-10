@@ -2,9 +2,11 @@
 // - 항공권: Travelpayouts Data API, 하루 4회 → KV flight-prices/날짜_UTC시
 // - 숙소: Xotelo /api/rates, 고정 목록(hotels.json) × 체크인 14/30/60일 뒤 → KV hotel-rates/날짜/part-NN
 // - 위키 조회수: 매월 2일 5분마다 45건 → KV wiki-pageviews/YYYY-MM/part-NNN (권역 물가는 Xotelo 목록 고장으로 보류)
+// - 평균가: 수집마다 agg/flight|hotel/날짜 에 더하고 최근 14일로 summary/latest 갱신 → GET /summary
 // - 읽기: GET /list?prefix=..., GET /get?key=..., GET /hotel-rates?date=YYYY-MM-DD (조각 합본)
 import HOTELS from "./hotels.json";
 import WIKI from "./wiki-titles.json";
+import { buildSummary, mergeFlightAgg, mergeHotelAgg, SUMMARY_DAYS } from "./summary.js";
 
 const FIELDS = ["destination", "departure_at", "return_at", "price", "airline", "transfers", "return_transfers", "duration"];
 const ORIGIN = "ICN";
@@ -53,7 +55,37 @@ async function collectFlights(env, now) {
   }
   const key = `flight-prices/${ymd(now)}_${String(now.getUTCHours()).padStart(2, "0")}`;
   await env.DATA.put(key, JSON.stringify(result), { expirationTtl: TTL });
+  await addFlightAgg(env, now, result);
+  await rebuildSummary(env, now);
   return key;
+}
+
+// ---------- 평균가 (앱이 읽는 값) ----------
+// 수집할 때마다 날짜별 합계(agg/…/날짜)에 더하고, 최근 SUMMARY_DAYS일 합계로 summary/latest 를 다시 만든다.
+// 큰 원본을 다시 읽지 않아 무료 플랜 CPU 한도 안에서 돈다.
+const AGG_TTL = 60 * 60 * 24 * 60;
+const HOTEL_NAMES = Object.fromEntries(Object.values(HOTELS.regions).flatMap((r) => r.hotels));
+async function getJson(env, key) {
+  const v = await env.DATA.get(key);
+  return v ? JSON.parse(v) : null;
+}
+async function addFlightAgg(env, now, result) {
+  const key = `agg/flight/${ymd(now)}`;
+  await env.DATA.put(key, JSON.stringify(mergeFlightAgg(await getJson(env, key), result)), { expirationTtl: AGG_TTL });
+}
+async function addHotelAgg(env, now, rows) {
+  const key = `agg/hotel/${ymd(now)}`;
+  await env.DATA.put(key, JSON.stringify(mergeHotelAgg(await getJson(env, key), rows)), { expirationTtl: AGG_TTL });
+}
+async function rebuildSummary(env, now) {
+  const fd = [], hd = [];
+  for (let i = 0; i < SUMMARY_DAYS; i++) {
+    const d = ymd(new Date(now.getTime() - i * 864e5));
+    const [a, b] = await Promise.all([getJson(env, `agg/flight/${d}`), getJson(env, `agg/hotel/${d}`)]);
+    if (a) fd.push(a);
+    if (b) hd.push(b);
+  }
+  await env.DATA.put("summary/latest", JSON.stringify(buildSummary(fd, hd, now, HOTEL_NAMES)));
 }
 
 // ---------- 숙소 ----------
@@ -102,7 +134,10 @@ async function collectHotelBatch(env, now, index, size = BATCH) {
     await sleep(800);
   }
   const key = `hotel-rates/${ymd(now)}/part-${String(index).padStart(2, "0")}`;
-  await env.DATA.put(key, JSON.stringify({ collectedAt: now.toISOString(), index, total: Math.ceil(jobs.length / BATCH), stays, requests: slice.length, failed: errors.length, rows, errors: errors.slice(0, 5) }), { expirationTtl: TTL });
+  const total = Math.ceil(jobs.length / BATCH);
+  await env.DATA.put(key, JSON.stringify({ collectedAt: now.toISOString(), index, total, stays, requests: slice.length, failed: errors.length, rows, errors: errors.slice(0, 5) }), { expirationTtl: TTL });
+  await addHotelAgg(env, now, rows);
+  if (index === total - 1) await rebuildSummary(env, now);
   return key;
 }
 async function mergedHotelRates(env, date) {
@@ -202,7 +237,21 @@ export default {
       if (job === "flight") return json({ saved: await collectFlights(env, now) });
       if (job === "wiki") return json({ saved: await collectWikiBatch(env, now, Number(u.searchParams.get("i") ?? 0)) });
       if (job === "hotel") return json({ saved: await collectHotelBatch(env, now, Number(u.searchParams.get("i") ?? 0), Number(u.searchParams.get("n") ?? BATCH)) });
-      return json({ error: "job=flight|hotel" }, 400);
+      // 예전 원본으로 날짜별 합계 다시 만들기: job=backfill&date=YYYY-MM-DD (그 날짜 합계를 덮어씀)
+      if (job === "backfill") {
+        const date = u.searchParams.get("date") ?? "";
+        const fl = await env.DATA.list({ prefix: `flight-prices/${date}_` });
+        let fa = null;
+        for (const k of fl.keys) fa = mergeFlightAgg(fa, await getJson(env, k.name));
+        if (fa) await env.DATA.put(`agg/flight/${date}`, JSON.stringify(fa), { expirationTtl: AGG_TTL });
+        const hl = await env.DATA.list({ prefix: `hotel-rates/${date}/` });
+        let ha = null;
+        for (const k of hl.keys) ha = mergeHotelAgg(ha, (await getJson(env, k.name)).rows);
+        if (ha) await env.DATA.put(`agg/hotel/${date}`, JSON.stringify(ha), { expirationTtl: AGG_TTL });
+        return json({ date, flightSnapshots: fa?.snapshots ?? 0, hotelBatches: ha?.batches ?? 0 });
+      }
+      if (job === "summary") { await rebuildSummary(env, now); return json({ ok: true }); }
+      return json({ error: "job=flight|hotel|wiki|backfill|summary" }, 400);
     }
     if (u.pathname === "/list") {
       const r = await env.DATA.list({ prefix: u.searchParams.get("prefix") ?? "", cursor: u.searchParams.get("cursor") ?? undefined });
@@ -212,6 +261,11 @@ export default {
       const v = await env.DATA.get(u.searchParams.get("key") ?? "");
       return v ? new Response(v, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } }) : json({ error: "없음" }, 404);
     }
+    // 앱이 읽는 최근 평균가 (수집할 때마다 갱신)
+    if (u.pathname === "/summary") {
+      const v = await env.DATA.get("summary/latest");
+      return v ? new Response(v, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", "cache-control": "public, max-age=600" } }) : json({ error: "없음" }, 404);
+    }
     if (u.pathname === "/hotel-rates") {
       const v = await mergedHotelRates(env, u.searchParams.get("date") ?? ymd(new Date()));
       return v ? json(v) : json({ error: "없음" }, 404);
@@ -220,6 +274,6 @@ export default {
       const v = await mergedWiki(env, u.searchParams.get("month") ?? wikiPeriod(new Date()).label);
       return v ? json(v) : json({ error: "없음" }, 404);
     }
-    return json({ ok: true, routes: ["/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
+    return json({ ok: true, routes: ["/summary", "/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
   },
 };

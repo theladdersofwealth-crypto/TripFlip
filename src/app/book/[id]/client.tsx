@@ -13,6 +13,7 @@ import { PILOT_TWIN_OF, estimateTripCost, scoreRegions, tripDays } from "@/servi
 import type { StayTier } from "@/services/regionScore";
 import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelSearchUrl } from "@/services/booking";
 import { HOTELS } from "@/data/worldHotels";
+import { useLivePrices } from "@/lib/livePrices";
 import type { HotelRow } from "@/data/worldHotels";
 
 const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], 가심비: [0.3, 0.7], 프리미엄: [0.7, 0.9], 하이엔드: [0.9, 1.01] };
@@ -26,7 +27,8 @@ export default function BookPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const q = useFlowQuery();
-  const r = useMemo(() => q ? scoreRegions(q).find((x) => x.region.id === id) : undefined, [q, id]);
+  const priceVersion = useLivePrices();
+  const r = useMemo(() => q ? scoreRegions(q).find((x) => x.region.id === id) : undefined, [q, id, priceVersion]);
   const [booked, setBooked] = useState({ flight: false, hotel: false });
   const [tier, setTier] = useState<StayTier | null>(null);
   const [rooms, setRooms] = useState<number | null | undefined>(undefined);
@@ -85,7 +87,7 @@ export default function BookPage() {
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
     </div>
-    <p className="small muted" style={{ marginTop: 12 }}>현재 숙소 수준·객실 수 기준 일행 전체 예상 경비: {estimate.partyTotalKrw == null ? "미확인" : `약 ${Math.round(estimate.partyTotalKrw / 10000).toLocaleString()}만원`}. 항공·숙박·식비의 과거 자료와 가정으로 계산했어요.</p>
+    <p className="small muted" style={{ marginTop: 12 }}>현재 숙소 수준·객실 수 기준 일행 전체 예상 경비: {estimate.partyTotalKrw == null ? "미확인" : `약 ${Math.round(estimate.partyTotalKrw / 10000).toLocaleString()}만원`}. {estimate.priceSource.flight === "live" || estimate.priceSource.hotel === "live" ? "항공·숙박은 최근 2주 수집 평균, 식비는 가정으로 계산했어요." : "항공·숙박·식비의 과거 자료와 가정으로 계산했어요."}</p>
     {estimate.budgetStatus === "over" && <p role="status" className="small" style={{ color: "var(--danger)" }}>현재 선택은 입력한 전체 예산을 넘는 것으로 추정돼요.</p>}
     <p className="xs faint" style={{ marginTop: 10 }}>현재는 일반 검색 링크예요. 예약과 결제는 외부 사이트에서 진행하며, 예약 전에도 계획을 저장할 수 있어요. 실제 항공시간·숙소 위치에 맞춘 일정 조정은 별도 확인이 필요해요.</p>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}

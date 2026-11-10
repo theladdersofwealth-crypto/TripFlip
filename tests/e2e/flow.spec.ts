@@ -48,11 +48,17 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   const runtimeErrors: string[] = [];
   const consoleErrors: string[] = [];
   const externalRequests: string[] = [];
+  let summaryRequests = 0;
   page.on("pageerror", (error) => runtimeErrors.push(error.message));
   page.on("console", (message) => { if (message.type() === "error") consoleErrors.push(message.text()); });
   await page.route("**/*", async (route) => {
     const url = new URL(route.request().url());
     if (url.hostname === "localhost" || url.hostname === "127.0.0.1") await route.continue();
+    // 앱이 읽는 유일한 외부 주소: 수집 서버의 최근 평균가 (시험용 값으로 응답)
+    else if (url.href === "https://tripflip-collector.ohysky0127.workers.dev/summary") {
+      summaryRequests++;
+      await route.fulfill({ json: { updatedAt: "2026-11-10T02:15:00Z", windowDays: 14, days: { flight: 3, hotel: 3 }, counts: { flightSnapshots: 9, hotelBatches: 66 }, flights: { NHA: { "2027-05": [298000, 3] } }, hotels: {} }, headers: { "access-control-allow-origin": "*" } });
+    }
     else { externalRequests.push(url.href); await route.abort(); }
   });
 
@@ -218,6 +224,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(runtimeErrors).toEqual([]);
   expect(consoleErrors).toEqual([]);
   expect(externalRequests).toEqual([]);
+  expect(summaryRequests).toBeGreaterThan(0);
 });
 
 test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼쳐서 확인한다", async ({ page }, testInfo) => {
