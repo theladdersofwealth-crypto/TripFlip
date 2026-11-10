@@ -20,8 +20,10 @@ export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
 }
 
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {
-  const params = new URLSearchParams({ textToSearch: name ?? region.searchName, checkIn: q.startDate, checkOut: q.endDate, rooms: String(roomEstimate(q).rooms), adults: String(q.adults), children: String(q.children.length) });
+  // 아고다 검색 페이지는 체크인(checkIn)과 숙박일수(los)로 날짜를 받는다. checkOut 만으로는 날짜가 빠지는 경우가 있어 둘 다 넣는다.
+  const los = Math.max(1, Math.round((Date.parse(q.endDate) - Date.parse(q.startDate)) / 864e5) || 1);
+  const params = new URLSearchParams({ textToSearch: name ?? region.searchName, checkIn: q.startDate, checkOut: q.endDate, los: String(los), rooms: String(roomEstimate(q).rooms), adults: String(q.adults), children: String(q.children.length) });
   const ages = childAgesForBooking(q);
-  if (ages?.length) params.set("childAges", ages.join(","));
+  if (ages?.length) params.set("childages", ages.join(","));
   return `https://www.agoda.com/ko-kr/search?${params}`;
 }

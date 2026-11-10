@@ -163,7 +163,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(flight.searchParams.get("childrenv2")).toBe("1|8");
   expect(hotel.searchParams.get("rooms")).toBe("2");
   expect(hotel.searchParams.get("adults")).toBe("4");
-  expect(hotel.searchParams.get("childAges")).toBe("1,8");
+  expect(hotel.searchParams.get("childages")).toBe("1,8");
   await expect(page.getByLabel("항공권 예약 완료 (직접 확인)", { exact: true })).not.toBeChecked();
   await expect(page.getByLabel("숙소 예약 완료 (직접 확인)", { exact: true })).not.toBeChecked();
   await page.getByRole("button", { name: "일정과 함께 내 여행에 저장", exact: true }).click();

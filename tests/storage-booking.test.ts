@@ -37,14 +37,17 @@ test("예약 링크는 실제 자녀 나이와 선택한 객실 수를 사용한
   const hotel = new URL(hotelSearchUrl(REGIONS_V1[0], q));
   assert.equal(hotel.searchParams.get("rooms"), "3");
   assert.equal(hotel.searchParams.get("adults"), "2");
-  assert.equal(hotel.searchParams.get("childAges"), "2");
+  assert.equal(hotel.searchParams.get("childages"), "2");
+  assert.equal(hotel.searchParams.get("checkIn"), q.startDate);
+  assert.equal(hotel.searchParams.get("checkOut"), q.endDate);
+  assert.equal(Number(hotel.searchParams.get("los")), Math.round((Date.parse(q.endDate) - Date.parse(q.startDate)) / 864e5));
   assert.equal(new URL(flightSearchUrl(REGIONS_V1[0], q)).searchParams.get("childrenv2"), "2");
 });
 
 test("미확인 자녀 나이를 대표 나이로 꾸며 예약처에 전달하지 않는다", () => {
   const q = { ...DEFAULT_QUERY, children: [{ band: "유아" as const, height: null }] };
   assert.equal(childAgesForBooking(q), null);
-  assert.equal(new URL(hotelSearchUrl(REGIONS_V1[0], q)).searchParams.has("childAges"), false);
+  assert.equal(new URL(hotelSearchUrl(REGIONS_V1[0], q)).searchParams.has("childages"), false);
 });
 
 test("브라우저 저장 실패를 성공으로 보고하지 않는다", () => {
