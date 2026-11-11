@@ -64,7 +64,6 @@ async function collectFlights(env, now) {
 // 수집할 때마다 날짜별 합계(agg/…/날짜)에 더하고, 최근 SUMMARY_DAYS일 합계로 summary/latest 를 다시 만든다.
 // 큰 원본을 다시 읽지 않아 무료 플랜 CPU 한도 안에서 돈다.
 const AGG_TTL = 60 * 60 * 24 * 60;
-const HOTEL_NAMES = Object.fromEntries(Object.values(HOTELS.regions).flatMap((r) => r.hotels));
 async function getJson(env, key) {
   const v = await env.DATA.get(key);
   return v ? JSON.parse(v) : null;
@@ -85,15 +84,20 @@ async function rebuildSummary(env, now) {
     if (a) fd.push(a);
     if (b) hd.push(b);
   }
-  await env.DATA.put("summary/latest", JSON.stringify(buildSummary(fd, hd, now, HOTEL_NAMES)));
+  await env.DATA.put("summary/latest", JSON.stringify(buildSummary(fd, hd, now)));
 }
 
 // ---------- 숙소 ----------
 function hotelJobs(now) {
   const base = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-  const stays = AHEAD_DAYS.map((n) => ({ chkIn: ymd(new Date(base + n * 864e5)), chkOut: ymd(new Date(base + (n + 1) * 864e5)) }));
+  const stay = (n) => ({ chkIn: ymd(new Date(base + n * 864e5)), chkOut: ymd(new Date(base + (n + 1) * 864e5)) });
+  const stays = AHEAD_DAYS.map(stay);
+  const rotate = Math.floor(base / 864e5) % AHEAD_DAYS.length; // 시범 외 권역은 하루 1회, 14·30·60일 뒤를 날마다 돌아가며
   const jobs = [];
-  for (const [region, r] of Object.entries(HOTELS.regions)) for (const [key] of r.hotels) for (const s of stays) jobs.push({ region, key, ...s });
+  for (const [region, r] of Object.entries(HOTELS.regions)) {
+    const mine = r.stays === 1 ? [stays[rotate]] : stays;
+    for (const [key] of r.hotels) for (const s of mine) jobs.push({ region, key, ...s });
+  }
   return { stays, jobs };
 }
 async function rates(key, chkIn, chkOut, budget) {
@@ -140,10 +144,11 @@ async function collectHotelBatch(env, now, index, size = BATCH) {
   if (index === total - 1) await rebuildSummary(env, now);
   return key;
 }
-async function mergedHotelRates(env, date) {
+async function mergedHotelRates(env, date, offset = 0, limit = 40) {
   const list = await env.DATA.list({ prefix: `hotel-rates/${date}/` });
+  const names = list.keys.map((k) => k.name).sort();
   const parts = [];
-  for (const k of list.keys) parts.push(JSON.parse(await env.DATA.get(k.name)));
+  for (const k of names.slice(offset, offset + limit)) parts.push(JSON.parse(await env.DATA.get(k)));
   if (!parts.length) return null;
   const total = parts[0].total;
   const regions = {};
@@ -156,8 +161,10 @@ async function mergedHotelRates(env, date) {
     }
   }
   for (const r of Object.values(regions)) r.priced = r.rows.filter((x) => x[2] != null).length;
-  const status = parts.length < total ? "partial" : fail / req >= 0.5 ? "failed" : "complete";
-  return { collectedAt: parts[0].collectedAt, source: "Xotelo /api/rates (TripAdvisor 기반, 비공식). 고정 숙소 목록", currency: "USD", priceUnit: "1박 객실(세금 미포함일 수 있음)", stays: parts[0].stays, fields: ["key", "chk_in", "min_rate", "min_provider", "rates"], status, parts: `${parts.length}/${total}`, requests: req, failedRequests: fail, regions };
+  const status = names.length < total ? "partial" : fail / req >= 0.5 ? "failed" : "complete";
+  // 무료 플랜은 요청 하나에 조각 40개까지 읽는다. 더 있으면 nextOffset 으로 이어서 부른다.
+  const nextOffset = offset + limit < names.length ? offset + limit : null;
+  return { collectedAt: parts[0].collectedAt, source: "Xotelo /api/rates (TripAdvisor 기반, 비공식). 고정 숙소 목록", currency: "USD", priceUnit: "1박 객실(세금 미포함일 수 있음)", stays: parts[0].stays, fields: ["key", "chk_in", "min_rate", "min_provider", "rates"], status, parts: `${names.length}/${total}`, shown: `${offset}-${offset + parts.length}`, nextOffset, requests: req, failedRequests: fail, regions };
 }
 
 
@@ -267,7 +274,7 @@ export default {
       return v ? new Response(v, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", "cache-control": "public, max-age=600" } }) : json({ error: "없음" }, 404);
     }
     if (u.pathname === "/hotel-rates") {
-      const v = await mergedHotelRates(env, u.searchParams.get("date") ?? ymd(new Date()));
+      const v = await mergedHotelRates(env, u.searchParams.get("date") ?? ymd(new Date()), Number(u.searchParams.get("offset") ?? 0));
       return v ? json(v) : json({ error: "없음" }, 404);
     }
     if (u.pathname === "/wiki-pageviews") {

@@ -3,7 +3,6 @@
 // 못 읽으면(오프라인·서버 오류) 앱에 들어 있는 10/31 자료(worldPrices·worldHotels)를 그대로 쓴다.
 import { useEffect, useState } from "react";
 import { WORLD_REGIONS } from "@/data/worldV1";
-import { HOTELS } from "@/data/worldHotels";
 
 export const SUMMARY_URL = "https://tripflip-collector.ohysky0127.workers.dev/summary";
 const CACHE_KEY = "tripflip:live-prices:v1";
@@ -16,14 +15,15 @@ export interface LiveSummary {
   counts: { flightSnapshots: number; hotelBatches: number };
   /** 도착 도시코드 → { "YYYY-MM": [원, 표본수] } */
   flights: Record<string, Record<string, [number, number]>>;
-  /** 시범 권역코드 → [[숙소키, 이름, USD, 표본수]] */
-  hotels: Record<string, [string, string | null, number, number][]>;
+  /** 권역(시범 5곳 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수]] 숙소별 평균, 싼 순. 품질 기준 통과 숙소만 */
+  hotels: Record<string, [number, number][]>;
+  v?: number;
 }
 
 let live: LiveSummary | null = null;
 let request: Promise<LiveSummary | null> | null = null; // 화면을 옮겨도 한 번만 요청
 export function setLiveSummary(s: LiveSummary | null) {
-  live = s && typeof s === "object" && s.flights && s.hotels ? s : null;
+  live = s && typeof s === "object" && s.v === 2 && s.flights && s.hotels ? s : null;
 }
 export function liveSummary() {
   return live;
@@ -50,13 +50,11 @@ export function liveFlightKrw(regionKey: string, startDate?: string): number | n
   return vals.length ? Math.round(median(vals) / 1000) * 1000 : null;
 }
 
-/** 시범 권역의 품질 기준(총점 4.5↑·리뷰 300↑) 통과 숙소 1박 평균 최저가(USD), 싼 순. 5곳 미만이면 null */
+/** 권역의 품질 기준(총점 4.5↑·리뷰 300↑) 통과 숙소 1박 평균 최저가(USD), 싼 순. 5곳 미만이면 null */
 export function liveHotelPrices(regionKey: string): number[] | null {
-  const code = PILOT_CODE[regionKey];
-  const list = code ? live?.hotels[code] : undefined;
+  const list = live?.hotels[PILOT_CODE[regionKey] ?? regionKey];
   if (!list) return null;
-  const good = new Set((HOTELS[regionKey] ?? []).filter((h) => h[1] >= 4.5 && h[2] >= 300).map((h) => h[0]));
-  const prices = list.filter(([, name, usd]) => name != null && good.has(name) && usd > 0).map(([, , usd]) => usd).sort((a, b) => a - b);
+  const prices = list.map(([usd]) => usd).filter((usd) => usd > 0).sort((a, b) => a - b);
   return prices.length >= 5 ? prices : null;
 }
 
