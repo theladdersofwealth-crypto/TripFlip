@@ -37,7 +37,7 @@ export function mergeHotelAgg(agg, rows) {
   }
   return agg;
 }
-export function buildSummary(flightDays, hotelDays, now, hotelNames = {}) {
+export function buildSummary(flightDays, hotelDays, now) {
   const f = {};
   let snapshots = 0;
   for (const a of flightDays) {
@@ -65,17 +65,18 @@ export function buildSummary(flightDays, hotelDays, now, hotelNames = {}) {
   }
   const hotels = {};
   for (const [k, [sum, n]] of Object.entries(h)) {
-    const [region, key] = k.split("|");
-    (hotels[region] ??= []).push([key, hotelNames[key] ?? null, Math.round(sum / n), n]);
+    const region = k.split("|")[0];
+    (hotels[region] ??= []).push([Math.round(sum / n), n]);
   }
-  for (const list of Object.values(hotels)) list.sort((a, b) => a[2] - b[2]);
+  for (const list of Object.values(hotels)) list.sort((a, b) => a[0] - b[0]);
   return {
+    v: 2,
     updatedAt: now.toISOString(),
     windowDays: SUMMARY_DAYS,
     days: { flight: flightDays.length, hotel: hotelDays.length },
     source: { flight: "Travelpayouts 인천발 왕복 최저가(최근 48시간 검색 캐시), 수집 회차별 도착도시·출발월 최저가의 평균", hotel: "Xotelo 1박 최저가(USD, 체크인 14·30·60일 뒤), 숙소별 평균" },
     counts: { flightSnapshots: snapshots, hotelBatches: batches },
     flights, // 도착 도시코드 → { "YYYY-MM": [원, 표본수] }
-    hotels, // 시범 권역코드 → [[숙소키, 이름, USD, 표본수]] 싼 순
+    hotels, // 권역(시범 5곳은 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수]] 숙소별 평균, 싼 순. 숙소 목록은 수집 때 4.5점·후기 300개 이상만 담음
   };
 }
