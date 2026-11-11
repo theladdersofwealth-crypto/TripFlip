@@ -37,7 +37,7 @@ export function mergeHotelAgg(agg, rows) {
   }
   return agg;
 }
-export function buildSummary(flightDays, hotelDays, now) {
+export function buildSummary(flightDays, hotelDays, now, relaxed = [], relaxedLabel = "") {
   const f = {};
   let snapshots = 0;
   for (const a of flightDays) {
@@ -71,6 +71,8 @@ export function buildSummary(flightDays, hotelDays, now) {
   for (const list of Object.values(hotels)) list.sort((a, b) => a[0] - b[0]);
   return {
     v: 2,
+    relaxed, // 숙소 기준을 낮춘 권역 id (앱이 알림)
+    relaxedRule: relaxedLabel,
     updatedAt: now.toISOString(),
     windowDays: SUMMARY_DAYS,
     days: { flight: flightDays.length, hotel: hotelDays.length },

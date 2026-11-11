@@ -18,6 +18,9 @@ export interface LiveSummary {
   /** 권역(시범 5곳 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수]] 숙소별 평균, 싼 순. 품질 기준 통과 숙소만 */
   hotels: Record<string, [number, number][]>;
   v?: number;
+  /** 숙소 기준을 낮춘 권역 id와 그 기준 문구 */
+  relaxed?: string[];
+  relaxedRule?: string;
 }
 
 let live: LiveSummary | null = null;
@@ -56,6 +59,12 @@ export function liveHotelPrices(regionKey: string): number[] | null {
   if (!list) return null;
   const prices = list.map(([usd]) => usd).filter((usd) => usd > 0).sort((a, b) => a - b);
   return prices.length >= 5 ? prices : null;
+}
+
+/** 숙소 기준을 낮춰 계산한 권역이면 안내 문구, 아니면 null */
+export function relaxedNotice(regionKey: string): string | null {
+  const id = PILOT_CODE[regionKey] ?? regionKey;
+  return live?.relaxed?.includes(id) ? `숙소가 적은 지역이라 숙소 기준을 ${live.relaxedRule || "4.0점·후기 100개 이상"}으로 낮춰 계산했어요.` : null;
 }
 
 function readCache(): { at: number; data: LiveSummary } | null {
