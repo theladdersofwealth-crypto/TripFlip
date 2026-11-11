@@ -10,6 +10,7 @@ import { coreInterests, membersOf } from "@/lib/travelParty";
 import { PILOT_TWIN_OF, scoreRegions, tripDays } from "@/services/regionScore";
 import type { RegionResult } from "@/services/regionScore";
 import { hotelCandidates } from "@/services/booking";
+import { relaxedNotice } from "@/lib/livePrices";
 import { HOTEL_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
 import { useLivePrices } from "@/lib/livePrices";
 
@@ -47,7 +48,9 @@ function StayLine({ r, tier }: { r: RegionResult; tier: Parameters<typeof hotelC
     <span className="small bold">경비 내역</span>
     <span className="xs">{parts.join(" · ")}</span>
     {hotels.length ? <span className="xs"><b>{tier} 숙소 예</b> · {hotels.map((h) => `${h[0]} ★${h[1]}`).join(" / ")}</span>
+      : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
       : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
+    {relaxedNotice(r.region.id) && <span className="xs warn">⚠ {relaxedNotice(r.region.id)}</span>}
   </div>;
 }
 

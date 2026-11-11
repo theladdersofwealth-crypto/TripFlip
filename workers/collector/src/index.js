@@ -7,6 +7,8 @@
 import HOTELS from "./hotels.json";
 import WIKI from "./wiki-titles.json";
 import { buildSummary, mergeFlightAgg, mergeHotelAgg, SUMMARY_DAYS } from "./summary.js";
+import TARGETS from "./discover-targets.json";
+import { RELAXED, discoverRegion } from "./discover.js";
 
 const FIELDS = ["destination", "departure_at", "return_at", "price", "airline", "transfers", "return_transfers", "duration"];
 const ORIGIN = "ICN";
@@ -84,17 +86,20 @@ async function rebuildSummary(env, now) {
     if (a) fd.push(a);
     if (b) hd.push(b);
   }
-  await env.DATA.put("summary/latest", JSON.stringify(buildSummary(fd, hd, now)));
+  const ext = await getJson(env, "hotels-ext");
+  const relaxed = Object.entries(ext?.regions ?? {}).filter(([, r]) => r.relaxed).map(([id]) => id);
+  await env.DATA.put("summary/latest", JSON.stringify(buildSummary(fd, hd, now, relaxed, RELAXED.label)));
 }
 
 // ---------- 숙소 ----------
-function hotelJobs(now) {
+function hotelJobs(now, ext) {
   const base = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   const stay = (n) => ({ chkIn: ymd(new Date(base + n * 864e5)), chkOut: ymd(new Date(base + (n + 1) * 864e5)) });
   const stays = AHEAD_DAYS.map(stay);
   const rotate = Math.floor(base / 864e5) % AHEAD_DAYS.length; // 시범 외 권역은 하루 1회, 14·30·60일 뒤를 날마다 돌아가며
   const jobs = [];
-  for (const [region, r] of Object.entries(HOTELS.regions)) {
+  const all = { ...HOTELS.regions, ...Object.fromEntries(Object.entries(ext?.regions ?? {}).map(([id, r]) => [id, { ...r, stays: 1 }])) };
+  for (const [region, r] of Object.entries(all)) {
     const mine = r.stays === 1 ? [stays[rotate]] : stays;
     for (const [key] of r.hotels) for (const s of mine) jobs.push({ region, key, ...s });
   }
@@ -121,7 +126,7 @@ async function rates(key, chkIn, chkOut, budget) {
   return { ok: false, ...last };
 }
 async function collectHotelBatch(env, now, index, size = BATCH) {
-  const { stays, jobs } = hotelJobs(now);
+  const { stays, jobs } = hotelJobs(now, await getJson(env, "hotels-ext"));
   const slice = jobs.slice(index * size, index * size + size);
   if (!slice.length) return null;
   const budget = { left: 48 };
@@ -214,6 +219,34 @@ async function mergedWiki(env, label) {
   return { source: "Wikimedia Pageviews API (user agent, all-access, monthly sum). 문서 제목은 2026-10 위키데이터 기준 고정", generatedAt: new Date().toISOString(), period: { start: period.start, end: period.end }, parts: `${list.keys.length}/${total}`, summary: { places: v.length, koArticle: v.filter((r) => r.ko).length, enArticle: v.filter((r) => r.en).length, errors: errors.length }, errors: errors.slice(0, 50), places };
 }
 
+// ---------- 숙소 목록 찾기 (목록이 없던 권역) ----------
+const DISCOVER_PER_RUN = 8;
+async function discoverStep(env, now) {
+  const state = (await getJson(env, "discover/state")) ?? { done: {} };
+  const ext = (await getJson(env, "hotels-ext")) ?? { regions: {} };
+  const today = ymd(now);
+  const budget = { left: 44 };
+  let n = 0;
+  for (const t of TARGETS) {
+    if (n >= DISCOVER_PER_RUN || budget.left < 4) break;
+    const d = state.done[t.id];
+    if (d && (d.ok || d.tries >= 3 || d.day === today)) continue; // 실패한 곳은 하루 한 번만, 3번까지 다시 시도
+    const res = await discoverRegion(t, budget);
+    if (res.retry) break;
+    n++;
+    const tries = (d?.tries ?? 0) + (res.ok ? 0 : 1);
+    if (res.ok && res.hotels.length) {
+      ext.regions[t.id] = { name: t.name, ta: res.ta, relaxed: res.relaxed, hotels: res.hotels, discoveredAt: now.toISOString() };
+      state.done[t.id] = { ok: true, day: today, relaxed: res.relaxed, hotels: res.hotels.length, passed: res.passed, scanned: res.scanned };
+    } else {
+      state.done[t.id] = { ok: false, day: today, tries, error: res.error ?? (res.ok ? `기준을 낮춰도 ${RELAXED.label} 숙소가 5곳 미만 (스캔 ${res.scanned}곳)` : "알 수 없음"), ...(res.ok ? { scanned: res.scanned, passed: res.passed } : {}) };
+    }
+  }
+  await env.DATA.put("hotels-ext", JSON.stringify(ext));
+  await env.DATA.put("discover/state", JSON.stringify(state));
+  return n;
+}
+
 // ---------- 진입점 ----------
 export default {
   async scheduled(event, env, ctx) {
@@ -232,6 +265,8 @@ export default {
     if (minutes < 0 || minutes % 5) return;
     const key = await collectHotelBatch(env, now, minutes / 5);
     if (key) console.log("숙소 저장", key);
+    // 오늘 숙소 묶음이 끝난 뒤 남는 5분 칸에서 숙소 목록 없던 권역을 회당 8곳씩 찾는다
+    else console.log("숙소 목록 찾기", await discoverStep(env, now));
   },
   async fetch(req, env) {
     const u = new URL(req.url);
@@ -273,6 +308,12 @@ export default {
       const v = await env.DATA.get("summary/latest");
       return v ? new Response(v, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", "cache-control": "public, max-age=600" } }) : json({ error: "없음" }, 404);
     }
+    if (u.pathname === "/discover") {
+      const st = (await getJson(env, "discover/state")) ?? { done: {} };
+      const ext = (await getJson(env, "hotels-ext")) ?? { regions: {} };
+      const e = Object.entries(st.done);
+      return json({ targets: TARGETS.length, tried: e.length, ok: e.filter(([, v]) => v.ok).length, strict: Object.values(ext.regions).filter((r) => !r.relaxed).length, relaxed: Object.values(ext.regions).filter((r) => r.relaxed).length, failed: Object.fromEntries(e.filter(([, v]) => !v.ok).map(([k, v]) => [k, v.error])) });
+    }
     if (u.pathname === "/hotel-rates") {
       const v = await mergedHotelRates(env, u.searchParams.get("date") ?? ymd(new Date()), Number(u.searchParams.get("offset") ?? 0));
       return v ? json(v) : json({ error: "없음" }, 404);
@@ -281,6 +322,6 @@ export default {
       const v = await mergedWiki(env, u.searchParams.get("month") ?? wikiPeriod(new Date()).label);
       return v ? json(v) : json({ error: "없음" }, 404);
     }
-    return json({ ok: true, routes: ["/summary", "/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
+    return json({ ok: true, routes: ["/summary", "/discover", "/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
   },
 };
