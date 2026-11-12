@@ -42,6 +42,26 @@ test("번호가 있으면 Xotelo 목록만 읽고, 멀리 떨어진 도시 번�
   }
 });
 
+test("목록에 가격대가 없어도 통과하고, 번호는 힌트에서 가져오며, 1쪽이 100곳이면 3쪽까지 읽는다", async () => {
+  const realFetch = globalThis.fetch;
+  const calls: string[] = [];
+  globalThis.fetch = (async (url: string) => {
+    calls.push(String(url));
+    const list = [...Array(100)].map((_, i) => ({ key: `k${calls.length}-${i}`, name: "n", review_summary: { rating: 4.6, count: 500 }, geo: { latitude: 12.2, longitude: 109.2 } }));
+    return new Response(JSON.stringify({ result: { list } }), { status: 200 });
+  }) as typeof fetch;
+  try {
+    const r = await discoverRegion({ id: "h", lat: 12.2, lon: 109.2 }, { left: 20 }, { h: ["g123"] });
+    assert.equal(r.ok, true);
+    assert.equal(r.relaxed, false);
+    assert.equal(r.ta, "g123");
+    assert.equal(calls.length, 3);
+    assert.equal(r.hotels.length, 20);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
 test("기준을 낮춘 권역은 앱이 안내 문구를 보여준다", () => {
   setLiveSummary({ v: 2, updatedAt: "2026-11-12T00:00:00Z", windowDays: 14, days: { flight: 1, hotel: 1 }, counts: { flightSnapshots: 1, hotelBatches: 1 }, flights: {}, hotels: {}, relaxed: ["jap-fukuoka"], relaxedRule: "4.0점·후기 100개 이상" });
   assert.match(relaxedNotice("jap-fukuoka")!, /4\.0점·후기 100개 이상/);

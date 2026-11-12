@@ -21,7 +21,7 @@ export function median(xs) {
 /** Xotelo 목록 → 기준에 맞는 숙소. 엄격 기준으로 5곳 이상이면 그대로, 아니면 낮춘 기준(relaxed) */
 export function pickHotels(list) {
   const rows = list
-    .filter((h) => h?.key && h.name && (h.price_ranges?.minimum ?? 0) > 0)
+    .filter((h) => h?.key && h.name) // 가격은 /api/rates 로 따로 받으므로 목록의 가격대는 요구하지 않는다
     .map((h) => ({ key: h.key, name: h.name, rating: h.review_summary?.rating ?? 0, reviews: h.review_summary?.count ?? 0 }));
   const by = (c) => rows.filter((h) => h.rating >= c.rating && h.reviews >= c.reviews).sort((a, b) => b.reviews - a.reviews);
   const strict = by(STRICT);
@@ -53,9 +53,9 @@ async function wikidataCandidates(lat, lon, budget) {
   }
 }
 
-async function xoteloList(loc, budget, pages = 3) {
+async function xoteloList(loc, budget, pages = 3, startPage = 0) {
   const list = [];
-  for (let i = 0; i < pages; i++) {
+  for (let i = startPage; i < startPage + pages; i++) {
     if (budget.left < 1) return { list, partial: true };
     budget.left--;
     try {
@@ -74,8 +74,8 @@ async function xoteloList(loc, budget, pages = 3) {
 }
 
 /** 한 권역 처리. 결과: { ok, ta, relaxed, hotels, scanned, passed } 또는 { error } */
-export async function discoverRegion(t, budget) {
-  let ids = t.ta ? [t.ta] : [];
+export async function discoverRegion(t, budget, hints = {}) {
+  let ids = t.ta ? [t.ta] : [...(hints[t.id] ?? [])];
   if (!ids.length) {
     const w = await wikidataCandidates(t.lat, t.lon, budget);
     if (!w) return { retry: true };
@@ -86,13 +86,18 @@ export async function discoverRegion(t, budget) {
   let lastErr = null;
   for (const ta of ids.slice(0, 2)) {
     if (budget.left < 3) return { retry: true };
-    const { list, error } = await xoteloList(ta, budget);
-    if (error) { lastErr = error; if (!list.length) break; }
-    const dists = list.filter((h) => h.geo?.latitude != null).map((h) => km(t.lat, t.lon, h.geo.latitude, h.geo.longitude));
-    const hotelKm = median(dists);
-    if (list.length && hotelKm != null && hotelKm <= MAX_HOTEL_KM) {
+    // 먼저 1쪽만 읽어 거점에서 가까운 도시 번호인지 확인한다(틀린 번호에 요청을 쓰지 않으려고)
+    const first = await xoteloList(ta, budget, 1, 0);
+    if (first.error) { lastErr = first.error; if (!first.list.length) continue; }
+    const near = (rows) => median(rows.filter((h) => h.geo?.latitude != null).map((h) => km(t.lat, t.lon, h.geo.latitude, h.geo.longitude)));
+    if (first.list.length && (near(first.list) ?? Infinity) <= MAX_HOTEL_KM) {
+      const list = [...first.list];
+      if (first.list.length >= 100 && !first.error) {
+        const more = await xoteloList(ta, budget, 2, 1);
+        list.push(...more.list);
+      }
       const p = pickHotels(list);
-      return { ok: true, ta, scanned: list.length, hotelKm: Math.round(hotelKm), ...p, ...(lastErr ? { note: lastErr } : {}) };
+      return { ok: true, ta, scanned: list.length, hotelKm: Math.round(near(list) ?? 0), ...p };
     }
     lastErr = lastErr ?? "맞는 트립어드바이저 지역 없음";
   }

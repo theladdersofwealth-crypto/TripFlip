@@ -8,6 +8,7 @@ import HOTELS from "./hotels.json";
 import WIKI from "./wiki-titles.json";
 import { buildSummary, mergeFlightAgg, mergeHotelAgg, SUMMARY_DAYS } from "./summary.js";
 import TARGETS from "./discover-targets.json";
+import TA_HINTS from "./ta-hints.json";
 import { RELAXED, discoverRegion } from "./discover.js";
 
 const FIELDS = ["destination", "departure_at", "return_at", "price", "airline", "transfers", "return_transfers", "duration"];
@@ -221,8 +222,11 @@ async function mergedWiki(env, label) {
 
 // ---------- 숙소 목록 찾기 (목록이 없던 권역) ----------
 const DISCOVER_PER_RUN = 8;
+const DISCOVER_VERSION = 2; // 2: 가격대 요구 제거 + 도시 번호 힌트
 async function discoverStep(env, now) {
   const state = (await getJson(env, "discover/state")) ?? { done: {} };
+  // 찾는 방식이 바뀌면(v) 이전에 실패한 곳을 다시 시도한다
+  if (state.v !== DISCOVER_VERSION) { state.done = Object.fromEntries(Object.entries(state.done).filter(([, d]) => d.ok)); state.v = DISCOVER_VERSION; }
   const ext = (await getJson(env, "hotels-ext")) ?? { regions: {} };
   const today = ymd(now);
   const budget = { left: 44 };
@@ -231,7 +235,7 @@ async function discoverStep(env, now) {
     if (n >= DISCOVER_PER_RUN || budget.left < 4) break;
     const d = state.done[t.id];
     if (d && (d.ok || d.tries >= 3 || d.day === today)) continue; // 실패한 곳은 하루 한 번만, 3번까지 다시 시도
-    const res = await discoverRegion(t, budget);
+    const res = await discoverRegion(t, budget, TA_HINTS);
     if (res.retry) break;
     n++;
     const tries = (d?.tries ?? 0) + (res.ok ? 0 : 1);
