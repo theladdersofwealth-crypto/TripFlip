@@ -73,17 +73,17 @@ test("영문 이름 검색으로 도시 번호 후보를 얻어 거리 확인 �
   const realFetch = globalThis.fetch;
   globalThis.fetch = (async (url: string) => {
     const u = String(url);
-    if (u.includes("/api/search")) return new Response(JSON.stringify({ result: { list: [{ key: "g555-d1" }, { key: "g555-d2" }, { key: "g777-d3" }] } }), { status: 200 });
-    const far = u.includes("g555");
+    if (u.includes("/api/search")) return new Response(JSON.stringify({ result: { list: [{ key: "g5555-d1" }, { key: "g5555-d2" }, { key: "g7777-d3" }] } }), { status: 200 });
+    const far = u.includes("g5555");
     const list = [...Array(8)].map((_, i) => h(`k${i}`, 4.6, 500, far ? 40 : 12.2, far ? 100 : 109.2));
     return new Response(JSON.stringify({ result: { list } }), { status: 200 });
   }) as typeof fetch;
   try {
     const r = await discoverBySearch({ id: "s", lat: 12.2, lon: 109.2 }, ["Somewhere"], { left: 30 }, []);
     assert.equal(r.ok, true);
-    assert.equal(r.ta, "g777", "가장 많이 나온 g555는 멀어서 거르고 g777을 쓴다");
+    assert.equal(r.ta, "g7777", "가장 많이 나온 g5555는 멀어서 거르고 g7777을 쓴다");
     assert.equal(r.via, "search");
-    const none = await discoverBySearch({ id: "s", lat: 12.2, lon: 109.2 }, ["Somewhere"], { left: 30 }, ["g555", "g777"]);
+    const none = await discoverBySearch({ id: "s", lat: 12.2, lon: 109.2 }, ["Somewhere"], { left: 30 }, ["g5555", "g7777"]);
     assert.match(none.error!, /검색 후보 없음|번호 없음/);
   } finally {
     globalThis.fetch = realFetch;
