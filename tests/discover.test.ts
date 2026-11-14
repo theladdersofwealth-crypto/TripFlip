@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { relaxedNotice, setLiveSummary } from "../src/lib/livePrices";
 // @ts-expect-error 수집 Worker의 순수 JS 모듈
-import { discoverRegion, pickHotels } from "../workers/collector/src/discover.js";
+import { discoverBySearch, discoverRegion, pickHotels } from "../workers/collector/src/discover.js";
 
 const h = (key: string, rating: number, count: number, lat = 12.2, lon = 109.2) => ({ key, name: key, review_summary: { rating, count }, price_ranges: { minimum: 50, maximum: 90 }, geo: { latitude: lat, longitude: lon } });
 
@@ -67,4 +67,25 @@ test("기준을 낮춘 권역은 앱이 안내 문구를 보여준다", () => {
   assert.match(relaxedNotice("jap-fukuoka")!, /4\.0점·후기 100개 이상/);
   assert.equal(relaxedNotice("jap-tokyo"), null);
   setLiveSummary(null);
+});
+
+test("영문 이름 검색으로 도시 번호 후보를 얻어 거리 확인 후 통과시킨다", async () => {
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string) => {
+    const u = String(url);
+    if (u.includes("/api/search")) return new Response(JSON.stringify({ result: { list: [{ key: "g5555-d1" }, { key: "g5555-d2" }, { key: "g7777-d3" }] } }), { status: 200 });
+    const far = u.includes("g5555");
+    const list = [...Array(8)].map((_, i) => h(`k${i}`, 4.6, 500, far ? 40 : 12.2, far ? 100 : 109.2));
+    return new Response(JSON.stringify({ result: { list } }), { status: 200 });
+  }) as typeof fetch;
+  try {
+    const r = await discoverBySearch({ id: "s", lat: 12.2, lon: 109.2 }, ["Somewhere"], { left: 30 }, []);
+    assert.equal(r.ok, true);
+    assert.equal(r.ta, "g7777", "가장 많이 나온 g5555는 멀어서 거르고 g7777을 쓴다");
+    assert.equal(r.via, "search");
+    const none = await discoverBySearch({ id: "s", lat: 12.2, lon: 109.2 }, ["Somewhere"], { left: 30 }, ["g5555", "g7777"]);
+    assert.match(none.error!, /검색 후보 없음|번호 없음/);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
