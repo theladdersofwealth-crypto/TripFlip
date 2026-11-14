@@ -103,3 +103,40 @@ export async function discoverRegion(t, budget, hints = {}) {
   }
   return { error: lastErr ?? "맞는 트립어드바이저 지역 없음" };
 }
+
+/** 번호를 못 찾았거나 맞지 않은 권역: 영문 이름으로 Xotelo 검색 → 결과 숙소 번호(g…-d…)에서 도시 번호 후보를 모아 하나씩 거리로 검증한다 */
+export async function discoverBySearch(t, names, budget, skip = []) {
+  const tally = new Map();
+  let note = "";
+  for (const q of names.slice(0, 2)) {
+    if (budget.left < 5) return { retry: true };
+    budget.left--;
+    try {
+      const r = await fetch(`https://data.xotelo.com/api/search?query=${encodeURIComponent(q)}&location_type=accommodation`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(20000) });
+      const txt = await r.text();
+      if (!r.ok) { note = `search ${r.status}`; continue; }
+      for (const m of txt.matchAll(/g(\d{4,8})-d\d+/g)) tally.set(`g${m[1]}`, (tally.get(`g${m[1]}`) ?? 0) + 1);
+      if (!tally.size) note = `search 결과에 번호 없음: ${txt.slice(0, 80)}`;
+    } catch (e) {
+      note = `search ${String(e?.message ?? e)}`;
+    }
+    await new Promise((ok) => setTimeout(ok, 800));
+  }
+  const cands = [...tally.entries()].filter(([g]) => !skip.includes(g)).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([g]) => g);
+  if (!cands.length) return { error: note || "검색 후보 없음" };
+  let best = null;
+  for (const ta of cands) {
+    if (budget.left < 3) return best ?? { retry: true };
+    const first = await xoteloList(ta, budget, 1, 0);
+    if (!first.list.length) { note = first.error ?? note; continue; }
+    const near = (rows) => median(rows.filter((h) => h.geo?.latitude != null).map((h) => km(t.lat, t.lon, h.geo.latitude, h.geo.longitude)));
+    if ((near(first.list) ?? Infinity) > MAX_HOTEL_KM) continue;
+    const list = [...first.list];
+    if (first.list.length >= 100 && !first.error) list.push(...(await xoteloList(ta, budget, 2, 1)).list);
+    const p = pickHotels(list);
+    const res = { ok: true, ta, scanned: list.length, hotelKm: Math.round(near(list) ?? 0), via: "search", ...p };
+    if (p.hotels.length && (!best || p.hotels.length > best.hotels.length)) best = res;
+    if (best) break;
+  }
+  return best ?? { error: `검색 후보 ${cands.join(",")} 모두 맞지 않음${note ? " · " + note : ""}` };
+}
