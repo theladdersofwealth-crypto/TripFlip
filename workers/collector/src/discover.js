@@ -34,9 +34,10 @@ export function pickHotels(list) {
 const UA = "TripFlip/0.1 (travel price research; data collection)";
 async function wikidataCandidates(lat, lon, budget) {
   const q = `SELECT ?item ?ta ?sl WHERE {
-    SERVICE wikibase:around { ?item wdt:P625 ?loc. bd:serviceParam wikibase:center "Point(${lon} ${lat})"^^geo:wktLiteral; wikibase:radius "30". }
-    ?item wdt:P3134 ?ta; wikibase:sitelinks ?sl; wdt:P31/wdt:P279* wd:Q486972.
-  } ORDER BY DESC(?sl) LIMIT 3`;
+    SERVICE wikibase:around { ?item wdt:P625 ?loc. bd:serviceParam wikibase:center "Point(${lon} ${lat})"^^geo:wktLiteral; wikibase:radius "60". }
+    ?item wdt:P3134 ?ta; wikibase:sitelinks ?sl.
+    FILTER(STRSTARTS(STR(?ta), "g"))
+  } ORDER BY DESC(?sl) LIMIT 8`;
   if (budget.left < 1) return null;
   budget.left--;
   try {
@@ -75,33 +76,39 @@ async function xoteloList(loc, budget, pages = 3, startPage = 0) {
 
 /** 한 권역 처리. 결과: { ok, ta, relaxed, hotels, scanned, passed } 또는 { error } */
 export async function discoverRegion(t, budget, hints = {}) {
-  let ids = t.ta ? [t.ta] : [...(hints[t.id] ?? [])];
-  if (!ids.length) {
-    const w = await wikidataCandidates(t.lat, t.lon, budget);
-    if (!w) return { retry: true };
-    if (w.error) return { error: w.error };
-    ids = w.ids;
-    if (!ids.length) return { error: "트립어드바이저 번호 없음" };
-  }
+  const base = t.ta ? [t.ta] : [...(hints[t.id] ?? [])];
+  const tried = [];
   let lastErr = null;
-  for (const ta of ids.slice(0, 2)) {
-    if (budget.left < 3) return { retry: true };
-    // 먼저 1쪽만 읽어 거점에서 가까운 도시 번호인지 확인한다(틀린 번호에 요청을 쓰지 않으려고)
-    const first = await xoteloList(ta, budget, 1, 0);
-    if (first.error) { lastErr = first.error; if (!first.list.length) continue; }
-    const near = (rows) => median(rows.filter((h) => h.geo?.latitude != null).map((h) => km(t.lat, t.lon, h.geo.latitude, h.geo.longitude)));
-    if (first.list.length && (near(first.list) ?? Infinity) <= MAX_HOTEL_KM) {
-      const list = [...first.list];
-      if (first.list.length >= 100 && !first.error) {
-        const more = await xoteloList(ta, budget, 2, 1);
-        list.push(...more.list);
+  const tryIds = async (ids) => {
+    for (const ta of ids) {
+      if (tried.includes(ta)) continue;
+      if (budget.left < 3) return { retry: true };
+      tried.push(ta);
+      // 먼저 1쪽만 읽어 거점에서 가까운 도시 번호인지 확인한다(틀린 번호에 요청을 쓰지 않으려고)
+      const first = await xoteloList(ta, budget, 1, 0);
+      if (first.error) { lastErr = first.error; if (!first.list.length) continue; }
+      const near = (rows) => median(rows.filter((h) => h.geo?.latitude != null).map((h) => km(t.lat, t.lon, h.geo.latitude, h.geo.longitude)));
+      if (first.list.length && (near(first.list) ?? Infinity) <= MAX_HOTEL_KM) {
+        const list = [...first.list];
+        if (first.list.length >= 100 && !first.error) list.push(...(await xoteloList(ta, budget, 2, 1)).list);
+        const p = pickHotels(list);
+        if (p.hotels.length) return { ok: true, ta, scanned: list.length, hotelKm: Math.round(near(list) ?? 0), ...p };
+        lastErr = `기준을 낮춰도 ${RELAXED.label} 숙소가 5곳 미만 (스캔 ${list.length}곳)`;
+        continue;
       }
-      const p = pickHotels(list);
-      return { ok: true, ta, scanned: list.length, hotelKm: Math.round(near(list) ?? 0), ...p };
+      lastErr = lastErr ?? "맞는 트립어드바이저 지역 없음";
     }
-    lastErr = lastErr ?? "맞는 트립어드바이저 지역 없음";
-  }
-  return { error: lastErr ?? "맞는 트립어드바이저 지역 없음" };
+    return null;
+  };
+  let r = await tryIds(base.slice(0, 2));
+  if (r) return r;
+  // 번호가 없거나 맞지 않으면 위키데이터(반경 60km 안 트립어드바이저 도시 번호 g…)에서 후보를 더 받는다
+  const w = await wikidataCandidates(t.lat, t.lon, budget);
+  if (!w) return { retry: true };
+  if (w.error) return { error: lastErr ?? w.error };
+  r = await tryIds(w.ids.slice(0, 3));
+  if (r) return r;
+  return { error: lastErr ?? (tried.length ? "맞는 트립어드바이저 지역 없음" : "트립어드바이저 번호 없음") };
 }
 
 /** 번호를 못 찾았거나 맞지 않은 권역: 영문 이름으로 Xotelo 검색 → 결과 숙소 번호(g…-d…)에서 도시 번호 후보를 모아 하나씩 거리로 검증한다 */
