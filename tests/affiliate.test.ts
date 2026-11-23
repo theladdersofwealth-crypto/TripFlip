@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl, tpLink } from "../src/services/affiliate";
+import { aviasalesSearchUrl, kkdaySearchUrl, klookHotelUrl, klookSearchUrl, tpLink, welcomePickupsUrl } from "../src/services/affiliate";
 
 test("제휴 값이 없으면 원래 주소 그대로", () => {
   assert.equal(klookSearchUrl("Nha Trang", { marker: "", trs: "" }), "https://www.klook.com/ko/search/result/?query=Nha%20Trang");
@@ -34,4 +34,20 @@ test("클룩 호텔 링크도 제휴로 감싼다", () => {
   const h = new URL(klookHotelUrl());
   assert.equal(h.searchParams.get("p"), "4110");
   assert.equal(h.searchParams.get("u"), "https://www.klook.com/ko/hotels/");
+});
+
+const none = { marker: "", trs: "" };
+test("Aviasales 왕복 검색 주소(성인·어린이·유아)", () => {
+  const base = { from: "ICN", to: "cxr", startDate: "2027-01-13", endDate: "2027-01-20" };
+  assert.equal(aviasalesSearchUrl({ ...base, adults: 2, childAges: null, childCount: 0 }, none), "https://www.aviasales.com/search/ICN1301CXR20012?currency=krw");
+  assert.equal(aviasalesSearchUrl({ ...base, adults: 2, childAges: [4, 1], childCount: 2 }, none), "https://www.aviasales.com/search/ICN1301CXR2001211?currency=krw");
+  assert.equal(aviasalesSearchUrl({ ...base, adults: 2, childAges: null, childCount: 2 }, none), "https://www.aviasales.com/search/ICN1301CXR200122?currency=krw");
+  assert.equal(aviasalesSearchUrl({ ...base, to: "", adults: 2, childAges: null, childCount: 0 }, none), "https://www.aviasales.com/");
+});
+
+test("Aviasales·공항 픽업도 제휴로 감싼다", () => {
+  const a = new URL(aviasalesSearchUrl({ from: "ICN", to: "HKG", startDate: "2027-01-13", endDate: "2027-01-20", adults: 1, childAges: null, childCount: 0 }));
+  assert.equal(a.searchParams.get("p"), "4114");
+  assert.equal(a.searchParams.get("campaign_id"), "100");
+  assert.equal(new URL(welcomePickupsUrl()).searchParams.get("p"), "8919");
 });
