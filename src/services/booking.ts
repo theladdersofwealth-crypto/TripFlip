@@ -4,6 +4,7 @@ import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
+import { aviasalesSearchUrl } from "@/services/affiliate";
 
 export const STAY_TIERS: StayTier[] = ["가성비", "가심비", "프리미엄", "하이엔드"];
 
@@ -28,6 +29,11 @@ export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
   const params = new URLSearchParams({ adultsv2: String(q.adults) });
   if (ages?.length) params.set("childrenv2", ages.join("|"));
   return `https://www.skyscanner.co.kr/transport/flights/icn/${region.airportCode.toLowerCase()}/${ymd(q.startDate)}/${ymd(q.endDate)}/?${params}`;
+}
+
+/** 항공권: Aviasales(Travelpayouts 제휴) 왕복 검색 */
+export function flightAffiliateUrl(region: RegionV1, q: RegionQuery) {
+  return aviasalesSearchUrl({ from: "ICN", to: region.airportCode, startDate: q.startDate, endDate: q.endDate, adults: q.adults, childAges: childAgesForBooking(q), childCount: q.children.length });
 }
 
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {

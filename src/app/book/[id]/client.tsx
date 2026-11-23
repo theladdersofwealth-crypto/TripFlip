@@ -12,9 +12,9 @@ import { fmtDate } from "@/services/itineraryV1";
 import { boardKey, emptyBoard } from "@/services/planner";
 import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
 import type { StayTier } from "@/services/regionScore";
-import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
+import { STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
-import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl } from "@/services/affiliate";
+import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
 import { track } from "@/lib/analytics";
 
 
@@ -63,7 +63,11 @@ export default function BookPage() {
         <label className="field"><span className="label">항공 선호</span><select className="input" aria-label="항공 선호" value={flightPreference} onChange={(e) => setFlightPreference(e.target.value as typeof flightPreference)}><option value="any">상관없음</option><option value="lowcost">저가항공 우선</option><option value="fullservice">일반 항공사 우선</option></select></label>
         <p className="xs muted">선호는 계획에 저장돼요. 실제 항공사·수하물·도착시간은 예약처에서 비교해 주세요.</p>
         {unknownAges && <p className="xs muted">자녀 나이가 미확인이에요. 예약처에서 정확한 나이와 인원을 다시 입력해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너에서 검색 <Icon name="link" /></a>
+        <div className="grid-2">
+          <a className="btn btn-teal btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">Aviasales <Icon name="link" /></a>
+          <a className="btn btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너 <Icon name="link" /></a>
+        </div>
+        <a className="btn btn-block" href={welcomePickupsUrl()} target="_blank" rel="noopener noreferrer sponsored">공항 픽업 예약 (Welcome Pickups) <Icon name="link" /></a>
         <label className="check-row"><input type="checkbox" checked={booked.flight} onChange={(e) => setBooked((v) => ({ ...v, flight: e.target.checked }))} />항공권 예약 완료 (직접 확인)</label>
       </section>
       <section className={`book-card ${booked.hotel ? "done" : ""}`}>
@@ -88,7 +92,7 @@ export default function BookPage() {
       </section>
       <section className="book-card">
         <div className="row"><Icon name="compass" size={22} /><b style={{ fontSize: 18 }}>현지 투어·입장권</b></div>
-        <p className="small muted">{r.region.name}의 투어·입장권·공항 픽업을 찾아요. 가격·운영 여부는 각 사이트에서 확인해 주세요.</p>
+        <p className="small muted">{r.region.name}의 투어·입장권을 찾아요. 가격·운영 여부는 각 사이트에서 확인해 주세요.</p>
         <div className="grid-2">
           <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">클룩 <Icon name="link" /></a>
           <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">KKday <Icon name="link" /></a>
