@@ -94,7 +94,7 @@ export default function BookPage() {
     <p className="small muted" style={{ marginTop: 12 }}>현재 숙소 수준·객실 수 기준 일행 전체 예상 경비: {estimate.partyTotalKrw == null ? "미확인" : `약 ${Math.round(estimate.partyTotalKrw / 10000).toLocaleString()}만원`}. {estimate.priceSource.flight === "live" || estimate.priceSource.hotel === "live" ? "항공·숙박은 최근 2주 수집 평균, 식비는 가정으로 계산했어요." : "항공·숙박·식비의 과거 자료와 가정으로 계산했어요."}</p>
     {relaxedNotice(id) && <p className="xs muted">⚠ {relaxedNotice(id)}</p>}
     {estimate.budgetStatus === "over" && <p role="status" className="small" style={{ color: "var(--danger)" }}>현재 선택은 입력한 전체 예산을 넘는 것으로 추정돼요.</p>}
-    <p className="xs faint" style={{ marginTop: 10 }}>현재는 일반 검색 링크예요. 예약과 결제는 외부 사이트에서 진행하며, 예약 전에도 계획을 저장할 수 있어요. 실제 항공시간·숙소 위치에 맞춘 일정 조정은 별도 확인이 필요해요.</p>
+    <p className="xs faint" style={{ marginTop: 10 }}>예약과 결제는 외부 사이트에서 진행하며, 예약 전에도 계획을 저장할 수 있어요. 실제 항공시간·숙소 위치에 맞춘 일정 조정은 별도 확인이 필요해요.</p>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
     <div className="sticky-cta stack" style={{ marginTop: 12 }}><button className="btn btn-primary btn-lg btn-block" onClick={save}>일정과 함께 내 여행에 저장</button><button className="btn btn-block" onClick={() => downloadPlan(makePlan())}>계획 파일 내려받기</button></div>
   </main>;

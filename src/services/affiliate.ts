@@ -7,10 +7,10 @@
 export type TpProgram = { p: string; campaignId: string };
 
 export const TP = {
-  marker: "",
-  trs: "",
-  klook: { p: "", campaignId: "" } as TpProgram,
-  kkday: { p: "", campaignId: "" } as TpProgram,
+  marker: "798059", // 형님 파트너 번호
+  trs: "605469", // 프로젝트 Tripflip (tripflip.pages.dev)
+  klook: { p: "4110", campaignId: "137" } as TpProgram,
+  kkday: { p: "9074", campaignId: "633" } as TpProgram,
 };
 
 export function tpLink(url: string, prog: TpProgram, tp: { marker: string; trs: string } = TP): string {

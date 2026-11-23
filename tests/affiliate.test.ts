@@ -20,3 +20,12 @@ test("제휴 값이 있으면 tp.media 로 감싸고 원래 주소를 u 에 넣�
 test("프로그램 번호가 없으면 감싸지 않는다", () => {
   assert.equal(tpLink("https://x.test/", { p: "", campaignId: "" }, { marker: "1", trs: "2" }), "https://x.test/");
 });
+
+test("실제 계정 값으로 클룩·KKday 제휴 링크가 만들어진다", () => {
+  const k = new URL(klookSearchUrl("Nha Trang"));
+  assert.equal(k.searchParams.get("marker"), "798059");
+  assert.equal(k.searchParams.get("p"), "4110");
+  const d = new URL(kkdaySearchUrl("Nha Trang"));
+  assert.equal(d.searchParams.get("p"), "9074");
+  assert.equal(d.searchParams.get("campaign_id"), "633");
+});
