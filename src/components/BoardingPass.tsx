@@ -8,7 +8,8 @@ type Slot = { n: string; k: string; v: string; sub: string; target: string };
 const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 // 보딩패스 시안: 지금 고른 조건 4가지를 한 장에 요약하고, 칸을 누르면 해당 입력으로 이동
-export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸을 누르면 아래 입력으로 이동해요." }: { q: RegionQuery; members: TravelMember[]; days: number; interests: string[]; onSlot?: (target: string) => void; hint?: string }) {
+// compact: 첫 화면 위에 고정되는 작은 보딩패스. 답할 때마다 값이 바뀌고, 지금 묻는 칸(active)을 강조
+export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸을 누르면 아래 입력으로 이동해요.", compact = false, active }: { q: RegionQuery; members: TravelMember[]; days: number; interests: string[]; onSlot?: (target: string) => void; hint?: string; compact?: boolean; active?: string | null }) {
   const kids = members.filter((m) => m.relationship === "child");
   const adults = members.length - kids.length;
   const okDays = Number.isFinite(days) && days > 0;
@@ -18,6 +19,27 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
     { n: "③", k: "VIBE · 여행취향", v: `메인 ${interests[0] ?? "-"}`, sub: [interests.length > 1 ? `+ ${interests.slice(1, 3).join("·")}${interests.length > 3 ? ` 외 ${interests.length - 3}` : ""}` : null, `하루 ${q.perDay}곳`].filter(Boolean).join(" · "), target: "vibe" },
     { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "s3" },
   ];
+  if (compact) return (
+    <section className="boarding-pass compact" aria-label="여행 조건 요약">
+      <div className="ticket-top">
+        <div className="route-visualizer">
+          <span className="airport-code">ICN</span>
+          <div className="flight-arc"><div className="flight-arc-line"><i />✈️<i /></div></div>
+          <span className="airport-code">FLIP?</span>
+        </div>
+        <span className="ticket-top-label">TRIPFLIP BOARDING PASS</span>
+      </div>
+      <div className="ticket-slots-grid">
+        {slots.map((s) => (
+          <button key={s.k} type="button" className={`ticket-slot ${active === s.target ? "active" : ""}`} onClick={() => onSlot?.(s.target)}>
+            <span className="slot-k">{s.n} {s.k.split(" · ")[1]}</span>
+            <span key={s.v} className="slot-v">{s.v}</span>
+            <span key={s.sub} className="slot-sub">{s.sub}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
   return (
     <section className="boarding-pass" aria-label="여행 조건 요약">
       <div className="ticket-top">

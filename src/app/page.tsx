@@ -101,6 +101,8 @@ export default function Home() {
     router.prefetch("/results");
     setTimeout(() => startTransition(() => router.push("/results")), 1800);
   };
+  const curQ = open == null ? null : STEPS[open].qs[qi];
+  const activeSlot = curQ === "who" || curQ === "when" || curQ === "vibe" ? curQ : curQ === "intensity" ? "vibe" : curQ === "budget" || curQ === "stay" ? "s3" : null;
   const slotJump = (t: string) => { if (t === "s3") openStep(2); else openStep(0, Math.max(0, STEPS[0].qs.indexOf(t as Q))); };
   const question = (k: Q) => {
     switch (k) {
@@ -145,6 +147,7 @@ export default function Home() {
     <main className="container page discovery-form" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
       <p className="small muted form-intro">1단계만 답하면 바로 추천받을 수 있어요. 2·3단계를 더하면 더 정확해져요.</p>
+      <div className="bp-sticky"><BoardingPass compact q={q} members={members} days={days} interests={interests} active={activeSlot} onSlot={slotJump} /></div>
       <ol className="flow-steps">
         {STEPS.map((s, i) => {
           const isOpen = open === i;
@@ -173,7 +176,6 @@ export default function Home() {
         <div className="accuracy-head"><b>추천 정확도 {accuracy}%</b><span className="xs muted">{!done[0] ? "1단계를 마치면 추천받을 수 있어요" : accuracy < 100 ? "단계를 더할수록 더 정확해져요" : "모든 단계 반영 완료"}</span></div>
         <div className="accuracy-bar"><span style={{ width: `${accuracy}%` }} /></div>
       </div>
-      <BoardingPass q={q} members={members} days={days} interests={interests} hint="고른 값이 여기에 모여요." onSlot={slotJump} />
       {done[0] && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 정확도 ${accuracy}%`}</button>
       </div>}

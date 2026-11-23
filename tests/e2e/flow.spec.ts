@@ -238,7 +238,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
 test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼쳐서 확인한다", async ({ page }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: /PASSENGER/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /① 누구와/ })).toBeVisible();
   // 1단계 첫 질문만 보이고, 날짜·2·3단계는 아직 펼치지 않는다.
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
   await expect(page.getByRole("button", { name: "다음 달", exact: true })).toHaveCount(0);

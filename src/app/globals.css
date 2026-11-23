@@ -590,7 +590,7 @@ p { margin: 0; }
 
 /* 첫 화면: 1단계 → 2단계 → 3단계 세로 흐름, 단계 안 질문은 하나씩 */
 .flow-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
-.flow-step { position: relative; padding-left: 0; scroll-margin-top: 72px; }
+.flow-step { position: relative; padding-left: 0; scroll-margin-top: 200px; }
 .flow-step + .flow-step { margin-top: 18px; }
 .flow-step + .flow-step::before { content: ""; position: absolute; left: 25px; top: -18px; height: 18px; border-left: 2px dashed var(--line); }
 .flow-step.done + .flow-step::before { border-left-color: var(--teal); border-left-style: solid; }
@@ -611,4 +611,22 @@ p { margin: 0; }
 .flow-answered em { font-style: normal; font-size: 12px; color: var(--teal-dark); font-weight: 700; }
 .flow-q { font-size: 18px; font-weight: 900; color: var(--navy); margin: 2px 0 0; }
 .flow-next { margin-top: 4px; }
-.discovery-form .boarding-pass { margin-top: 14px; }
+
+
+/* 첫 화면 위 고정 보딩패스(작게) — 답할 때마다 칸 값이 바뀌며 반짝 */
+.bp-sticky { position: sticky; top: 57px; z-index: 15; margin: 0 -16px 14px; padding: 6px 16px 8px; background: var(--bg); }
+.boarding-pass.compact { margin-top: 0; border-radius: 16px; box-shadow: 0 8px 20px rgba(16, 47, 84, 0.12); }
+.boarding-pass.compact .ticket-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 14px; }
+.boarding-pass.compact .route-visualizer { margin: 0; flex: 1; gap: 6px; }
+.boarding-pass.compact .airport-code { font-size: 16px; }
+.boarding-pass.compact .flight-arc { padding: 0 4px; }
+.boarding-pass.compact .ticket-top-label { font-size: 9.5px; white-space: nowrap; }
+.boarding-pass.compact .ticket-slots-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 0; }
+.boarding-pass.compact .ticket-slots-grid::before, .boarding-pass.compact .ticket-slots-grid::after { display: none; }
+.boarding-pass.compact .ticket-slot { padding: 7px 8px; border-bottom: 0; border-right: 1px solid #f0eee8; }
+.boarding-pass.compact .ticket-slot:last-child { border-right: 0; }
+.boarding-pass.compact .ticket-slot.active { background: var(--teal-50); box-shadow: inset 0 -3px 0 var(--teal); }
+.boarding-pass.compact .slot-k { font-size: 9.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boarding-pass.compact .slot-v { font-size: 13px; margin-top: 2px; animation: slot-flash .5s ease; }
+.boarding-pass.compact .slot-sub { font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; animation: slot-flash .5s ease; }
+@keyframes slot-flash { from { color: var(--teal); transform: translateY(-3px); opacity: .3; } to { transform: none; opacity: 1; } }
