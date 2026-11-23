@@ -14,7 +14,7 @@ import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore
 import type { StayTier } from "@/services/regionScore";
 import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
-import { kkdaySearchUrl, klookSearchUrl } from "@/services/affiliate";
+import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl } from "@/services/affiliate";
 import { track } from "@/lib/analytics";
 
 
@@ -79,7 +79,11 @@ export default function BookPage() {
           {hotels.map(([name, rating, reviews, lo, hi]) => <a key={name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, name)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer"><span><b className="small">{name}</b><span className="xs muted" style={{ display: "block" }}>종합 ★ {rating} · 후기 {reviews.toLocaleString()} · 과거 1박 ${lo}~${hi}</span></span><Icon name="link" size={16} /></a>)}
           <p className="xs faint">2026-10-31 수집 자료의 가격대예요. 날짜별 실시간 요금·청결 기준·정원은 재확인이 필요해요.</p>
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">아고다에서 검색 <Icon name="link" /></a>
+        <div className="grid-2">
+          <a className="btn btn-teal btn-block" href={klookHotelUrl()} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 호텔 <Icon name="link" /></a>
+          <a className="btn btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">아고다 검색 <Icon name="link" /></a>
+        </div>
+        <p className="xs faint">클룩 호텔은 열린 화면에서 {r.region.name}·날짜를 다시 골라 주세요.</p>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
       <section className="book-card">
