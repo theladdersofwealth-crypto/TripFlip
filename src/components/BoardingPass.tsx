@@ -5,6 +5,7 @@ import { fmtDate } from "@/services/itineraryV1";
 
 type Slot = { n: string; k: string; v: string; sub: string; target: string };
 
+const shortDate = (d: string) => fmtDate(d).replace(/\(.\)$/, "");
 const go = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
 // 보딩패스 시안: 지금 고른 조건 4가지를 한 장에 요약하고, 칸을 누르면 해당 입력으로 이동
@@ -22,19 +23,19 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
   if (compact) return (
     <section className="boarding-pass compact" aria-label="여행 조건 요약">
       <div className="ticket-top">
+        <span className="ticket-top-label">TRIPFLIP BOARDING PASS</span>
         <div className="route-visualizer">
           <span className="airport-code">ICN</span>
           <div className="flight-arc"><div className="flight-arc-line"><i />✈️<i /></div></div>
           <span className="airport-code">FLIP?</span>
         </div>
-        <span className="ticket-top-label">TRIPFLIP BOARDING PASS</span>
       </div>
       <div className="ticket-slots-grid">
         {slots.map((s) => (
           <button key={s.k} type="button" className={`ticket-slot ${active === s.target ? "active" : ""}`} onClick={() => onSlot?.(s.target)}>
             <span className="slot-k">{s.n} {s.k.split(" · ")[1]}</span>
             <span key={s.v} className="slot-v">{s.v}</span>
-            <span key={s.sub} className="slot-sub">{s.sub}</span>
+            <span key={s.sub} className="slot-sub">{s.target === "when" && okDays ? `${shortDate(q.startDate)}~${shortDate(q.endDate)}` : s.sub}</span>
           </button>
         ))}
       </div>
