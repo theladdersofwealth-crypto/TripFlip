@@ -20,6 +20,12 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
     { n: "③", k: "VIBE · 여행취향", v: `메인 ${interests[0] ?? "-"}`, sub: [interests.length > 1 ? `+ ${interests.slice(1, 3).join("·")}${interests.length > 3 ? ` 외 ${interests.length - 3}` : ""}` : null, `하루 ${q.perDay}곳`].filter(Boolean).join(" · "), target: "vibe" },
     { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "s3" },
   ];
+  // 작은 보딩패스는 칸마다 한 줄씩만 — 줄바꿈 없이 짧게
+  const compactSub = (s: Slot) => {
+    if (s.target === "when") return okDays ? `${shortDate(q.startDate)}~${shortDate(q.endDate)}` : s.sub;
+    if (s.target === "vibe") return interests.length > 1 ? `+${interests[1]}${interests.length > 2 ? ` 외${interests.length - 2}` : ""}` : `하루 ${q.perDay}곳`;
+    return s.sub;
+  };
   if (compact) return (
     <section className="boarding-pass compact" aria-label="여행 조건 요약">
       <div className="ticket-top">
@@ -35,7 +41,7 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
           <button key={s.k} type="button" className={`ticket-slot ${active === s.target ? "active" : ""}`} onClick={() => onSlot?.(s.target)}>
             <span className="slot-k">{s.n} {s.k.split(" · ")[1]}</span>
             <span key={s.v} className="slot-v">{s.v}</span>
-            <span key={s.sub} className="slot-sub">{s.target === "when" && okDays ? `${shortDate(q.startDate)}~${shortDate(q.endDate)}` : s.sub}</span>
+            <span key={s.sub} className="slot-sub">{compactSub(s)}</span>
           </button>
         ))}
       </div>
