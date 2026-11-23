@@ -5,7 +5,7 @@ import { WORLD_PLACES, WORLD_REGIONS } from "@/data/worldV1";
 import { applyWikiBoost } from "@/data/wikiBoost";
 import { openDuring } from "@/data/seasonal";
 import { WORLD_WEATHER, WORLD_WEATHER_SOURCE } from "@/data/worldWeather";
-import { COUNTRY_PRICE_LEVEL, FLIGHT_KRW, FOOD_USD_US, HOTEL_MEDIAN_USD, KRW_PER_USD } from "@/data/worldPrices";
+import { COUNTRY_PRICE_LEVEL, FLIGHT_ESTIMATED, FLIGHT_KRW, FOOD_USD_US, HOTEL_ESTIMATED, HOTEL_MEDIAN_USD, KRW_PER_USD } from "@/data/worldPrices";
 import { HOTELS } from "@/data/worldHotels";
 import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
@@ -317,6 +317,17 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const transit = flightHours != null ? Math.min(0.5, (flightHours * 2) / (tripDays(q.startDate, q.endDate) * 24)) : 0;
     if (transit >= 0.1) base.flags.push(`왕복 비행 약 ${Math.round(flightHours! * 2)}시간이 일정의 ${Math.round(transit * 100)}%라 적합도를 낮췄어요`);
     score *= 1 - transit;
+    // 미확인 감점(형님 11/24): 항공·숙소·날씨 중 실제 자료 없이 추정한 칸 하나당 10%, 최대 30%. 제외하지는 않는다.
+    const key = PILOT_TWIN_OF[region.id] ?? region.id;
+    const unknown = [
+      base.stay.flightKrw == null || (base.stay.priceSource.flight !== "live" && FLIGHT_ESTIMATED.has(key)) ? "항공" : "",
+      base.stay.hotelNightUsd == null || (base.stay.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(key)) ? "숙소" : "",
+      weather.judge === "미확인" ? "날씨" : "",
+    ].filter(Boolean);
+    if (unknown.length) {
+      score *= 1 - 0.1 * unknown.length;
+      base.flags.push(`${unknown.join("·")} 자료가 없어 추정값이라 적합도를 ${unknown.length * 10}% 낮췄어요`);
+    }
     const display = Math.min(100, Math.max(0, (score / MAX_SCORE) * 100));
     return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, scored, weather, N, flightHours), themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
   });

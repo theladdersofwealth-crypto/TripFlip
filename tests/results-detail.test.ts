@@ -75,3 +75,15 @@ test("최근 수집가(숙소 키 포함)가 있으면 추천 숙소를 그 목�
   assert.ok(Math.abs(picks[0].nightUsd! - night) <= 10, `${picks[0].nightUsd} vs ${night}`);
   setLiveSummary(null);
 });
+
+test("항공·숙소·날씨 추정 칸 하나당 10% 감점, 사유를 남긴다", async () => {
+  const { scoreRegions } = await import("../src/services/regionScore");
+  const { setLiveSummary } = await import("../src/lib/livePrices");
+  setLiveSummary(null);
+  const q = { startDate: "2027-04-10", endDate: "2027-04-16", adults: 2, children: [], elders: false, pet: false, main: "관광", subs: [], perDay: 2, price: "상관없음", stay: "가심비" } as never;
+  const rs = scoreRegions(q).filter((r) => r.status === "ranked");
+  const est = rs.find((r) => r.flags.some((f) => f.includes("추정값이라")));
+  assert.ok(est, "추정 권역 사유 없음");
+  const known = rs.find((r) => r.region.id === "OS");
+  assert.ok(known && !known.flags.some((f) => f.includes("추정값이라")));
+});
