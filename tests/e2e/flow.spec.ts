@@ -20,7 +20,7 @@ test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) =
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
   // 1단계 질문이 하나씩: 누구와 → 언제 → 취향. 1단계를 끝내기 전엔 추천 버튼이 없다.
-  const submit = page.getByRole("button", { name: /^여행지 추천받기/ });
+  const submit = page.getByRole("button", { name: /추천받기 · 정확도/ });
   await expect(submit).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
@@ -38,6 +38,8 @@ test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) =
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
   await expect(page.getByText("추천 정확도 60%", { exact: true })).toBeVisible();
+  // 1단계가 끝나면 "2단계로 / 이대로 추천" 중에 고른다.
+  await expect(page.getByRole("button", { name: /^2단계로 더 정확하게/ })).toBeVisible();
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect(page).toHaveURL(/\/results$/);
@@ -105,12 +107,14 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
   await expect(page.getByText("추천 정확도 60%", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);
-  // 2단계는 원할 때만 펼친다. 하나만 고르는 질문은 누르면 바로 다음으로 넘어간다.
-  await page.getByRole("button", { name: /2단계 · 일정 스타일/ }).click();
+  // 1단계가 끝나면 2단계로 갈지 이대로 추천받을지 고른다. 하나만 고르는 질문은 누르면 바로 다음으로.
+  await expect(page.getByRole("button", { name: "이대로 추천받기 · 정확도 60%" })).toBeVisible();
+  await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "상관없음", exact: true }).click();
   await page.getByRole("button", { name: "알차게 · 3곳", exact: true }).click();
   await expect(page.getByText("추천 정확도 80%", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: /3단계 · 예산·숙소/ }).click();
+  await expect(page.getByRole("button", { name: "이대로 추천받기 · 정확도 80%" })).toBeVisible();
+  await page.getByRole("button", { name: /^3단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
   await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
   await page.getByRole("button", { name: "다음 · 숙소 →", exact: true }).click();
@@ -118,7 +122,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("가성비");
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("3");
   await page.getByRole("button", { name: /^3단계 완료/ }).click();
-  const findNow = page.getByRole("button", { name: "여행지 추천받기 · 정확도 100%" });
+  const findNow = page.getByRole("button", { name: "이대로 추천받기 · 정확도 100%" });
   await expect(findNow).toBeVisible();
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("family-mobile.png"), fullPage: true });
@@ -203,10 +207,10 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await pickRange(page, "2027-06-01", "2027-06-04");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await page.getByRole("button", { name: /2단계 · 일정 스타일/ }).click();
+  await page.getByRole("button", { name: /^2단계로 더 정확하게/ }).click();
   await page.getByRole("button", { name: "8시간", exact: true }).click();
   await page.getByRole("button", { name: "보통 · 2곳", exact: true }).click();
-  await page.getByRole("button", { name: /^여행지 추천받기/ }).click();
+  await page.getByRole("button", { name: /^이대로 추천받기/ }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.goto("/r/NT");
   await expect(page.locator(".day-card")).toHaveCount(4);

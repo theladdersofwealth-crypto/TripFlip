@@ -39,6 +39,7 @@ export default function Home() {
   const [open, setOpen] = useState<number | null>(0);
   const [qi, setQi] = useState(0);
   const [done, setDone] = useState([false, false, false]);
+  const [choice, setChoice] = useState<number | null>(null); // 방금 끝낸 단계 → "다음 단계 / 이대로 추천" 고르기
   const stepRefs = useRef<(HTMLElement | null)[]>([]);
   const moved = useRef(false);
   useEffect(() => {
@@ -75,12 +76,13 @@ export default function Home() {
       case "stay": return `${q.stay} · 물가 ${q.price}`;
     }
   };
-  const openStep = (i: number, at = 0) => { moved.current = true; setOpen(i); setQi(at); };
+  const openStep = (i: number, at = 0) => { moved.current = true; setChoice(null); setOpen(i); setQi(at); };
   const next = () => {
     if (open == null) return;
     moved.current = true;
     if (qi < STEPS[open].qs.length - 1) { setQi(qi + 1); return; }
     setDone(done.map((d, i) => (i === open ? true : d)));
+    setChoice(open);
     setOpen(null);
     setQi(0);
   };
@@ -146,7 +148,6 @@ export default function Home() {
   return (
     <main className="container page discovery-form" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
-      <p className="small muted form-intro">1단계만 답하면 바로 추천받을 수 있어요. 2·3단계를 더하면 더 정확해져요.</p>
       <div className="bp-sticky"><BoardingPass compact q={q} members={members} days={days} interests={interests} active={activeSlot} onSlot={slotJump} /></div>
       <ol className="flow-steps">
         {STEPS.map((s, i) => {
@@ -168,6 +169,14 @@ export default function Home() {
                   {qi < s.qs.length - 1 ? `다음 · ${Q_SHORT[s.qs[qi + 1]]} →` : `${i + 1}단계 완료${done[i] ? "" : ` (+${s.pct}%)`}`}
                 </button>
               </div>}
+              {choice === i && (() => {
+                const nx = STEPS.findIndex((_, j) => j !== i && !done[j]);
+                return <div className="flow-choice" role="group" aria-label={`${i + 1}단계 완료 후 선택`}>
+                  <p><b>{i + 1}단계 완료!</b> 지금 정확도 {accuracy}%예요.</p>
+                  {nx >= 0 && <button type="button" className="btn btn-primary btn-block" onClick={() => openStep(nx)}>{nx + 1}단계로 더 정확하게 (+{STEPS[nx].pct}%) →</button>}
+                  <button type="button" className={`btn btn-block ${nx >= 0 ? "" : "btn-primary btn-lg"}`} disabled={!!error || pending} onClick={go}><Icon name="plane" /> 이대로 추천받기 · 정확도 {accuracy}%</button>
+                </div>;
+              })()}
             </li>
           );
         })}
@@ -176,7 +185,7 @@ export default function Home() {
         <div className="accuracy-head"><b>추천 정확도 {accuracy}%</b><span className="xs muted">{!done[0] ? "1단계를 마치면 추천받을 수 있어요" : accuracy < 100 ? "단계를 더할수록 더 정확해져요" : "모든 단계 반영 완료"}</span></div>
         <div className="accuracy-bar"><span style={{ width: `${accuracy}%` }} /></div>
       </div>
-      {done[0] && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
+      {done[0] && choice == null && open == null && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 정확도 ${accuracy}%`}</button>
       </div>}
       {flying && (
