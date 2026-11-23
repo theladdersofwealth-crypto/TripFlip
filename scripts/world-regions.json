@@ -1310,5 +1310,1945 @@
 "name": "룩소르",
 "query": "Luxor, Egypt",
 "tier": "뎁스"
+},
+{
+"id": "mex-tulum",
+"country": "멕시코",
+"countryEn": "Mexico",
+"name": "툴룸",
+"query": "Tulum, Mexico",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "uni-sedona",
+"country": "미국",
+"countryEn": "United States",
+"name": "그랜드캐니언(세도나)",
+"query": "Sedona, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "uni-maui",
+"country": "미국",
+"countryEn": "United States",
+"name": "마우이",
+"query": "Kahului, Hawaii, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "uni-sandiego",
+"country": "미국",
+"countryEn": "United States",
+"name": "샌디에이고",
+"query": "San Diego, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "bol-uyuni",
+"country": "볼리비아",
+"countryEn": "Bolivia",
+"name": "우유니",
+"query": "Uyuni, Bolivia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "arg-iguazu",
+"country": "아르헨티나",
+"countryEn": "Argentina",
+"name": "이과수",
+"query": "Puerto Iguazú, Argentina",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "can-yellowknife",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "옐로나이프",
+"query": "Yellowknife, Canada",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "cos-lafortuna",
+"country": "코스타리카",
+"countryEn": "Costa Rica",
+"name": "라포르투나(아레날)",
+"query": "La Fortuna, Costa Rica",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "per-cusco",
+"country": "페루",
+"countryEn": "Peru",
+"name": "쿠스코(마추픽추)",
+"query": "Cusco, Peru",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "nep-pokhara",
+"country": "네팔",
+"countryEn": "Nepal",
+"name": "포카라",
+"query": "Pokhara, Nepal",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "vie-quynhon",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "퀴논",
+"query": "Quy Nhon, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "vie-ninhbinh",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "닌빈",
+"query": "Ninh Binh, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "sri-ella",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "엘라",
+"query": "Ella, Sri Lanka",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "sri-sigiriya",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "시기리야(담불라)",
+"query": "Sigiriya, Sri Lanka",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ind-labuanbajo",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "라부안바조(코모도)",
+"query": "Labuan Bajo, Indonesia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jap-kanazawa",
+"country": "일본",
+"countryEn": "Japan",
+"name": "가나자와(시라카와고)",
+"query": "Kanazawa, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jap-beppu",
+"country": "일본",
+"countryEn": "Japan",
+"name": "벳푸·유후인(오이타)",
+"query": "Beppu, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jap-miyakojima",
+"country": "일본",
+"countryEn": "Japan",
+"name": "미야코지마",
+"query": "Miyakojima, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jap-ishigaki",
+"country": "일본",
+"countryEn": "Japan",
+"name": "이시가키(야에야마)",
+"query": "Ishigaki, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jap-hakone",
+"country": "일본",
+"countryEn": "Japan",
+"name": "하코네(후지산)",
+"query": "Hakone, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "chi-hangzhou",
+"country": "중국",
+"countryEn": "China",
+"name": "항저우",
+"query": "Hangzhou, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "chi-jiuzhaigou",
+"country": "중국",
+"countryEn": "China",
+"name": "구채구",
+"query": "Jiuzhaigou, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "tha-khaolak",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "카오락",
+"query": "Khao Lak, Thailand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "tur-fethiye",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "페티예(욀뤼데니즈)",
+"query": "Fethiye, Turkey",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "phi-coron",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "코론(팔라완)",
+"query": "Coron, Philippines",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "phi-siargao",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "시아르가오",
+"query": "General Luna, Siargao, Philippines",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "new-tekapo",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "테카포",
+"query": "Lake Tekapo, New Zealand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "aus-hobart",
+"country": "호주",
+"countryEn": "Australia",
+"name": "태즈메이니아(호바트)",
+"query": "Hobart, Australia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "aus-airliebeach",
+"country": "호주",
+"countryEn": "Australia",
+"name": "휘트선데이(에얼리비치)",
+"query": "Airlie Beach, Australia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "gre-crete",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "크레타",
+"query": "Heraklion, Crete, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "nor-bergen",
+"country": "노르웨이",
+"countryEn": "Norway",
+"name": "베르겐(피오르)",
+"query": "Bergen, Norway",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "nor-tromso",
+"country": "노르웨이",
+"countryEn": "Norway",
+"name": "트롬쇠",
+"query": "Tromsø, Norway",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "mon-kotor",
+"country": "몬테네그로",
+"countryEn": "Montenegro",
+"name": "코토르(부드바)",
+"query": "Kotor, Montenegro",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "mal-valletta",
+"country": "몰타",
+"countryEn": "Malta",
+"name": "몰타(발레타·슬리에마)",
+"query": "Valletta, Malta",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "spa-mallorca",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "마요르카",
+"query": "Palma, Mallorca, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "spa-tenerife",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "테네리페(카나리아)",
+"query": "Santa Cruz de Tenerife, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "spa-sansebastian",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "산세바스티안(빌바오)",
+"query": "San Sebastián, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ice-reykjavik",
+"country": "아이슬란드",
+"countryEn": "Iceland",
+"name": "레이캬비크",
+"query": "Reykjavik, Iceland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "alb-sarande",
+"country": "알바니아",
+"countryEn": "Albania",
+"name": "사란다(크사밀)",
+"query": "Sarandë, Albania",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "uni-inverness",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "스코틀랜드 하이랜드(인버네스)",
+"query": "Inverness, United Kingdom",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "uni-bath",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "코츠월드(바스)",
+"query": "Bath, United Kingdom",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "aus-hallstatt",
+"country": "오스트리아",
+"countryEn": "Austria",
+"name": "할슈타트(잘츠카머구트)",
+"query": "Hallstatt, Austria",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ita-dolomites",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "돌로미티(코르티나)",
+"query": "Cortina d'Ampezzo, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ita-cinqueterre",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "친퀘테레",
+"query": "La Spezia, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ita-siena",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "토스카나(시에나)",
+"query": "Siena, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ita-puglia",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "풀리아(바리·알베로벨로)",
+"query": "Bari, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "ita-como",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "코모 호수",
+"query": "Como, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "geo-tbilisi",
+"country": "조지아",
+"countryEn": "Georgia",
+"name": "트빌리시",
+"query": "Tbilisi, Georgia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "cro-plitvice",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "플리트비체",
+"query": "Plitvice Lakes, Croatia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "cyp-paphos",
+"country": "키프로스",
+"countryEn": "Cyprus",
+"name": "파포스(리마솔)",
+"query": "Paphos, Cyprus",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "por-madeira",
+"country": "포르투갈",
+"countryEn": "Portugal",
+"name": "마데이라",
+"query": "Funchal, Madeira, Portugal",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "por-azores",
+"country": "포르투갈",
+"countryEn": "Portugal",
+"name": "아조레스",
+"query": "Ponta Delgada, Azores, Portugal",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "por-algarve",
+"country": "포르투갈",
+"countryEn": "Portugal",
+"name": "알가르브(라고스)",
+"query": "Lagos, Portugal",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "pol-krakow",
+"country": "폴란드",
+"countryEn": "Poland",
+"name": "크라쿠프",
+"query": "Kraków, Poland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "fra-avignon",
+"country": "프랑스",
+"countryEn": "France",
+"name": "프로방스(아비뇽)",
+"query": "Avignon, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "fra-annecy",
+"country": "프랑스",
+"countryEn": "France",
+"name": "안시",
+"query": "Annecy, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "fra-chamonix",
+"country": "프랑스",
+"countryEn": "France",
+"name": "샤모니",
+"query": "Chamonix, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "sou-kruger",
+"country": "남아프리카공화국",
+"countryEn": "South Africa",
+"name": "크루거(사파리)",
+"query": "Hazyview, South Africa",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "mor-marrakech",
+"country": "모로코",
+"countryEn": "Morocco",
+"name": "마라케시",
+"query": "Marrakech, Morocco",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "jor-petra",
+"country": "요르단",
+"countryEn": "Jordan",
+"name": "페트라(와디럼)",
+"query": "Wadi Musa, Jordan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "egy-hurghada",
+"country": "이집트",
+"countryEn": "Egypt",
+"name": "후르가다(홍해)",
+"query": "Hurghada, Egypt",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "tan-zanzibar",
+"country": "탄자니아",
+"countryEn": "Tanzania",
+"name": "잔지바르",
+"query": "Zanzibar City, Tanzania",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "tan-arusha",
+"country": "탄자니아",
+"countryEn": "Tanzania",
+"name": "세렝게티(아루샤)",
+"query": "Arusha, Tanzania",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "A"
+},
+{
+"id": "mex-loscabos",
+"country": "멕시코",
+"countryEn": "Mexico",
+"name": "로스카보스",
+"query": "Cabo San Lucas, Mexico",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "mex-oaxaca",
+"country": "멕시코",
+"countryEn": "Mexico",
+"name": "오악사카",
+"query": "Oaxaca, Mexico",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-bigisland",
+"country": "미국",
+"countryEn": "United States",
+"name": "빅아일랜드",
+"query": "Kailua-Kona, Hawaii, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-kauai",
+"country": "미국",
+"countryEn": "United States",
+"name": "카우아이",
+"query": "Lihue, Hawaii, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-miami",
+"country": "미국",
+"countryEn": "United States",
+"name": "마이애미(키웨스트)",
+"query": "Miami, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-yellowstone",
+"country": "미국",
+"countryEn": "United States",
+"name": "옐로스톤",
+"query": "West Yellowstone, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-yosemite",
+"country": "미국",
+"countryEn": "United States",
+"name": "요세미티",
+"query": "Yosemite Valley, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-zion",
+"country": "미국",
+"countryEn": "United States",
+"name": "유타 국립공원(자이언·브라이스)",
+"query": "Springdale, Utah, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-alaska",
+"country": "미국",
+"countryEn": "United States",
+"name": "알래스카(페어뱅크스·앵커리지)",
+"query": "Anchorage, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "bra-rio",
+"country": "브라질",
+"countryEn": "Brazil",
+"name": "리우데자네이루",
+"query": "Rio de Janeiro, Brazil",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "arg-elcalafate",
+"country": "아르헨티나",
+"countryEn": "Argentina",
+"name": "엘칼라파테(파타고니아)",
+"query": "El Calafate, Argentina",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "arg-buenosaires",
+"country": "아르헨티나",
+"countryEn": "Argentina",
+"name": "부에노스아이레스",
+"query": "Buenos Aires, Argentina",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ecu-galapagos",
+"country": "에콰도르",
+"countryEn": "Ecuador",
+"name": "갈라파고스",
+"query": "Puerto Ayora, Ecuador",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-torresdelpaine",
+"country": "칠레",
+"countryEn": "Chile",
+"name": "토레스델파이네",
+"query": "Puerto Natales, Chile",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "can-victoria",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "빅토리아",
+"query": "Victoria, British Columbia, Canada",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "can-jasper",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "재스퍼",
+"query": "Jasper, Canada",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "cos-manuelantonio",
+"country": "코스타리카",
+"countryEn": "Costa Rica",
+"name": "마누엘안토니오",
+"query": "Quepos, Costa Rica",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "col-cartagena",
+"country": "콜롬비아",
+"countryEn": "Colombia",
+"name": "카르타헤나",
+"query": "Cartagena, Colombia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "cub-havana",
+"country": "쿠바",
+"countryEn": "Cuba",
+"name": "아바나(트리니다드)",
+"query": "Havana, Cuba",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "tai-taitung",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "타이동",
+"query": "Taitung, Taiwan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "tai-kenting",
+"country": "대만",
+"countryEn": "Taiwan",
+"name": "컨딩",
+"query": "Hengchun, Taiwan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "mal-melaka",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "말라카",
+"query": "Malacca, Malaysia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "mal-perhentian",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "퍼렌티안 섬",
+"query": "Perhentian Islands, Malaysia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "mon-gobi",
+"country": "몽골",
+"countryEn": "Mongolia",
+"name": "고비사막",
+"query": "Dalanzadgad, Mongolia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "vie-hue",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "후에",
+"query": "Hue, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "vie-condao",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "꼰다오",
+"query": "Con Dao, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "bhu-paro",
+"country": "부탄",
+"countryEn": "Bhutan",
+"name": "파로(팀푸)",
+"query": "Paro, Bhutan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "sri-mirissa",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "미리사",
+"query": "Mirissa, Sri Lanka",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uzb-khiva",
+"country": "우즈베키스탄",
+"countryEn": "Uzbekistan",
+"name": "히바",
+"query": "Khiva, Uzbekistan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ind-jaipur",
+"country": "인도",
+"countryEn": "India",
+"name": "라자스탄(자이푸르·우다이푸르)",
+"query": "Jaipur, India",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ind-bintan",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "빈탄",
+"query": "Bintan, Indonesia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-hakodate",
+"country": "일본",
+"countryEn": "Japan",
+"name": "하코다테",
+"query": "Hakodate, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-nagasaki",
+"country": "일본",
+"countryEn": "Japan",
+"name": "나가사키",
+"query": "Nagasaki, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-kumamoto",
+"country": "일본",
+"countryEn": "Japan",
+"name": "구마모토(아소)",
+"query": "Kumamoto, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-takayama",
+"country": "일본",
+"countryEn": "Japan",
+"name": "다카야마",
+"query": "Takayama, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-aomori",
+"country": "일본",
+"countryEn": "Japan",
+"name": "아오모리(오이라세)",
+"query": "Aomori, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jap-toyama",
+"country": "일본",
+"countryEn": "Japan",
+"name": "도야마(알펜루트)",
+"query": "Toyama, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-huangshan",
+"country": "중국",
+"countryEn": "China",
+"name": "황산",
+"query": "Huangshan, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-lijiang",
+"country": "중국",
+"countryEn": "China",
+"name": "리장(옥룡설산)",
+"query": "Lijiang, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-xiamen",
+"country": "중국",
+"countryEn": "China",
+"name": "샤먼",
+"query": "Xiamen, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-chongqing",
+"country": "중국",
+"countryEn": "China",
+"name": "충칭",
+"query": "Chongqing, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "chi-changbaishan",
+"country": "중국",
+"countryEn": "China",
+"name": "장백산(백두산)",
+"query": "Erdaobaihe, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "kyr-karakol",
+"country": "키르기스스탄",
+"countryEn": "Kyrgyzstan",
+"name": "카라콜(이식쿨)",
+"query": "Karakol, Kyrgyzstan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "tha-kohlanta",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "코란타",
+"query": "Ko Lanta, Thailand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "tha-kanchanaburi",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "칸차나부리",
+"query": "Kanchanaburi, Thailand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "tur-izmir",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "이즈미르(에페스)",
+"query": "Izmir, Turkey",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "phi-dumaguete",
+"country": "필리핀",
+"countryEn": "Philippines",
+"name": "두마게티(아포섬)",
+"query": "Dumaguete, Philippines",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "new-wanaka",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "와나카",
+"query": "Wanaka, New Zealand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "new-noumea",
+"country": "뉴칼레도니아",
+"countryEn": "New Caledonia",
+"name": "누메아",
+"query": "Nouméa, New Caledonia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "nor-rota",
+"country": "북마리아나(사이판)",
+"countryEn": "Northern Mariana Islands",
+"name": "로타",
+"query": "Rota, Northern Mariana Islands",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fre-borabora",
+"country": "프랑스령 폴리네시아",
+"countryEn": "French Polynesia",
+"name": "보라보라(타히티)",
+"query": "Vaitape, Bora Bora, French Polynesia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fij-mamanuca",
+"country": "피지",
+"countryEn": "Fiji",
+"name": "마마누카 제도",
+"query": "Mamanuca Islands, Fiji",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "aus-uluru",
+"country": "호주",
+"countryEn": "Australia",
+"name": "울루루",
+"query": "Yulara, Australia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "aus-adelaide",
+"country": "호주",
+"countryEn": "Australia",
+"name": "애들레이드(캥거루섬)",
+"query": "Adelaide, Australia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gre-mykonos",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "미코노스",
+"query": "Mykonos, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gre-naxos",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "낙소스(파로스)",
+"query": "Naxos, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gre-meteora",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "메테오라",
+"query": "Kalambaka, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gre-corfu",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "코르푸",
+"query": "Corfu, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gre-rhodes",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "로도스",
+"query": "Rhodes, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "nor-lofoten",
+"country": "노르웨이",
+"countryEn": "Norway",
+"name": "로포텐 제도",
+"query": "Svolvær, Norway",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "den-copenhagen",
+"country": "덴마크",
+"countryEn": "Denmark",
+"name": "코펜하겐",
+"query": "Copenhagen, Denmark",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ger-fussen",
+"country": "독일",
+"countryEn": "Germany",
+"name": "퓌센(노이슈반슈타인)",
+"query": "Füssen, Germany",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ger-dresden",
+"country": "독일",
+"countryEn": "Germany",
+"name": "드레스덴",
+"query": "Dresden, Germany",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "rom-brasov",
+"country": "루마니아",
+"countryEn": "Romania",
+"name": "브라쇼브(트란실바니아)",
+"query": "Brașov, Romania",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "bel-brussels",
+"country": "벨기에",
+"countryEn": "Belgium",
+"name": "브뤼셀(브뤼헤)",
+"query": "Brussels, Belgium",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "nor-ohrid",
+"country": "북마케도니아",
+"countryEn": "North Macedonia",
+"name": "오흐리드",
+"query": "Ohrid, North Macedonia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "swi-stmoritz",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "생모리츠(베르니나)",
+"query": "St. Moritz, Switzerland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "spa-valencia",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "발렌시아",
+"query": "Valencia, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "spa-menorca",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "메노르카",
+"query": "Mahón, Menorca, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ire-dublin",
+"country": "아일랜드",
+"countryEn": "Ireland",
+"name": "더블린(모허절벽)",
+"query": "Dublin, Ireland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "est-tallinn",
+"country": "에스토니아",
+"countryEn": "Estonia",
+"name": "탈린",
+"query": "Tallinn, Estonia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "uni-lakedistrict",
+"country": "영국",
+"countryEn": "United Kingdom",
+"name": "레이크 디스트릭트",
+"query": "Windermere, United Kingdom",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ita-sardinia",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "사르데냐",
+"query": "Cagliari, Sardinia, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ita-bologna",
+"country": "이탈리아",
+"countryEn": "Italy",
+"name": "볼로냐",
+"query": "Bologna, Italy",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "geo-stepantsminda",
+"country": "조지아",
+"countryEn": "Georgia",
+"name": "카즈베기(스테판츠민다)",
+"query": "Stepantsminda, Georgia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "cro-hvar",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "흐바르",
+"query": "Hvar, Croatia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "cro-rovinj",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "로빈(이스트라)",
+"query": "Rovinj, Croatia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fra-bordeaux",
+"country": "프랑스",
+"countryEn": "France",
+"name": "보르도",
+"query": "Bordeaux, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fra-colmar",
+"country": "프랑스",
+"countryEn": "France",
+"name": "콜마르",
+"query": "Colmar, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fra-saintmalo",
+"country": "프랑스",
+"countryEn": "France",
+"name": "몽생미셸(생말로)",
+"query": "Saint-Malo, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "fra-corsica",
+"country": "프랑스",
+"countryEn": "France",
+"name": "코르시카",
+"query": "Ajaccio, Corsica, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "sou-gardenroute",
+"country": "남아프리카공화국",
+"countryEn": "South Africa",
+"name": "가든루트",
+"query": "Knysna, South Africa",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "mor-fes",
+"country": "모로코",
+"countryEn": "Morocco",
+"name": "페스(셰프샤우엔)",
+"query": "Fes, Morocco",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "sey-mahe",
+"country": "세이셸",
+"countryEn": "Seychelles",
+"name": "마헤(프랄린)",
+"query": "Victoria, Seychelles",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "oma-muscat",
+"country": "오만",
+"countryEn": "Oman",
+"name": "무스카트",
+"query": "Muscat, Oman",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "jor-aqaba",
+"country": "요르단",
+"countryEn": "Jordan",
+"name": "아카바(사해)",
+"query": "Aqaba, Jordan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "egy-aswan",
+"country": "이집트",
+"countryEn": "Egypt",
+"name": "아스완",
+"query": "Aswan, Egypt",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "egy-sharm",
+"country": "이집트",
+"countryEn": "Egypt",
+"name": "다합(샤름엘셰이크)",
+"query": "Sharm El Sheikh, Egypt",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "ken-nairobi",
+"country": "케냐",
+"countryEn": "Kenya",
+"name": "마사이마라(나이로비)",
+"query": "Nairobi, Kenya",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "B"
+},
+{
+"id": "gua-antigua",
+"country": "과테말라",
+"countryEn": "Guatemala",
+"name": "안티구아",
+"query": "Antigua Guatemala, Guatemala",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "uni-boston",
+"country": "미국",
+"countryEn": "United States",
+"name": "보스턴",
+"query": "Boston, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "uni-washington",
+"country": "미국",
+"countryEn": "United States",
+"name": "워싱턴DC",
+"query": "Washington, D.C., United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "uni-chicago",
+"country": "미국",
+"countryEn": "United States",
+"name": "시카고",
+"query": "Chicago, United States",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "chi-atacama",
+"country": "칠레",
+"countryEn": "Chile",
+"name": "아타카마",
+"query": "San Pedro de Atacama, Chile",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "can-whistler",
+"country": "캐나다",
+"countryEn": "Canada",
+"name": "휘슬러",
+"query": "Whistler, Canada",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "pue-sanjuan",
+"country": "푸에르토리코",
+"countryEn": "Puerto Rico",
+"name": "산후안",
+"query": "San Juan, Puerto Rico",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "mal-kuching",
+"country": "말레이시아",
+"countryEn": "Malaysia",
+"name": "쿠칭(사라왁)",
+"query": "Kuching, Malaysia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "vie-tuyhoa",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "뚜이호아(푸옌)",
+"query": "Tuy Hoa, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "vie-hagiang",
+"country": "베트남",
+"countryEn": "Vietnam",
+"name": "하장",
+"query": "Ha Giang, Vietnam",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "bru-bandar",
+"country": "브루나이",
+"countryEn": "Brunei",
+"name": "반다르스리브가완",
+"query": "Bandar Seri Begawan, Brunei",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "sri-nuwaraeliya",
+"country": "스리랑카",
+"countryEn": "Sri Lanka",
+"name": "누와라엘리야",
+"query": "Nuwara Eliya, Sri Lanka",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "uni-rasalkhaimah",
+"country": "아랍에미리트",
+"countryEn": "United Arab Emirates",
+"name": "라스알카이마",
+"query": "Ras Al Khaimah, United Arab Emirates",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ind-kochi",
+"country": "인도",
+"countryEn": "India",
+"name": "케랄라(코친)",
+"query": "Kochi, India",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ind-goa",
+"country": "인도",
+"countryEn": "India",
+"name": "고아",
+"query": "Panaji, Goa, India",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ind-rajaampat",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "라자암팟",
+"query": "Waisai, Indonesia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ind-malang",
+"country": "인도네시아",
+"countryEn": "Indonesia",
+"name": "브로모(말랑)",
+"query": "Malang, Indonesia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "jap-miyazaki",
+"country": "일본",
+"countryEn": "Japan",
+"name": "미야자키",
+"query": "Miyazaki, Japan",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "chi-suzhou",
+"country": "중국",
+"countryEn": "China",
+"name": "쑤저우",
+"query": "Suzhou, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "chi-xishuangbanna",
+"country": "중국",
+"countryEn": "China",
+"name": "시솽반나",
+"query": "Jinghong, China",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "tha-kohtao",
+"country": "태국",
+"countryEn": "Thailand",
+"name": "코따오",
+"query": "Ko Tao, Thailand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "tur-bodrum",
+"country": "튀르키예",
+"countryEn": "Turkey",
+"name": "보드룸",
+"query": "Bodrum, Turkey",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "new-nelson",
+"country": "뉴질랜드",
+"countryEn": "New Zealand",
+"name": "넬슨(아벨태즈먼)",
+"query": "Nelson, New Zealand",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "van-portvila",
+"country": "바누아투",
+"countryEn": "Vanuatu",
+"name": "포트빌라",
+"query": "Port Vila, Vanuatu",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "coo-rarotonga",
+"country": "쿡 제도",
+"countryEn": "Cook Islands",
+"name": "라로통가(아이투타키)",
+"query": "Avarua, Cook Islands",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "gre-zakynthos",
+"country": "그리스",
+"countryEn": "Greece",
+"name": "자킨토스",
+"query": "Zakynthos, Greece",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ger-heidelberg",
+"country": "독일",
+"countryEn": "Germany",
+"name": "하이델베르크",
+"query": "Heidelberg, Germany",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "bul-sofia",
+"country": "불가리아",
+"countryEn": "Bulgaria",
+"name": "소피아(릴라 수도원)",
+"query": "Sofia, Bulgaria",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "ser-belgrade",
+"country": "세르비아",
+"countryEn": "Serbia",
+"name": "베오그라드",
+"query": "Belgrade, Serbia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "swe-stockholm",
+"country": "스웨덴",
+"countryEn": "Sweden",
+"name": "스톡홀름",
+"query": "Stockholm, Sweden",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "swi-lugano",
+"country": "스위스",
+"countryEn": "Switzerland",
+"name": "루가노",
+"query": "Lugano, Switzerland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "spa-ibiza",
+"country": "스페인",
+"countryEn": "Spain",
+"name": "이비사",
+"query": "Ibiza, Spain",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "slo-bratislava",
+"country": "슬로바키아",
+"countryEn": "Slovakia",
+"name": "브라티슬라바",
+"query": "Bratislava, Slovakia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "arm-yerevan",
+"country": "아르메니아",
+"countryEn": "Armenia",
+"name": "예레반",
+"query": "Yerevan, Armenia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "alb-tirana",
+"country": "알바니아",
+"countryEn": "Albania",
+"name": "티라나(베라트)",
+"query": "Tirana, Albania",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "cro-zadar",
+"country": "크로아티아",
+"countryEn": "Croatia",
+"name": "자다르",
+"query": "Zadar, Croatia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "pol-gdansk",
+"country": "폴란드",
+"countryEn": "Poland",
+"name": "그단스크",
+"query": "Gdańsk, Poland",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "fra-loire",
+"country": "프랑스",
+"countryEn": "France",
+"name": "루아르 고성",
+"query": "Tours, France",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "hun-eger",
+"country": "헝가리",
+"countryEn": "Hungary",
+"name": "에게르",
+"query": "Eger, Hungary",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "nam-sossusvlei",
+"country": "나미비아",
+"countryEn": "Namibia",
+"name": "소수스블레이",
+"query": "Sesriem, Namibia",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "mad-morondava",
+"country": "마다가스카르",
+"countryEn": "Madagascar",
+"name": "모론다바",
+"query": "Morondava, Madagascar",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
+},
+{
+"id": "qat-doha",
+"country": "카타르",
+"countryEn": "Qatar",
+"name": "도하",
+"query": "Doha, Qatar",
+"tier": "뎁스",
+"added": "2026-11-24",
+"grade": "C"
 }
 ]
