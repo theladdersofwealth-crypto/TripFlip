@@ -43,7 +43,7 @@ export default function Home() {
   const moved = useRef(false);
   useEffect(() => {
     const saved = loadQuery();
-    setQ(normalizeParty({ ...saved, interests: saved.interests?.length ? saved.interests : [saved.main, ...saved.subs] }));
+    setQ(normalizeParty({ ...saved, dateWindow: undefined, interests: saved.interests?.length ? saved.interests : [saved.main, ...saved.subs] }));
   }, []);
   useEffect(() => {
     // 처음 열 때는 그대로, 질문이 바뀔 때만 그 단계로 화면을 맞춤

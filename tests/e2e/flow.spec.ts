@@ -16,7 +16,7 @@ async function pickRange(page: import("@playwright/test").Page, start: string, e
   }
 }
 
-test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", async ({ page }) => {
+test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
   // 1단계 질문이 하나씩: 누구와 → 언제 → 취향. 1단계를 끝내기 전엔 추천 버튼이 없다.
@@ -30,10 +30,9 @@ test("자녀 실제 나이와 가능한 기간·희망 박수를 입력한다", 
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
 
   await expect(page.getByRole("heading", { name: "언제 떠나요?" })).toBeVisible();
-  await page.getByRole("button", { name: "가능한 기간이 있어요", exact: true }).click();
-  await pickRange(page, "2027-05-07", "2027-05-20");
-  await page.getByLabel("희망 숙박 수", { exact: true }).fill("10");
-  await page.getByLabel(/기준 일정 ·/).selectOption("2027-05-10");
+  // 날짜는 출발 → 귀국 두 번만 누르면 되고, 박수는 따로 묻지 않는다.
+  await expect(page.getByLabel("희망 숙박 수")).toHaveCount(0);
+  await pickRange(page, "2027-05-10", "2027-05-20");
   await expect(page.getByText("기준 일정 10박 11일", { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
