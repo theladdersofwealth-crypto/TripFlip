@@ -14,6 +14,7 @@ import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore
 import type { StayTier } from "@/services/regionScore";
 import { STAY_TIERS, childAgesForBooking, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
+import { kkdaySearchUrl, klookSearchUrl } from "@/services/affiliate";
 import { track } from "@/lib/analytics";
 
 
@@ -80,6 +81,14 @@ export default function BookPage() {
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
         <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">아고다에서 검색 <Icon name="link" /></a>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
+      </section>
+      <section className="book-card">
+        <div className="row"><Icon name="compass" size={22} /><b style={{ fontSize: 18 }}>현지 투어·입장권</b></div>
+        <p className="small muted">{r.region.name}의 투어·입장권·공항 픽업을 찾아요. 가격·운영 여부는 각 사이트에서 확인해 주세요.</p>
+        <div className="grid-2">
+          <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">클룩 <Icon name="link" /></a>
+          <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">KKday <Icon name="link" /></a>
+        </div>
       </section>
     </div>
     <p className="small muted" style={{ marginTop: 12 }}>현재 숙소 수준·객실 수 기준 일행 전체 예상 경비: {estimate.partyTotalKrw == null ? "미확인" : `약 ${Math.round(estimate.partyTotalKrw / 10000).toLocaleString()}만원`}. {estimate.priceSource.flight === "live" || estimate.priceSource.hotel === "live" ? "항공·숙박은 최근 2주 수집 평균, 식비는 가정으로 계산했어요." : "항공·숙박·식비의 과거 자료와 가정으로 계산했어요."}</p>
