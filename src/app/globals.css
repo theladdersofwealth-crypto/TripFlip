@@ -587,3 +587,46 @@ p { margin: 0; }
 .admin-table th, .admin-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 .admin-table th:first-child, .admin-table td:first-child { text-align: left; }
 .admin-table th { font-size: 12px; color: var(--muted); font-weight: 700; }
+
+/* 첫 화면: 1단계 → 2단계 → 3단계 세로 흐름, 단계 안 질문은 하나씩 */
+.flow-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.flow-step { position: relative; padding-left: 0; scroll-margin-top: 200px; }
+.flow-step + .flow-step { margin-top: 18px; }
+.flow-step + .flow-step::before { content: ""; position: absolute; left: 25px; top: -18px; height: 18px; border-left: 2px dashed var(--line); }
+.flow-step.done + .flow-step::before { border-left-color: var(--teal); border-left-style: solid; }
+.flow-step-head { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 60px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 16px; background: #fff; text-align: left; color: var(--navy); }
+.flow-step.open .flow-step-head { border-color: var(--navy); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.flow-step.locked .flow-step-head { opacity: .55; }
+.flow-dot { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 99px; background: var(--line); color: var(--navy); font-size: 13px; }
+.flow-step.open .flow-dot { background: var(--navy); color: #fff; }
+.flow-step.done .flow-dot { background: var(--teal); color: #fff; }
+.flow-step-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.flow-step-text strong { font-size: 15px; font-weight: 800; }
+.flow-step-text small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flow-step-head em { font-style: normal; font-weight: 800; font-size: 13px; color: var(--teal-dark); white-space: nowrap; }
+.flow-step-body { display: flex; flex-direction: column; gap: 12px; padding: 14px; border: 1px solid var(--navy); border-top: 0; border-radius: 0 0 16px 16px; background: #fff; animation: fade .2s; }
+.flow-answered { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; border: 0; border-radius: 10px; background: var(--soft); text-align: left; font-size: 13px; color: var(--navy); }
+.flow-answered span { color: var(--muted); flex: none; }
+.flow-answered b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flow-answered em { font-style: normal; font-size: 12px; color: var(--teal-dark); font-weight: 700; }
+.flow-q { font-size: 18px; font-weight: 900; color: var(--navy); margin: 2px 0 0; }
+.flow-next { margin-top: 4px; }
+
+
+/* 첫 화면 위 고정 보딩패스(작게) — 답할 때마다 칸 값이 바뀌며 반짝 */
+.bp-sticky { position: sticky; top: 57px; z-index: 15; margin: 0 -16px 14px; padding: 6px 16px 8px; background: var(--bg); }
+.boarding-pass.compact { margin-top: 0; border-radius: 16px; box-shadow: 0 8px 20px rgba(16, 47, 84, 0.12); }
+.boarding-pass.compact .ticket-top { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 7px 14px 8px; }
+.boarding-pass.compact .route-visualizer { margin: 0; width: 100%; max-width: 260px; justify-content: center; gap: 6px; }
+.boarding-pass.compact .airport-code { font-size: 16px; }
+.boarding-pass.compact .flight-arc { padding: 0 4px; }
+.boarding-pass.compact .ticket-top-label { font-size: 9.5px; white-space: nowrap; justify-content: center; }
+.boarding-pass.compact .ticket-slots-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 0; }
+.boarding-pass.compact .ticket-slots-grid::before, .boarding-pass.compact .ticket-slots-grid::after { display: none; }
+.boarding-pass.compact .ticket-slot { padding: 7px 4px; border-bottom: 0; border-right: 1px solid #f0eee8; align-items: center; text-align: center; }
+.boarding-pass.compact .ticket-slot:last-child { border-right: 0; }
+.boarding-pass.compact .ticket-slot.active { background: var(--teal-50); box-shadow: inset 0 -3px 0 var(--teal); }
+.boarding-pass.compact .slot-k { font-size: 10px; white-space: nowrap; }
+.boarding-pass.compact .slot-v { font-size: 13px; margin-top: 2px; white-space: nowrap; animation: slot-flash .5s ease; }
+.boarding-pass.compact .slot-sub { font-size: 10px; white-space: nowrap; letter-spacing: -0.02em; animation: slot-flash .5s ease; }
+@keyframes slot-flash { from { color: var(--teal); transform: translateY(-3px); opacity: .3; } to { transform: none; opacity: 1; } }
