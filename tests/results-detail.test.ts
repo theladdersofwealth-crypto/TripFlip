@@ -36,3 +36,25 @@ test("추천 카드에 나오는 숙소는 모두 한글 표기가 있다", () =
   const missing = ALL_REGIONS.flatMap((r) => STAY_TIERS.flatMap((t) => hotelCandidates(r.id, t))).filter((h) => !HOTEL_KO[h[0]]);
   assert.deepEqual(missing, []);
 });
+
+test("낮 최고 5℃ 미만은 혹한기로 감점", async () => {
+  const { judgeWeather } = await import("../src/services/regionScore");
+  assert.equal(judgeWeather({ tmax: 3.2, rainDays: 4.7, sunHours: null } as never, 4).judge, "혹한기");
+});
+
+test("짧은 일정에선 장거리 여행지가 비행 부담만큼 내려간다", async () => {
+  const { scoreRegions } = await import("../src/services/regionScore");
+  const q = { startDate: "2027-04-10", endDate: "2027-04-16", adults: 1, children: [], elders: false, pet: false, main: "액티비티", subs: ["미식", "관광"], interests: ["액티비티", "미식", "관광"], perDay: 2, price: "상관없음", stay: "가심비" } as never;
+  const top = scoreRegions(q).filter((r) => r.status === "ranked").slice(0, 3);
+  assert.ok(top.every((r) => (r.flightHours ?? 0) < 10), top.map((r) => r.region.name).join(","));
+});
+
+test("부킹닷컴 링크에 숙소·날짜·인원이 들어간다", async () => {
+  const { bookingComUrl } = await import("../src/services/booking");
+  const { REGIONS_V1 } = await import("../src/data/regionsV1");
+  const u = new URL(bookingComUrl(REGIONS_V1[0], { startDate: "2026-12-10", endDate: "2026-12-14", adults: 2, children: [], elders: false, pet: false, main: "휴양", subs: [], perDay: 2, price: "상관없음", stay: "가심비" } as never, "Regent Phu Quoc"));
+  assert.equal(u.searchParams.get("ss"), "Regent Phu Quoc");
+  assert.equal(u.searchParams.get("checkin"), "2026-12-10");
+  assert.equal(u.searchParams.get("checkout"), "2026-12-14");
+  assert.equal(u.searchParams.get("group_adults"), "2");
+});

@@ -55,8 +55,8 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
     </div>
     {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
     {hotels.length ? <div className="hotel-picks">
-      <span className="xs bold">{tier} 추천 숙소 · 눌러서 정보 보기</span>
-      {hotels.map((h) => <button type="button" key={h[0]} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h[0])}</b><small>★{h[1]} · 후기 {h[2].toLocaleString()}개</small></span><Icon name="next" size={16} /></button>)}
+      <span className="xs bold">{tier} 추천 숙소 · 위 1박 값과 가까운 곳 · 눌러서 정보 보기</span>
+      {hotels.map((h) => <button type="button" key={h[0]} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h[0])}</b><small>★{h[1]} · 후기 {h[2].toLocaleString()}개{h[3] > 0 && h[4] >= h[3] ? ` · 1박 ${Math.round(h[3] * KRW_PER_USD / 10000)}~${Math.round(h[4] * KRW_PER_USD / 10000)}만원` : ""}</small></span><Icon name="next" size={16} /></button>)}
     </div>
       : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
       : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
@@ -114,6 +114,7 @@ export default function ResultsPage() {
             <span className="xs muted">{r.stay.nights}박 · {r.stay.rooms}객실{r.stay.roomEstimated ? " 가정" : " 검색 조건"} · 항공·숙소·식비 예상</span>
             <StayLine r={r} q={q} />
             <span className="small bold">추천 이유</span>
+            {!!r.themes?.length && <div className="theme-rows">{r.themes.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span><b>{t.theme}</b> {t.names.join(", ")}{t.count > t.names.length ? <span className="muted"> 등 {t.count}곳</span> : null}</span></div>)}</div>}
             <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
             <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>
             {!r.readiness.ready && <span className="xs muted">{r.filled < r.N ? `하루 ${q.perDay}곳 기준 ${r.N - r.filled}칸은 직접 골라야 해요. ` : ""}{r.readiness.meals < Math.ceil(r.readiness.mealsNeeded / 2) ? "식당은 아직 자료가 적어 현지에서 찾아야 해요. " : ""}자료가 부족한 것이지 여행지가 나쁘다는 뜻은 아니에요.</span>}
