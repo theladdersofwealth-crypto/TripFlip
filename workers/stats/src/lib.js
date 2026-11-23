@@ -64,3 +64,13 @@ export async function sha256(s) {
 
 /** n번째 연속 잠금의 길이(ms) */
 export const lockMs = (times) => Math.min(LOCK_MIN * 2 ** Math.max(times - 1, 0), 24 * 60) * 60000;
+
+// ── 회원 '내 여행' 저장 ─────────────────────────────────────
+export const PLAN_MAX = 300000; // 계획 1개 최대 크기(글자)
+export const PLANS_PER_USER = 100;
+export const PLANS_BODY_MAX = 3000000;
+
+/** 저장 계획 최소 모양 검사 */
+export function planOk(p) {
+  return !!p && typeof p === "object" && typeof p.id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(p.id) && typeof p.regionId === "string" && typeof p.regionName === "string" && !!p.query && typeof p.query === "object" && typeof p.createdAt === "string";
+}

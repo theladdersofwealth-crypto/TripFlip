@@ -3,7 +3,7 @@
 // 실행: node scripts/build-hotel-names.mjs
 import { readFile, writeFile } from "node:fs/promises";
 const base = JSON.parse(await readFile(new URL("../workers/collector/src/hotels.json", import.meta.url), "utf8"));
-const ext = await fetch("https://tripflip-collector.ohysky0127.workers.dev/get?key=hotels-ext").then((r) => r.json());
+const ext = await fetch("https://tripflip-collector.ohysky0127.workers.dev/get?key=hotels-ext", { headers: { "x-read-key": process.env.READ_KEY ?? "" } }).then((r) => r.json()); // READ_KEY: 수집 서버 조회 키
 const names = {};
 for (const src of [base.regions, ext.regions]) for (const reg of Object.values(src)) for (const [key, name] of reg.hotels) names[key] ??= name;
 const keys = Object.keys(names).sort();

@@ -174,6 +174,7 @@ interface MemberDetail {
   regions: { region: string; views: number; book: number; flight: number; hotel: number; save: number; last: number }[];
   daily: { day: string; visits: number }[];
   recent: { ts: number; step: string; region: string; path: string }[];
+  saved?: { regionId: string; regionName: string; createdAt: string; start: string | null; end: string | null }[];
 }
 
 const kst = (ms: number) => new Date(ms + 9 * 3600000).toISOString();
@@ -252,6 +253,11 @@ function MemberView({ adminKey, uid, onBack }: { adminKey: string; uid: string; 
             <tbody>{d.regions.map((r) => <tr key={r.region}><td>{rName(r.region)}</td><td>{r.views}</td><td>{r.book}</td><td>{r.flight}</td><td>{r.hotel}</td><td>{r.save}</td><td>{when(r.last)}</td></tr>)}</tbody>
           </table>
         </div>}
+    </section>
+    <section className="card-soft">
+      <b>저장한 여행 {d.saved?.length ?? 0}개</b>
+      {!d.saved?.length ? <p className="small muted" style={{ marginTop: 8 }}>아직 없어요.</p> :
+        <ul className="admin-log small">{d.saved.map((p, i) => <li key={i}><span className="xs faint">{md(p.createdAt)}</span> {p.regionName}{p.start ? ` · ${md(p.start)}~${p.end ? md(p.end) : ""}` : ""}</li>)}</ul>}
     </section>
     <section className="card-soft">
       <b>최근 이용 기록</b>

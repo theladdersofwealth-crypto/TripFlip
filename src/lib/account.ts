@@ -57,9 +57,12 @@ export async function login(nick: string, pin: string) {
   return r;
 }
 
-export async function logout() {
+/** 로그아웃. 내 여행이 계정에 올라간 게 확인되면 이 기기에서는 지운다(같이 쓰는 폰 보호) */
+export async function logout(beforeLeave?: () => Promise<boolean>, clearLocal?: () => void) {
   const a = loadAuth();
+  const synced = a && beforeLeave ? await beforeLeave() : false;
   saveAuth(null);
+  if (synced) clearLocal?.();
   if (a) await post("/logout", { token: a.token });
 }
 

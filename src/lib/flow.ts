@@ -129,8 +129,21 @@ export function loadPlans(): SavedPlan[] {
   const plans = read<SavedPlan[]>(K.plans, []);
   return Array.isArray(plans) ? plans.filter((p) => p && typeof p.id === "string" && p.query && Array.isArray(p.query.children) && Array.isArray(p.query.subs) && !travelDateError(p.query)) : [];
 }
-export const savePlan = (p: SavedPlan) => write(K.plans, [p, ...loadPlans().filter((x) => x.id !== p.id)]);
-export const removePlan = (id: string) => write(K.plans, loadPlans().filter((x) => x.id !== id));
+/** 저장·삭제가 생기면 알림 → 로그인 회원은 계정에 올림(planSync) */
+export const PLANS_CHANGED_EVENT = "tripflip:plans-changed";
+export const PLAN_DELS_KEY = "tripflip.flow.planDels";
+const changed = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(PLANS_CHANGED_EVENT)); };
+export const savePlan = (p: SavedPlan) => { const ok = write(K.plans, [p, ...loadPlans().filter((x) => x.id !== p.id)]); changed(); return ok; };
+export const removePlan = (id: string) => {
+  const ok = write(K.plans, loadPlans().filter((x) => x.id !== id));
+  write(PLAN_DELS_KEY, [...new Set([...read<string[]>(PLAN_DELS_KEY, []), id])].slice(-200));
+  changed();
+  return ok;
+};
+/** 계정에서 받은 목록으로 이 기기 저장을 바꿈(알림 없이) */
+export const replacePlans = (plans: SavedPlan[]) => write(K.plans, plans);
+export const loadPlanDels = () => { const d = read<string[]>(PLAN_DELS_KEY, []); return Array.isArray(d) ? d.filter((x) => typeof x === "string") : []; };
+export const clearPlanDels = (ids: string[]) => write(PLAN_DELS_KEY, loadPlanDels().filter((x) => !ids.includes(x)));
 
 /** 저장된 계획(?plan=)이 있으면 그 조건을, 없으면 마지막 입력 조건을 쓴다 */
 export function useFlowQuery(planId?: string | null) {
