@@ -23,6 +23,7 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
   // 작은 보딩패스는 칸마다 한 줄씩만 — 줄바꿈 없이 짧게
   const compactSub = (s: Slot) => {
     if (s.target === "when") return okDays ? `${shortDate(q.startDate)}~${shortDate(q.endDate)}` : s.sub;
+    if (s.target === "who") return kids.length ? `성인${adults}·자녀${kids.length}` : s.sub;
     if (s.target === "vibe") return interests.length > 1 ? `+${interests[1]}${interests.length > 2 ? ` 외${interests.length - 2}` : ""}` : `하루 ${q.perDay}곳`;
     return s.sub;
   };
@@ -40,7 +41,7 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
         {slots.map((s) => (
           <button key={s.k} type="button" className={`ticket-slot ${active === s.target ? "active" : ""}`} onClick={() => onSlot?.(s.target)}>
             <span className="slot-k">{s.n} {s.k.split(" · ")[1]}</span>
-            <span key={s.v} className="slot-v">{s.v}</span>
+            <span key={s.v} className="slot-v">{s.target === "vibe" ? interests[0] ?? "-" : s.v}</span>
             <span key={s.sub} className="slot-sub">{compactSub(s)}</span>
           </button>
         ))}
