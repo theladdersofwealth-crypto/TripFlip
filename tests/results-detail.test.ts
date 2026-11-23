@@ -33,7 +33,7 @@ test("추천 이유: 테마별 대표 명소, 테마끼리 겹치지 않음", ()
 });
 
 test("추천 카드에 나오는 숙소는 모두 한글 표기가 있다", () => {
-  const missing = ALL_REGIONS.flatMap((r) => STAY_TIERS.flatMap((t) => hotelCandidates(r.id, t))).filter((h) => !HOTEL_KO[h[0]]);
+  const missing = ALL_REGIONS.flatMap((r) => STAY_TIERS.flatMap((t) => hotelCandidates(r.id, t))).filter((h) => !HOTEL_KO[h.name]);
   assert.deepEqual(missing, []);
 });
 
@@ -57,4 +57,21 @@ test("부킹닷컴 링크에 숙소·날짜·인원이 들어간다", async () =
   assert.equal(u.searchParams.get("checkin"), "2026-12-10");
   assert.equal(u.searchParams.get("checkout"), "2026-12-14");
   assert.equal(u.searchParams.get("group_adults"), "2");
+});
+
+test("최근 수집가(숙소 키 포함)가 있으면 추천 숙소를 그 목록에서 경비 1박 값과 가깝게 고른다", async () => {
+  const { setLiveSummary } = await import("../src/lib/livePrices");
+  const { estimateTripCost } = await import("../src/services/regionScore");
+  const { REGIONS_V1 } = await import("../src/data/regionsV1");
+  const { HOTEL_NAMES } = await import("../src/data/hotelNames");
+  const keys = Object.keys(HOTEL_NAMES).filter((k) => k.startsWith("g293928-")).slice(0, 10);
+  setLiveSummary({ v: 2, updatedAt: "2026-11-23T00:00:00Z", windowDays: 14, days: { flight: 1, hotel: 1 }, counts: { flightSnapshots: 1, hotelBatches: 1 }, flights: {},
+    hotels: { NT: keys.map((k, i) => [50 + i * 10, 3, k] as [number, number, string]) } });
+  const picks = hotelCandidates("NT", "가심비");
+  const q = { startDate: "2026-12-10", endDate: "2026-12-14", adults: 2, children: [], elders: false, pet: false, main: "휴양", subs: [], perDay: 2, price: "상관없음", stay: "가심비" } as never;
+  const night = estimateTripCost(REGIONS_V1.find((r) => r.id === "NT")!, q).hotelNightUsd!;
+  assert.equal(picks.length, 3);
+  assert.ok(picks.every((p) => p.nightUsd != null && HOTEL_NAMES[p.key!] === p.name));
+  assert.ok(Math.abs(picks[0].nightUsd! - night) <= 10, `${picks[0].nightUsd} vs ${night}`);
+  setLiveSummary(null);
 });

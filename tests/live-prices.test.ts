@@ -19,7 +19,7 @@ test("수집 회차 합계 → 평균가 요약", () => {
   const hotel = mergeHotelAgg(mergeHotelAgg(null, [["NT", "k1", "2026-11-24", 40], ["NT", "k2", "2026-11-24", null]]), [["NT", "k1", "2026-12-10", 60]]);
   const s = buildSummary([day], [hotel], new Date("2026-11-10T00:00:00Z"));
   assert.deepEqual(s.flights.NHA["2027-01"], [250000, 2]);
-  assert.deepEqual(s.hotels.NT, [[50, 2]]);
+  assert.deepEqual(s.hotels.NT, [[50, 2, "k1"]]);
   assert.equal(s.v, 2);
   assert.equal(s.counts.flightSnapshots, 2);
 });
