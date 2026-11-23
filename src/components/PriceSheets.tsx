@@ -9,6 +9,7 @@ import { liveFlightInfo, liveSummary } from "@/lib/livePrices";
 import { loadFlightSamples } from "@/lib/flightSamples";
 import type { FlightSample } from "@/lib/flightSamples";
 import { flightAffiliateUrl, hotelSearchUrl } from "@/services/booking";
+import { klookHotelUrl } from "@/services/affiliate";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { CenterModal } from "@/components/ui";
@@ -55,7 +56,7 @@ export function FlightSheet({ region, q, flightKrw, onClose }: { region: RegionV
     : "10/31에 수집한 달별 최저가의 중간값이에요.";
   return (
     <CenterModal open onClose={onClose} title={`✈️ 인천 ↔ ${region.name} 항공`}
-      foot={<a className="btn btn-primary btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer">내 날짜로 실제 항공권 검색 <Icon name="link" /></a>}>
+      foot={<a className="btn btn-primary btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">내 날짜로 실제 항공권 검색 <Icon name="link" /></a>}>
       <div className="sheet-box">
         <span className="xs muted">경비에 넣은 값</span>
         <b>{flightKrw == null ? "미확인" : `1인 왕복 약 ${man(flightKrw)}`}</b>
@@ -99,7 +100,8 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelRo
   return (
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
-        <a className="btn btn-primary btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer">아고다에서 객실·조식 보기 <Icon name="link" /></a>
+        <a className="btn btn-primary btn-block" href={klookHotelUrl()} target="_blank" rel="noopener noreferrer sponsored">클룩 호텔에서 예약·객실 보기 <Icon name="link" /></a>
+        <a className="btn btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer">아고다에서 객실·조식 보기 <Icon name="link" /></a>
         {ta && <a className="btn btn-block" href={`https://www.tripadvisor.co.kr/Hotel_Review-g${ta[1]}-d${ta[2]}.html`} target="_blank" rel="noopener noreferrer">트립어드바이저 사진·후기 <Icon name="link" /></a>}
         <a className="btn btn-block" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`} target="_blank" rel="noopener noreferrer">구글 지도에서 위치 보기 <Icon name="link" /></a>
       </>}>
@@ -111,7 +113,7 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelRo
         <dt>객실 종류</dt><dd className="muted">미확인</dd>
         <dt>조식 포함</dt><dd className="muted">미확인</dd>
       </dl>
-      <span className="xs muted">객실 종류·조식은 날짜와 요금제마다 달라 지금 자료에는 없어요. 아고다에서 내 날짜로 확인해 주세요.</span>
+      <span className="xs muted">객실 종류·조식은 날짜와 요금제마다 달라 지금 자료에는 없어요. 예약 사이트에서 내 날짜로 확인해 주세요.</span>
       <span className="xs faint">가격대·평점은 10/31 Xotelo(트립어드바이저 기반) 수집값이에요. 한글 이름은 영문을 읽는 대로 옮긴 것이라 공식 한글명과 다를 수 있어요.</span>
     </CenterModal>
   );
