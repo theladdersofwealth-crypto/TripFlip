@@ -12,6 +12,7 @@ import { fmtDate } from "@/services/itineraryV1";
 import { boardKey, emptyBoard } from "@/services/planner";
 import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
 import type { StayTier } from "@/services/regionScore";
+import { hotelKo } from "@/components/PriceSheets";
 import { STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
 import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
@@ -80,7 +81,7 @@ export default function BookPage() {
         <p className="xs muted">객실 정원·침대·자녀 추가요금은 숙소별로 확인해야 해요. 현재 자료의 종합 평점은 청결 세부평점을 보장하지 않아요.</p>
         {hotels.length > 0 ? <div className="stack" style={{ gap: 8 }}>
           <span className="small bold">기존 자료의 비교 후보 · {selectedTier}</span>
-          {hotels.map(([name, rating, reviews, lo, hi]) => <a key={name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, name)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer"><span><b className="small">{name}</b><span className="xs muted" style={{ display: "block" }}>종합 ★ {rating} · 후기 {reviews.toLocaleString()} · 과거 1박 ${lo}~${hi}</span></span><Icon name="link" size={16} /></a>)}
+          {hotels.map(([name, rating, reviews, lo, hi]) => <a key={name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, name)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer"><span><b className="small">{hotelKo(name)}</b>{hotelKo(name) !== name && <span className="xs faint" style={{ display: "block" }}>{name}</span>}<span className="xs muted" style={{ display: "block" }}>종합 ★ {rating} · 후기 {reviews.toLocaleString()} · 과거 1박 ${lo}~${hi}</span></span><Icon name="link" size={16} /></a>)}
           <p className="xs faint">2026-10-31 수집 자료의 가격대예요. 날짜별 실시간 요금·청결 기준·정원은 재확인이 필요해요.</p>
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
         <div className="grid-2">

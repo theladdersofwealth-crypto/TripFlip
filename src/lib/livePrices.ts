@@ -42,15 +42,28 @@ const median = (xs: number[]) => {
   return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
 };
 
-/** 인천발 1인 왕복 평균 최저가(원). 출발월 값이 있으면 그 달, 없으면 수집된 달들의 중간값 */
-export function liveFlightKrw(regionKey: string, startDate?: string): number | null {
+/** 권역의 도착 공항 코드(대문자)와 여행사 도시 코드. 공항을 모르면 null */
+export function flightCodes(regionKey: string): { airport: string; city: string } | null {
   const ap = AIRPORT.get(regionKey);
-  const months = ap && live?.flights[CITY[ap] ?? ap.toUpperCase()];
+  return ap ? { airport: ap.toUpperCase(), city: CITY[ap] ?? ap.toUpperCase() } : null;
+}
+
+/** 경비에 넣은 항공 값이 무엇인지: 출발월 최저가 평균(month) 또는 수집된 달들의 중간값(median) */
+export interface LiveFlightInfo { krw: number; basis: "month" | "median"; month: string | null; samples: number }
+
+/** 인천발 1인 왕복 최저가의 최근 평균(원). 출발월 값이 있으면 그 달, 없으면 수집된 달들의 중간값 */
+export function liveFlightInfo(regionKey: string, startDate?: string): LiveFlightInfo | null {
+  const codes = flightCodes(regionKey);
+  const months = codes && live?.flights[codes.city];
   if (!months) return null;
   const m = startDate?.slice(0, 7);
-  if (m && months[m]) return months[m][0];
+  if (m && months[m]) return { krw: months[m][0], basis: "month", month: m, samples: months[m][1] };
   const vals = Object.values(months).map((v) => v[0]);
-  return vals.length ? Math.round(median(vals) / 1000) * 1000 : null;
+  return vals.length ? { krw: Math.round(median(vals) / 1000) * 1000, basis: "median", month: null, samples: Object.values(months).reduce((s, v) => s + v[1], 0) } : null;
+}
+
+export function liveFlightKrw(regionKey: string, startDate?: string): number | null {
+  return liveFlightInfo(regionKey, startDate)?.krw ?? null;
 }
 
 /** 권역의 품질 기준(총점 4.5↑·리뷰 300↑) 통과 숙소 1박 평균 최저가(USD), 싼 순. 5곳 미만이면 null */

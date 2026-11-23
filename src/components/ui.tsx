@@ -1,3 +1,6 @@
+"use client";
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Icon } from "./Icon";
 import { UNKNOWN } from "@/lib/labels";
 
@@ -71,5 +74,40 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         {children}
       </div>
     </div>
+  );
+}
+
+/** 화면 가운데 팝업. 폰 뒤로가기·바깥 누르기·Esc 로 닫힌다 */
+export function CenterModal({ open, onClose, title, children, foot }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode; foot?: React.ReactNode }) {
+  const close = useRef(onClose);
+  close.current = onClose;
+  useEffect(() => {
+    if (!open) return;
+    history.pushState({ ...(history.state ?? {}), tfModal: true }, "");
+    let popped = false;
+    const onPop = () => { popped = true; close.current(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close.current(); };
+    addEventListener("popstate", onPop);
+    addEventListener("keydown", onKey);
+    return () => {
+      removeEventListener("popstate", onPop);
+      removeEventListener("keydown", onKey);
+      if (!popped && history.state?.tfModal) history.back();
+    };
+  }, [open]);
+  if (!open || typeof document === "undefined") return null;
+  // 카드의 애니메이션(transform) 안에 갇히지 않게 body 바로 아래에 띄운다
+  return createPortal(
+    <div className="center-modal-back" onClick={(e) => { e.stopPropagation(); onClose(); }}>
+      <div className="center-modal" role="dialog" aria-modal aria-label={title} onClick={(e) => e.stopPropagation()}>
+        <div className="center-modal-head">
+          <h3>{title}</h3>
+          <button type="button" className="icon-btn" onClick={onClose} aria-label="닫기"><Icon name="x" /></button>
+        </div>
+        <div className="pop-body">{children}</div>
+        {foot && <div className="center-modal-foot">{foot}</div>}
+      </div>
+    </div>,
+    document.body,
   );
 }
