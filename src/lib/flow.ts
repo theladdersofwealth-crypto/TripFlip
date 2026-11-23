@@ -125,25 +125,123 @@ export function saveBoard(regionId: string, b: Board, planId?: string | null) {
   }
   return write(K.boards, { ...read<Record<string, Board>>(K.boards, {}), [regionId]: b });
 }
-export function loadPlans(): SavedPlan[] {
-  const plans = read<SavedPlan[]>(K.plans, []);
-  return Array.isArray(plans) ? plans.filter((p) => p && typeof p.id === "string" && p.query && Array.isArray(p.query.children) && Array.isArray(p.query.subs) && !travelDateError(p.query)) : [];
+const validPlans = (plans: unknown): SavedPlan[] => (Array.isArray(plans) ? plans.filter((p) => p && typeof p.id === "string" && p.query && Array.isArray(p.query.children) && Array.isArray(p.query.subs) && !travelDateError(p.query)) : []);
+
+// ── 내 여행 저장소 ───────────────────────────────────────────
+// 비회원: tripflip.guest.plans (이 기기에서 비회원으로 만든 것) + 예전 공용 저장소 tripflip.flow.plans(소유자 불분명, 자동 업로드·삭제 안 함)
+// 회원: 계정별로 분리. 서버가 확인한 목록(cache)과 아직 서버 확인 전인 변경(pending)을 따로 둔다.
+//   tripflip.acct.<uid>.plans   서버 원본의 사본
+//   tripflip.acct.<uid>.pending { puts: {id: {plan, state}}, dels: {id: {state}} }  state = waiting(동기화 대기) | failed(저장 실패)
+// 로그아웃·계정 전환하면 그 계정 것은 바로 안 보이고, 대기 변경은 지우지 않고 같은 계정으로 다시 로그인할 때만 재시도한다.
+export const GUEST_PLANS_KEY = "tripflip.guest.plans";
+export type PendingState = "waiting" | "failed";
+export interface Pending { puts: Record<string, { plan: SavedPlan; state: PendingState; error?: string }>; dels: Record<string, { state: PendingState; error?: string }> }
+export type PlanState = "synced" | PendingState | "local";
+const acctKey = (uid: string, part: "plans" | "pending") => `tripflip.acct.${uid}.${part}`;
+
+/** 지금 로그인한 계정(uid·token). 비회원이면 null, 계정 확인 중이면 { uid: "" } */
+export function currentAccount(): { uid: string; token: string } | null {
+  try {
+    const a = JSON.parse(localStorage.getItem("tripflip:auth") || "null");
+    if (!a || typeof a.token !== "string") return null;
+    return { uid: typeof a.uid === "string" && /^[a-f0-9]{16}$/.test(a.uid) ? a.uid : "", token: a.token };
+  } catch {
+    return null;
+  }
 }
+
+export const loadAccountCache = (uid: string) => validPlans(read<SavedPlan[]>(acctKey(uid, "plans"), []));
+export const saveAccountCache = (uid: string, plans: SavedPlan[]) => write(acctKey(uid, "plans"), plans);
+export const clearAccountCache = (uid: string) => { try { localStorage.removeItem?.(acctKey(uid, "plans")); } catch {} mem.delete(acctKey(uid, "plans")); };
+export function loadPending(uid: string): Pending {
+  const p = read<Pending>(acctKey(uid, "pending"), { puts: {}, dels: {} });
+  return { puts: p && typeof p.puts === "object" && p.puts ? p.puts : {}, dels: p && typeof p.dels === "object" && p.dels ? p.dels : {} };
+}
+export const savePending = (uid: string, p: Pending) => write(acctKey(uid, "pending"), p);
+
+export const loadGuestPlans = () => validPlans(read<SavedPlan[]>(GUEST_PLANS_KEY, []));
+export const loadLegacyPlans = () => validPlans(read<SavedPlan[]>(K.plans, []));
+
+const byNewest = (a: SavedPlan, b: SavedPlan) => (b.createdAt > a.createdAt ? 1 : b.createdAt < a.createdAt ? -1 : 0);
+
+/** 지금 보이는 '내 여행' (회원이면 그 계정 것만) */
+export function loadPlans(): SavedPlan[] {
+  const acct = currentAccount();
+  if (acct) {
+    if (!acct.uid) return []; // 계정 확인 전에는 아무것도 보이지 않게
+    const pend = loadPending(acct.uid);
+    const puts = Object.values(pend.puts).map((x) => x.plan);
+    const ids = new Set(puts.map((p) => p.id));
+    return validPlans([...puts, ...loadAccountCache(acct.uid).filter((p) => !ids.has(p.id) && !pend.dels[p.id])]).sort(byNewest);
+  }
+  const guest = loadGuestPlans();
+  const ids = new Set(guest.map((p) => p.id));
+  return [...guest, ...loadLegacyPlans().filter((p) => !ids.has(p.id))].sort(byNewest);
+}
+
+/** 계획 하나의 저장 상태: synced(계정에 저장됨) · waiting(동기화 대기) · failed(저장 실패) · local(비회원 기기 저장) */
+export function planState(id: string): { state: PlanState; error?: string } {
+  const acct = currentAccount();
+  if (!acct?.uid) return { state: "local" };
+  const pend = loadPending(acct.uid);
+  const x = pend.puts[id];
+  return x ? { state: x.state, error: x.error } : { state: "synced" };
+}
+
 /** 저장·삭제가 생기면 알림 → 로그인 회원은 계정에 올림(planSync) */
 export const PLANS_CHANGED_EVENT = "tripflip:plans-changed";
-export const PLAN_DELS_KEY = "tripflip.flow.planDels";
 const changed = () => { if (typeof window !== "undefined") window.dispatchEvent(new Event(PLANS_CHANGED_EVENT)); };
-export const savePlan = (p: SavedPlan) => { const ok = write(K.plans, [p, ...loadPlans().filter((x) => x.id !== p.id)]); changed(); return ok; };
-export const removePlan = (id: string) => {
-  const ok = write(K.plans, loadPlans().filter((x) => x.id !== id));
-  write(PLAN_DELS_KEY, [...new Set([...read<string[]>(PLAN_DELS_KEY, []), id])].slice(-200));
+
+export function savePlan(p: SavedPlan): boolean {
+  const acct = currentAccount();
+  let ok: boolean;
+  if (acct) {
+    if (!acct.uid) return false;
+    const pend = loadPending(acct.uid);
+    pend.puts[p.id] = { plan: p, state: "waiting" };
+    delete pend.dels[p.id];
+    ok = savePending(acct.uid, pend);
+  } else if (loadLegacyPlans().some((x) => x.id === p.id) && !loadGuestPlans().some((x) => x.id === p.id)) {
+    ok = write(K.plans, [p, ...loadLegacyPlans().filter((x) => x.id !== p.id)]); // 예전 저장소 계획은 제자리에서 고침
+  } else {
+    ok = write(GUEST_PLANS_KEY, [p, ...loadGuestPlans().filter((x) => x.id !== p.id)]);
+  }
   changed();
   return ok;
-};
-/** 계정에서 받은 목록으로 이 기기 저장을 바꿈(알림 없이) */
-export const replacePlans = (plans: SavedPlan[]) => write(K.plans, plans);
-export const loadPlanDels = () => { const d = read<string[]>(PLAN_DELS_KEY, []); return Array.isArray(d) ? d.filter((x) => typeof x === "string") : []; };
-export const clearPlanDels = (ids: string[]) => write(PLAN_DELS_KEY, loadPlanDels().filter((x) => !ids.includes(x)));
+}
+
+export function removePlan(id: string): boolean {
+  const acct = currentAccount();
+  let ok: boolean;
+  if (acct) {
+    if (!acct.uid) return false;
+    const pend = loadPending(acct.uid);
+    const onlyLocal = !!pend.puts[id] && !loadAccountCache(acct.uid).some((p) => p.id === id);
+    delete pend.puts[id];
+    if (!onlyLocal) pend.dels[id] = { state: "waiting" };
+    ok = savePending(acct.uid, pend);
+  } else {
+    ok = write(GUEST_PLANS_KEY, loadGuestPlans().filter((x) => x.id !== id));
+    if (loadLegacyPlans().some((x) => x.id === id)) ok = write(K.plans, loadLegacyPlans().filter((x) => x.id !== id)) && ok; // 사용자가 직접 지운 것만
+  }
+  changed();
+  return ok;
+}
+
+/** 비회원으로 만든 여행을 지금 계정으로 옮김(사용자가 '옮기기'를 눌렀을 때만). 예전 공용 저장소 것은 대상 아님 */
+export function moveGuestPlansToAccount(ids?: string[]): number {
+  const acct = currentAccount();
+  if (!acct?.uid) return 0;
+  const guest = loadGuestPlans();
+  const moving = guest.filter((p) => !ids || ids.includes(p.id));
+  if (!moving.length) return 0;
+  const pend = loadPending(acct.uid);
+  for (const p of moving) { pend.puts[p.id] = { plan: p, state: "waiting" }; delete pend.dels[p.id]; }
+  if (!savePending(acct.uid, pend)) return 0;
+  write(GUEST_PLANS_KEY, guest.filter((p) => !moving.includes(p)));
+  changed();
+  return moving.length;
+}
 
 /** 저장된 계획(?plan=)이 있으면 그 조건을, 없으면 마지막 입력 조건을 쓴다 */
 export function useFlowQuery(planId?: string | null) {
