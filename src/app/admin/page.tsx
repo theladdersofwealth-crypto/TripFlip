@@ -2,7 +2,7 @@
 // 관리자 통계: 일별 방문자, 사용 흐름(퍼널), 인기 권역. 데이터는 tripflip-stats Worker.
 // 메뉴에 노출하지 않고 /admin 주소로만 들어온다. 비밀번호는 Worker 비밀값 ADMIN_KEY.
 import { useEffect, useMemo, useState } from "react";
-import { NO_TRACK_KEY, STATS_URL } from "@/lib/analytics";
+import { NO_TRACK_KEY, STATS_URL, activityLabel } from "@/lib/analytics";
 import { ALL_REGIONS } from "@/services/regionScore";
 
 const KEY_STORE = "tripflip:admin-key";
@@ -10,6 +10,7 @@ const KEY_STORE = "tripflip:admin-key";
 interface Day { day: string; visitors: number; views: number; newVisitors: number; steps: Record<string, number> }
 interface Stats {
   ok: true; today: string; from: string; days: number; totalVisitors: number; periodVisitors: number;
+  members?: { total: number; today: number; activeToday: number };
   daily: Day[]; funnel: Record<string, number>;
   regions: { region: string; views: number; book: number; flight: number; hotel: number; save: number }[];
 }
@@ -41,6 +42,7 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [noTrack, setNoTrack] = useState(false);
+  const [tab, setTab] = useState<"stats" | "members">("stats");
 
   useEffect(() => {
     setKey(store.get(KEY_STORE) ?? "");
@@ -80,12 +82,16 @@ export default function AdminPage() {
       <h1 style={{ fontSize: 22, fontWeight: 900 }}>관리자 통계</h1>
       <button className="btn btn-ghost" onClick={() => { store.set(KEY_STORE, null); setKey(""); setData(null); }}>나가기</button>
     </div>
+    <div className="seg" role="tablist" style={{ marginTop: 8 }}>
+      <button role="tab" aria-selected={tab === "stats"} className={tab === "stats" ? "on" : ""} onClick={() => setTab("stats")}>방문 통계</button>
+      <button role="tab" aria-selected={tab === "members"} className={tab === "members" ? "on" : ""} onClick={() => setTab("members")}>회원 이용 기록{data?.members ? ` (${data.members.total})` : ""}</button>
+    </div>
     <div className="row-wrap" role="group" aria-label="기간" style={{ marginTop: 8 }}>
       {[7, 30, 90].map((d) => <button key={d} className={`btn ${days === d ? "btn-primary" : ""}`} style={{ minHeight: 36, padding: "0 14px" }} onClick={() => setDays(d)}>최근 {d}일</button>)}
     </div>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)", marginTop: 12 }}>{error}</p>}
     {loading && !data && <p className="muted small" style={{ marginTop: 12 }}>불러오는 중…</p>}
-    {data && <Dashboard data={data} />}
+    {tab === "stats" ? data && <Dashboard data={data} /> : <Members adminKey={key} days={days} />}
     <label className="check-row xs muted" style={{ marginTop: 24 }}>
       <input type="checkbox" checked={noTrack} onChange={(e) => { setNoTrack(e.target.checked); store.set(NO_TRACK_KEY, e.target.checked ? "1" : null); }} />
       이 기기는 통계에서 빼기 (관리자 테스트용)
@@ -117,6 +123,7 @@ function Dashboard({ data }: { data: Stats }) {
       <Tile label="어제 방문자" value={yesterday?.visitors ?? 0} sub={`신규 ${yesterday?.newVisitors ?? 0}`} />
       <Tile label="최근 7일 하루 평균" value={avg7} />
       <Tile label={`최근 ${data.days}일 방문자`} value={data.periodVisitors} sub={`누적 ${data.totalVisitors.toLocaleString()}`} />
+      {data.members && <Tile label="회원" value={data.members.total} sub={`오늘 가입 ${data.members.today} · 오늘 접속 ${data.members.activeToday}`} />}
     </section>
 
     <section className="card-soft">
@@ -157,4 +164,103 @@ function Dashboard({ data }: { data: Stats }) {
 
 function Tile({ label, value, sub }: { label: string; value: number; sub?: string }) {
   return <div className="card-soft admin-tile"><span className="xs muted">{label}</span><b>{value.toLocaleString()}</b>{sub && <span className="xs faint">{sub}</span>}</div>;
+}
+
+// ── 회원 이용 기록 ─────────────────────────────────────────
+interface Member { uid: string; nick: string; birth: string; gender: string; created: number; last: number | null; visitsAll: number; daysAll: number; visits: number; days: number; regions: number; flight: number; hotel: number; save: number }
+interface MemberDetail {
+  ok: true; devices: number;
+  user: { uid: string; nick: string; birth: string; gender: string; created: number; lock_until: number };
+  regions: { region: string; views: number; book: number; flight: number; hotel: number; save: number; last: number }[];
+  daily: { day: string; visits: number }[];
+  recent: { ts: number; step: string; region: string; path: string }[];
+}
+
+const kst = (ms: number) => new Date(ms + 9 * 3600000).toISOString();
+/** 11/23 17:05 (한국 시간) */
+const when = (ms: number | null) => (ms ? `${md(kst(ms))} ${kst(ms).slice(11, 16)}` : "–");
+const age = (birth: string) => {
+  const t = kst(Date.now()).slice(0, 10);
+  return Number(t.slice(0, 4)) - Number(birth.slice(0, 4)) - (t.slice(5) < birth.slice(5) ? 1 : 0);
+};
+const genderKo = (g: string) => (g === "M" ? "남" : g === "F" ? "여" : "–");
+const rName = (id: string) => regionName.get(id) ?? id;
+
+function Members({ adminKey, days }: { adminKey: string; days: number }) {
+  const [list, setList] = useState<Member[] | null>(null);
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    setError("");
+    fetch(`${STATS_URL}/users?days=${days}`, { headers: { authorization: `Bearer ${adminKey}` }, cache: "no-store" })
+      .then(async (res) => { if (!res.ok) throw new Error(String(res.status)); const j = await res.json(); if (alive) setList(j.users); })
+      .catch(() => alive && setError("회원 기록을 불러오지 못했어요."));
+    return () => { alive = false; };
+  }, [adminKey, days, reload]);
+
+  if (error) return <p role="alert" className="small" style={{ color: "var(--danger)", marginTop: 12 }}>{error}</p>;
+  if (!list) return <p className="muted small" style={{ marginTop: 12 }}>불러오는 중…</p>;
+  if (open) return <MemberView adminKey={adminKey} uid={open} onBack={() => { setOpen(null); setReload((n) => n + 1); }} />;
+  return <section className="card-soft" style={{ marginTop: 16 }}>
+    <b>회원 {list.length}명</b>
+    <p className="xs muted" style={{ margin: "4px 0 10px" }}>접속·권역·예약 클릭은 최근 {days}일, 로그인한 기기 기준. 줄을 누르면 상세 기록.</p>
+    {list.length === 0 ? <p className="small muted">아직 가입한 회원이 없어요.</p> :
+      <div style={{ overflowX: "auto" }}>
+        <table className="admin-table small">
+          <thead><tr><th>닉네임</th><th>나이·성별</th><th>최근 접속</th><th>접속</th><th>접속일</th><th>본 권역</th><th>항공</th><th>숙소</th><th>저장</th><th>가입</th></tr></thead>
+          <tbody>{list.map((u) => <tr key={u.uid} className="admin-row" tabIndex={0} onClick={() => setOpen(u.uid)} onKeyDown={(e) => e.key === "Enter" && setOpen(u.uid)}>
+            <td><b>{u.nick}</b></td><td>{age(u.birth)}·{genderKo(u.gender)}</td><td>{when(u.last)}</td><td>{u.visits}</td><td>{u.days}</td><td>{u.regions}</td><td>{u.flight}</td><td>{u.hotel}</td><td>{u.save}</td><td>{md(kst(u.created))}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+  </section>;
+}
+
+function MemberView({ adminKey, uid, onBack }: { adminKey: string; uid: string; onBack: () => void }) {
+  const [d, setD] = useState<MemberDetail | null>(null);
+  const [error, setError] = useState("");
+  const [confirmDel, setConfirmDel] = useState(false);
+  useEffect(() => {
+    fetch(`${STATS_URL}/user?id=${uid}`, { headers: { authorization: `Bearer ${adminKey}` }, cache: "no-store" })
+      .then(async (res) => { if (!res.ok) throw new Error(String(res.status)); setD(await res.json()); })
+      .catch(() => setError("상세 기록을 불러오지 못했어요."));
+  }, [adminKey, uid]);
+  const del = async () => {
+    const res = await fetch(`${STATS_URL}/user?id=${uid}`, { method: "DELETE", headers: { authorization: `Bearer ${adminKey}` } }).catch(() => null);
+    if (res?.ok) onBack(); else setError("삭제하지 못했어요.");
+  };
+  const back = <button className="btn btn-ghost" onClick={onBack}>← 회원 목록</button>;
+  if (error) return <div style={{ marginTop: 12 }}>{back}<p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p></div>;
+  if (!d) return <div style={{ marginTop: 12 }}>{back}<p className="muted small">불러오는 중…</p></div>;
+  const u = d.user;
+  const totalVisits = d.daily.reduce((s, x) => s + x.visits, 0);
+  return <div className="stack-lg" style={{ marginTop: 12 }}>
+    {back}
+    <section className="card-soft">
+      <b style={{ fontSize: 18 }}>{u.nick}</b>
+      <p className="small muted">{u.birth} ({age(u.birth)}세) · {genderKo(u.gender)} · 가입 {when(u.created)} · 로그인 기기 {d.devices}대{u.lock_until > Date.now() ? " · 🔒 PIN 잠김" : ""}</p>
+      <p className="small" style={{ marginTop: 6 }}>접속(화면 열람) {totalVisits}회 · 접속한 날 {d.daily.length}일{d.daily[0] ? ` · 마지막 ${md(d.daily[0].day)}` : ""}</p>
+    </section>
+    <section className="card-soft">
+      <b>본 권역</b>
+      {d.regions.length === 0 ? <p className="small muted" style={{ marginTop: 8 }}>아직 없어요.</p> :
+        <div style={{ overflowX: "auto", marginTop: 8 }}>
+          <table className="admin-table small">
+            <thead><tr><th>권역</th><th>일정 봄</th><th>예약 화면</th><th>항공</th><th>숙소</th><th>저장</th><th>최근</th></tr></thead>
+            <tbody>{d.regions.map((r) => <tr key={r.region}><td>{rName(r.region)}</td><td>{r.views}</td><td>{r.book}</td><td>{r.flight}</td><td>{r.hotel}</td><td>{r.save}</td><td>{when(r.last)}</td></tr>)}</tbody>
+          </table>
+        </div>}
+    </section>
+    <section className="card-soft">
+      <b>최근 이용 기록</b>
+      {d.recent.length === 0 ? <p className="small muted" style={{ marginTop: 8 }}>아직 없어요.</p> :
+        <ol className="admin-log small">{d.recent.map((x, i) => <li key={i}><span className="xs faint">{when(x.ts)}</span> {activityLabel(x.step, x.region, x.path, rName)}</li>)}</ol>}
+    </section>
+    <section>
+      {!confirmDel ? <button className="btn btn-ghost xs" onClick={() => setConfirmDel(true)}>이 계정 삭제(탈퇴 처리)</button> :
+        <div className="row-wrap"><span className="small">정말 삭제할까요? 기록도 모두 지워져요.</span><button className="btn" style={{ color: "var(--danger)" }} onClick={del}>삭제</button><button className="btn btn-ghost" onClick={() => setConfirmDel(false)}>취소</button></div>}
+    </section>
+  </div>;
 }

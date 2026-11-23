@@ -1,13 +1,19 @@
-// tripflip-stats: 익명 사용 흐름 집계.
-//  POST /e      {v, s, r?}  ← 앱(sendBeacon, text/plain). v=기기 무작위 번호, s=단계, r=권역 id
-//  GET  /stats?days=30      ← 관리자 페이지 (Authorization: Bearer ADMIN_KEY)
+// tripflip-stats: 사용 흐름 집계 + 간편 회원.
+//  POST /e      {v, s, r?, p?}  ← 앱(sendBeacon, text/plain). v=기기 무작위 번호, s=단계, r=권역 id, p=화면 주소
+//  GET  /stats?days=30          ← 관리자 페이지 (Authorization: Bearer ADMIN_KEY)
+//  POST /signup {nick, birth, gender, pin, agree, v} → {token, nick}
+//  POST /login  {nick, pin, v}  → {token, nick}   (PIN 5번 틀리면 15분 잠금, 반복 시 두 배)
+//  POST /logout {token}
+//  POST /me     {token}         → {nick}
+//  GET  /users, GET /user?id=, DELETE /user?id=   ← 관리자
+// 회원은 닉네임·생년월일·성별만. PIN은 PBKDF2 해시+솔트로만 저장. 로그인 기기의 화면 이동만 계정에 묶어 기록한다.
 import { DurableObject } from "cloudflare:workers";
 
-import { STEPS, KEEP_DAYS, kstDay, parseEvent } from "./lib.js";
+import { STEPS, KEEP_DAYS, LOCK_AFTER, PIN_ITER, kstDay, parseEvent, validateSignup, validPin, nickKey, hashPin, sha256, randomHex, lockMs } from "./lib.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, OPTIONS",
+  "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
   "access-control-allow-headers": "authorization, content-type",
   "access-control-max-age": "86400",
 };
@@ -33,15 +39,33 @@ export default {
       // 자동 프로그램(검색 로봇 등)은 세지 않음
       const ua = req.headers.get("user-agent") || "";
       if (/bot|crawl|spider|headless|lighthouse/i.test(ua)) return json({ ok: true, skipped: true });
-      await stub.record(kstDay(), e.v, e.s, e.r);
+      await stub.record(kstDay(), e.v, e.s, e.r, e.p ?? "");
       return json({ ok: true });
     }
 
-    if (url.pathname === "/stats" && req.method === "GET") {
+    // 회원: 앱에서 JSON 본문으로. IP는 잠깐 횟수 제한에만 쓰고 저장하지 않는다.
+    const ip = req.headers.get("cf-connecting-ip") || "";
+    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me"].includes(url.pathname)) {
+      let b;
+      try { b = JSON.parse((await req.text()).slice(0, 2000)); } catch { return json({ ok: false, error: "잘못된 요청이에요." }, 400); }
+      if (!b || typeof b !== "object") return json({ ok: false, error: "잘못된 요청이에요." }, 400);
+      const r = await stub[url.pathname.slice(1)](b, ip);
+      return json(r, r.status ?? (r.ok ? 200 : 400));
+    }
+
+    const isAdmin = () => {
       const auth = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      if (!env.ADMIN_KEY || !safeEqual(auth, env.ADMIN_KEY)) return json({ ok: false, error: "unauthorized" }, 401);
-      const days = Math.min(Math.max(parseInt(url.searchParams.get("days") || "30", 10) || 30, 1), 365);
-      return json(await stub.stats(days));
+      return !!env.ADMIN_KEY && safeEqual(auth, env.ADMIN_KEY);
+    };
+    if (["/stats", "/users", "/user"].includes(url.pathname) && !isAdmin()) return json({ ok: false, error: "unauthorized" }, 401);
+    const days = Math.min(Math.max(parseInt(url.searchParams.get("days") || "30", 10) || 30, 1), 365);
+    if (url.pathname === "/stats" && req.method === "GET") return json(await stub.stats(days));
+    if (url.pathname === "/users" && req.method === "GET") return json(await stub.users(days));
+    if (url.pathname === "/user") {
+      const id = url.searchParams.get("id") || "";
+      if (!/^[a-f0-9]{16}$/.test(id)) return json({ ok: false, error: "bad id" }, 400);
+      if (req.method === "GET") return json(await stub.user(id));
+      if (req.method === "DELETE") return json(await stub.deleteUser(id));
     }
 
     return json({ ok: true, service: "tripflip-stats" });
@@ -54,16 +78,147 @@ export class Stats extends DurableObject {
     this.sql = ctx.storage.sql;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS hits (day TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', n INTEGER NOT NULL DEFAULT 1, PRIMARY KEY (day, vid, step, region))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS visitors (vid TEXT PRIMARY KEY, first_day TEXT NOT NULL)`);
+    // 회원
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS users (uid TEXT PRIMARY KEY, nick TEXT NOT NULL, nick_key TEXT NOT NULL UNIQUE, birth TEXT NOT NULL, gender TEXT NOT NULL, salt TEXT NOT NULL, pin_hash TEXT NOT NULL, iter INTEGER NOT NULL, created INTEGER NOT NULL, fails INTEGER NOT NULL DEFAULT 0, locks INTEGER NOT NULL DEFAULT 0, lock_until INTEGER NOT NULL DEFAULT 0)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS sessions (tok TEXT PRIMARY KEY, uid TEXT NOT NULL, vid TEXT NOT NULL, created INTEGER NOT NULL)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (vid TEXT PRIMARY KEY, uid TEXT NOT NULL, since INTEGER NOT NULL)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '')`);
+    this.sql.exec(`CREATE INDEX IF NOT EXISTS log_uid ON log (uid, ts)`);
+    this.ipHits = new Map(); // 메모리에만: IP별 최근 시도 수 (저장 안 함)
   }
 
-  async record(day, vid, step, region) {
+  /** IP당 1시간 limit번까지. 넘으면 true */
+  throttled(kind, ip, limit) {
+    if (!ip) return false;
+    const k = kind + ip, now = Date.now();
+    const h = this.ipHits.get(k);
+    if (!h || now - h.t > 3600000) { this.ipHits.set(k, { n: 1, t: now }); return false; }
+    if (this.ipHits.size > 5000) this.ipHits.clear();
+    return ++h.n > limit;
+  }
+
+  async record(day, vid, step, region, path = "") {
     this.sql.exec(`INSERT INTO hits (day, vid, step, region) VALUES (?, ?, ?, ?) ON CONFLICT (day, vid, step, region) DO UPDATE SET n = n + 1`, day, vid, step, region);
     this.sql.exec(`INSERT OR IGNORE INTO visitors (vid, first_day) VALUES (?, ?)`, vid, day);
+    // 로그인한 기기면 계정 이용 기록에 남김
+    const uid = this.sql.exec(`SELECT uid FROM devices WHERE vid = ?`, vid).toArray()[0]?.uid;
+    if (uid) this.sql.exec(`INSERT INTO log (ts, day, uid, vid, step, region, path) VALUES (?, ?, ?, ?, ?, ?, ?)`, Date.now(), day, uid, vid, step, region, path);
     // 하루 한 번쯤 오래된 기록 정리
     if (Math.random() < 0.01) {
       const cut = kstDay(Date.now() - KEEP_DAYS * 86400000);
       this.sql.exec(`DELETE FROM hits WHERE day < ?`, cut);
+      this.sql.exec(`DELETE FROM log WHERE day < ?`, cut);
     }
+  }
+
+  async newSession(uid, v) {
+    const token = randomHex(24);
+    this.sql.exec(`INSERT INTO sessions (tok, uid, vid, created) VALUES (?, ?, ?, ?)`, await sha256(token), uid, v, Date.now());
+    this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid, since = excluded.since`, v, uid, Date.now());
+    return token;
+  }
+
+  async signup(b, ip) {
+    const v = typeof b.v === "string" && /^[a-z0-9]{8,32}$/.test(b.v) ? b.v : null;
+    if (!v) return { ok: false, error: "이 브라우저에서는 가입할 수 없어요. (저장 공간 차단)" };
+    const x = validateSignup(b);
+    if (x.error) return { ok: false, error: x.error };
+    if (this.throttled("s", ip, 10)) return { ok: false, error: "가입 요청이 너무 많아요. 잠시 뒤 다시 해 주세요.", status: 429 };
+    if (this.sql.exec(`SELECT 1 FROM users WHERE nick_key = ?`, nickKey(x.nick)).toArray().length) return { ok: false, error: "이미 쓰는 닉네임이에요. 다른 닉네임을 정해 주세요.", status: 409 };
+    const uid = randomHex(8), salt = randomHex(16);
+    this.sql.exec(`INSERT INTO users (uid, nick, nick_key, birth, gender, salt, pin_hash, iter, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      uid, x.nick, nickKey(x.nick), x.birth, x.gender, salt, await hashPin(x.pin, salt), PIN_ITER, Date.now());
+    return { ok: true, nick: x.nick, token: await this.newSession(uid, v) };
+  }
+
+  async login(b, ip) {
+    const v = typeof b.v === "string" && /^[a-z0-9]{8,32}$/.test(b.v) ? b.v : null;
+    const pin = validPin(b.pin);
+    if (!v || !pin || typeof b.nick !== "string") return { ok: false, error: "닉네임과 PIN 6자리를 넣어 주세요." };
+    if (this.throttled("l", ip, 30)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
+    const u = this.sql.exec(`SELECT * FROM users WHERE nick_key = ?`, nickKey(b.nick)).toArray()[0];
+    if (!u) return { ok: false, error: "닉네임 또는 PIN이 맞지 않아요.", status: 401 };
+    const now = Date.now();
+    if (u.lock_until > now) return { ok: false, error: `PIN을 여러 번 틀려 잠겼어요. ${Math.ceil((u.lock_until - now) / 60000)}분 뒤 다시 해 주세요.`, status: 429 };
+    if ((await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) {
+      const fails = u.fails + 1;
+      if (fails >= LOCK_AFTER) {
+        const locks = u.locks + 1;
+        this.sql.exec(`UPDATE users SET fails = 0, locks = ?, lock_until = ? WHERE uid = ?`, locks, now + lockMs(locks), u.uid);
+        return { ok: false, error: `PIN을 ${LOCK_AFTER}번 틀려 ${lockMs(locks) / 60000}분 동안 잠겼어요.`, status: 429 };
+      }
+      this.sql.exec(`UPDATE users SET fails = ? WHERE uid = ?`, fails, u.uid);
+      return { ok: false, error: `닉네임 또는 PIN이 맞지 않아요. (${LOCK_AFTER - fails}번 더 틀리면 잠겨요)`, status: 401 };
+    }
+    this.sql.exec(`UPDATE users SET fails = 0, locks = 0, lock_until = 0 WHERE uid = ?`, u.uid);
+    return { ok: true, nick: u.nick, token: await this.newSession(u.uid, v) };
+  }
+
+  async sessionOf(token) {
+    if (typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token)) return null;
+    return this.sql.exec(`SELECT s.tok, s.uid, s.vid, u.nick FROM sessions s JOIN users u ON u.uid = s.uid WHERE s.tok = ?`, await sha256(token)).toArray()[0] ?? null;
+  }
+
+  async me(b) {
+    const s = await this.sessionOf(b.token);
+    if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
+    // 이 기기가 다른 계정에 묶였으면 다시 이 계정으로
+    this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid`, s.vid, s.uid, Date.now());
+    return { ok: true, nick: s.nick };
+  }
+
+  async logout(b) {
+    const s = await this.sessionOf(b.token);
+    if (s) {
+      this.sql.exec(`DELETE FROM sessions WHERE tok = ?`, s.tok);
+      this.sql.exec(`DELETE FROM devices WHERE vid = ? AND uid = ?`, s.vid, s.uid);
+    }
+    return { ok: true };
+  }
+
+  async users(days) {
+    const from = kstDay(Date.now() - (days - 1) * 86400000);
+    const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
+    const all = rows(`SELECT u.uid, u.nick, u.birth, u.gender, u.created, MAX(l.ts) AS last,
+        COUNT(CASE WHEN l.step = 'visit' THEN 1 END) AS visitsAll,
+        COUNT(DISTINCT l.day) AS daysAll
+      FROM users u LEFT JOIN log l ON l.uid = u.uid GROUP BY u.uid`);
+    const period = new Map(rows(`SELECT uid,
+        COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits,
+        COUNT(DISTINCT day) AS days,
+        COUNT(DISTINCT CASE WHEN step IN ('region','day') THEN region END) AS regions,
+        COUNT(CASE WHEN step = 'flight' THEN 1 END) AS flight,
+        COUNT(CASE WHEN step = 'hotel' THEN 1 END) AS hotel,
+        COUNT(CASE WHEN step = 'save' THEN 1 END) AS save
+      FROM log WHERE day >= ? GROUP BY uid`, from).map((r) => [r.uid, r]));
+    const list = all.map((u) => {
+      const p = period.get(u.uid) ?? { visits: 0, days: 0, regions: 0, flight: 0, hotel: 0, save: 0 };
+      return { ...u, last: u.last ?? null, visits: p.visits, days: p.days, regions: p.regions, flight: p.flight, hotel: p.hotel, save: p.save };
+    }).sort((a, b) => (b.last ?? b.created) - (a.last ?? a.created));
+    return { ok: true, days, from, users: list };
+  }
+
+  async user(uid) {
+    const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
+    const u = rows(`SELECT uid, nick, birth, gender, created, locks, lock_until FROM users WHERE uid = ?`, uid)[0];
+    if (!u) return { ok: false, error: "없는 계정", status: 404 };
+    const regions = rows(`SELECT region,
+        COUNT(CASE WHEN step IN ('region','day') THEN 1 END) AS views,
+        COUNT(CASE WHEN step = 'book' THEN 1 END) AS book,
+        COUNT(CASE WHEN step = 'flight' THEN 1 END) AS flight,
+        COUNT(CASE WHEN step = 'hotel' THEN 1 END) AS hotel,
+        COUNT(CASE WHEN step = 'save' THEN 1 END) AS save,
+        MAX(ts) AS last
+      FROM log WHERE uid = ? AND region != '' GROUP BY region ORDER BY views DESC, last DESC LIMIT 50`, uid);
+    const daily = rows(`SELECT day, COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits FROM log WHERE uid = ? GROUP BY day ORDER BY day DESC LIMIT 60`, uid);
+    const recent = rows(`SELECT ts, step, region, path FROM log WHERE uid = ? AND step IN ('visit','search','flight','hotel','save') ORDER BY ts DESC LIMIT 150`, uid);
+    const devices = rows(`SELECT COUNT(*) AS c FROM devices WHERE uid = ?`, uid)[0]?.c ?? 0;
+    return { ok: true, user: u, devices, regions, daily, recent };
+  }
+
+  async deleteUser(uid) {
+    for (const t of ["log", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+    return { ok: true };
   }
 
   async stats(days) {
@@ -101,12 +256,19 @@ export class Stats extends DurableObject {
     }
 
     const total = rows(`SELECT COUNT(*) AS c FROM visitors`)[0]?.c ?? 0;
+    const kstStart = Date.parse(today + "T00:00:00+09:00");
+    const members = {
+      total: rows(`SELECT COUNT(*) AS c FROM users`)[0]?.c ?? 0,
+      today: rows(`SELECT COUNT(*) AS c FROM users WHERE created >= ?`, kstStart)[0]?.c ?? 0,
+      activeToday: rows(`SELECT COUNT(DISTINCT uid) AS c FROM log WHERE day = ?`, today)[0]?.c ?? 0,
+    };
     return {
       ok: true,
       today,
       from,
       days,
       totalVisitors: total,
+      members,
       periodVisitors: funnel.visit,
       daily: [...byDay.values()],
       funnel,
