@@ -30,3 +30,8 @@ export function klookSearchUrl(searchName: string, tp?: { marker: string; trs: s
 export function kkdaySearchUrl(searchName: string, tp?: { marker: string; trs: string }, prog: TpProgram = TP.kkday): string {
   return tpLink(`https://www.kkday.com/ko/product/productlist?keyword=${encodeURIComponent(searchName)}`, prog, tp);
 }
+
+/** 클룩 호텔(한국어). 도시별 번호를 몰라 호텔 첫 화면으로 보내고, 도시·날짜는 클룩에서 고른다. */
+export function klookHotelUrl(tp?: { marker: string; trs: string }, prog: TpProgram = TP.klook): string {
+  return tpLink("https://www.klook.com/ko/hotels/", prog, tp);
+}
