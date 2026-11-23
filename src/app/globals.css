@@ -334,8 +334,10 @@ p { margin: 0; }
 .reason-list { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
 .reason-list li + li { margin-top: 4px; }
 .theme-rows { display: flex; flex-direction: column; gap: 6px; }
-.theme-row { display: grid; grid-template-columns: 24px 1fr; gap: 6px; align-items: start; font-size: 14px; line-height: 1.5; color: var(--ink); }
+.theme-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 6px; align-items: start; font-size: 14px; line-height: 1.5; color: var(--ink); }
 .theme-ico { text-align: center; }
+.theme-detail { min-width: 0; overflow-wrap: break-word; }
+.theme-count { white-space: nowrap; }
 .reveal { animation: reveal 0.45s ease both; }
 @keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .day-card { display: flex; flex-direction: column; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; width: 100%; text-align: left; }

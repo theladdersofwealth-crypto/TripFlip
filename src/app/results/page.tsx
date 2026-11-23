@@ -51,7 +51,7 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
     </button>
     <div className="cost-row static">
       <span>🏨 숙소 <b>{s.hotelNightUsd != null ? `1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "가격 미확인"}</b>
-        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 목록이 없어 나라 물가로 추정" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
+        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 자료 없음 · 현지 물가로 추정" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
     </div>
     {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
     {hotels.length ? <div className="hotel-picks">
@@ -59,7 +59,7 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
       {hotels.map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
     </div>
       : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
-      : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
+      : estimated ? null : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
     {relaxedNotice(r.region.id) && <span className="xs warn">⚠ {relaxedNotice(r.region.id)}</span>}
     {open === "flight" && <FlightSheet region={r.region} q={q} flightKrw={s.flightKrw} onClose={() => setOpen(null)} />}
     {open && open !== "flight" && <HotelSheet hotel={open} tier={tier} region={r.region} q={q} onClose={() => setOpen(null)} />}
@@ -114,7 +114,7 @@ export default function ResultsPage() {
             <span className="xs muted">{r.stay.nights}박 · {r.stay.rooms}객실{r.stay.roomEstimated ? " 가정" : " 검색 조건"} · 항공·숙소·식비 예상</span>
             <StayLine r={r} q={q} />
             <span className="small bold">추천 이유</span>
-            {!!r.themes?.length && <div className="theme-rows">{r.themes.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span><b>{t.theme}</b> {t.names.join(", ")}{t.count > t.names.length ? <span className="muted"> 등 {t.count}곳</span> : null}</span></div>)}</div>}
+            {!!r.themes?.length && <div className="theme-rows">{r.themes.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span className="theme-detail"><b>{t.theme}</b> · {t.names[0]}<span className="theme-count muted"> 등 {t.count}곳</span></span></div>)}</div>}
             <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
             {r.flags.filter((f) => f.includes("적합도를")).map((f) => <span key={f} className="xs warn">⚠ {f}</span>)}
             <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>

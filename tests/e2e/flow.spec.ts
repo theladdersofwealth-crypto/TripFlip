@@ -136,6 +136,35 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(query.totalBudgetKrw).toBe(10_000_000);
   expect(query.roomCount).toBe(3);
   await noHorizontalOverflow(page);
+  const themeRow = page.locator(".rank-card .theme-row").first();
+  await expect(themeRow).toBeVisible();
+  await expect(themeRow.locator(".theme-count")).toHaveText(/등 \\d+곳/);
+  // 캡처에서 발생한 긴 대표명 회귀 사례: 실 데이터는 수정하지 않고 DOM에서만 검사.
+  await themeRow.locator(".theme-detail").evaluate((el) => {
+    el.innerHTML = '<b>액티비티</b> · 순록 유목민 캠프<span class="theme-count muted"> 등 11곳</span>';
+  });
+  for (const width of [390, 375, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await noHorizontalOverflow(page);
+    const clippedCount = await page.locator(".rank-card .theme-count").evaluateAll((items) =>
+      items.some((el) => {
+        const card = el.closest(".rank-card");
+        if (!card) return true;
+        const countRect = el.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        return countRect.left < cardRect.left || countRect.right > cardRect.right - 8;
+      }),
+    );
+    expect(clippedCount).toBe(false);
+    if (width >= 375) {
+      const singleLine = await themeRow.locator(".theme-detail").evaluate((el) => {
+        const lineHeight = Number.parseFloat(getComputedStyle(el).lineHeight);
+        return el.getBoundingClientRect().height <= lineHeight + 1;
+      });
+      expect(singleLine).toBe(true);
+    }
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.locator(".rank-card").filter({ hasText: "나트랑" }).getByRole("link", { name: "날짜별 일정 보기" }).click();
   await expect(page).toHaveURL(/\/r\/NT$/);
   await expect(page.getByRole("heading", { name: "나트랑 일정", exact: true })).toBeVisible();
