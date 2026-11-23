@@ -1,5 +1,5 @@
 "use client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { BackButton } from "@/components/AppShell";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,9 @@ import { TEMP_GRADE } from "@/data/regionsV1";
 import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { PILOT_TWIN_OF, scoreRegions, tripDays } from "@/services/regionScore";
-import type { RegionResult } from "@/services/regionScore";
+import type { RegionQuery, RegionResult } from "@/services/regionScore";
+import type { HotelRow } from "@/data/worldHotels";
+import { FlightSheet, HotelSheet, flightBasis, hotelKo, tierText } from "@/components/PriceSheets";
 import { hotelCandidates } from "@/services/booking";
 import { relaxedNotice } from "@/lib/livePrices";
 import { HOTEL_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
@@ -30,27 +32,37 @@ function budgetLine(total: number | null, budget: number | null | undefined) {
 function priceNote(s?: { flight: string; hotel: string; updatedAt: string | null }) {
   if (!s || !s.updatedAt || (s.flight !== "live" && s.hotel !== "live")) return "예상 경비는 10/31 수집 가격과 식비 가정으로 계산했어요.";
   const d = new Date(s.updatedAt);
-  return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
+  return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집한 최저가의 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
 }
 
 const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString()}만원`;
-/** 경비 내역 + 숙소 수준에 맞는 숙소 예시 */
-function StayLine({ r, tier }: { r: RegionResult; tier: Parameters<typeof hotelCandidates>[1] }) {
+/** 경비 내역(항공·숙소 누르면 팝업) + 숙소 수준에 맞는 숙소 예시 */
+function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
   const s = r.stay;
+  const tier = q.stay;
+  const [open, setOpen] = useState<"flight" | HotelRow | null>(null);
   const hotels = hotelCandidates(r.region.id, tier);
   const estimated = !hotels.length && s.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
-  const parts = [
-    s.flightKrw != null ? `✈️ 항공 1인 왕복 약 ${man(s.flightKrw)}` : "✈️ 항공 미확인",
-    s.hotelNightUsd != null ? `🏨 ${tier} 1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "🏨 숙소 가격 미확인",
-    s.foodPerDayUsd != null ? `🍽️ 식비 1인 하루 약 ${man(s.foodPerDayUsd * KRW_PER_USD)}` : "",
-  ].filter(Boolean);
-  return <div className="stay-line">
-    <span className="small bold">경비 내역</span>
-    <span className="xs">{parts.join(" · ")}</span>
-    {hotels.length ? <span className="xs"><b>{tier} 숙소 예</b> · {hotels.map((h) => `${h[0]} ★${h[1]}`).join(" / ")}</span>
+  const stop = (e: React.MouseEvent) => e.stopPropagation();
+  return <div className="stay-line" onClick={stop}>
+    <span className="small bold">경비 내역 <span className="xs muted" style={{ fontWeight: 500 }}>· 눌러서 자세히</span></span>
+    <button type="button" className="cost-row" onClick={() => setOpen("flight")}>
+      <span>✈️ 항공 <b>1인 왕복 약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(r.region.id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
+    </button>
+    <div className="cost-row static">
+      <span>🏨 숙소 <b>{s.hotelNightUsd != null ? `1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "가격 미확인"}</b>
+        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 목록이 없어 나라 물가로 추정" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
+    </div>
+    {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
+    {hotels.length ? <div className="hotel-picks">
+      <span className="xs bold">{tier} 추천 숙소 · 눌러서 정보 보기</span>
+      {hotels.map((h) => <button type="button" key={h[0]} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h[0])}</b><small>★{h[1]} · 후기 {h[2].toLocaleString()}개</small></span><Icon name="next" size={16} /></button>)}
+    </div>
       : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
       : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
     {relaxedNotice(r.region.id) && <span className="xs warn">⚠ {relaxedNotice(r.region.id)}</span>}
+    {open === "flight" && <FlightSheet region={r.region} q={q} flightKrw={s.flightKrw} onClose={() => setOpen(null)} />}
+    {open && open !== "flight" && <HotelSheet hotel={open} tier={tier} region={r.region} q={q} onClose={() => setOpen(null)} />}
   </div>;
 }
 
@@ -85,7 +97,7 @@ export default function ResultsPage() {
       {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href="/" className="btn btn-sm">조건 다시 선택하기</Link></div>}
       <div className="stack">
         {ranked.map((r, i) => (
-          <button key={r.region.id} className={`rank-card reveal ${i === 0 ? "first" : ""}`} style={{ animationDelay: `${i * 0.08}s` }} onClick={() => router.push(`/r/${r.region.id}`)}>
+          <article key={r.region.id} className={`rank-card reveal ${i === 0 ? "first" : ""}`} style={{ animationDelay: `${i * 0.08}s` }} onClick={() => router.push(`/r/${r.region.id}`)}>
             <div className="rank-hero" style={{ background: heroBg(r.region.country) }}>
               <div className="between" style={{ width: "100%" }}>
                 <span className="rank-pill">{i === 0 ? "🏆 " : ""}{r.rank}위 추천{r.weather.judge === "좋음" ? ` · ${r.weather.month}월 날씨 좋음` : ""}</span>
@@ -100,15 +112,15 @@ export default function ResultsPage() {
               <div><span>일정 준비</span><b className={r.readiness.ready ? "ok" : "warn"}>{r.readiness.ready ? "바로 가능" : "보완 필요"}</b></div>
             </div>
             <span className="xs muted">{r.stay.nights}박 · {r.stay.rooms}객실{r.stay.roomEstimated ? " 가정" : " 검색 조건"} · 항공·숙소·식비 예상</span>
-            <StayLine r={r} tier={q.stay} />
+            <StayLine r={r} q={q} />
             <span className="small bold">추천 이유</span>
             <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
             <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>
             {!r.readiness.ready && <span className="xs muted">{r.filled < r.N ? `하루 ${q.perDay}곳 기준 ${r.N - r.filled}칸은 직접 골라야 해요. ` : ""}{r.readiness.meals < Math.ceil(r.readiness.mealsNeeded / 2) ? "식당은 아직 자료가 적어 현지에서 찾아야 해요. " : ""}자료가 부족한 것이지 여행지가 나쁘다는 뜻은 아니에요.</span>}
             {r.weather.judge === "스콜성 우기" && <span className="badge badge-warn">스콜성 우기</span>}
             {r.overFlight && <span className="badge badge-warn">희망 비행시간 초과</span>}
-            <span className="row small" style={{ color: "var(--teal-dark)", fontWeight: 700 }}>날짜별 일정 보기 <Icon name="next" size={16} /></span>
-          </button>
+            <Link href={`/r/${r.region.id}`} className="row small" style={{ color: "var(--teal-dark)", fontWeight: 700 }} onClick={(e) => e.stopPropagation()}>날짜별 일정 보기 <Icon name="next" size={16} /></Link>
+          </article>
         ))}
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>

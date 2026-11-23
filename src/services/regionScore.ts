@@ -311,7 +311,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     if (base.stay.budgetStatus === "unknown") base.flags.push("예상 총경비 미확인: 예산 안에 드는지 판단할 수 없어요");
     base.flags.push("경비는 항공·숙박·식비 추정 합계이며 현지 교통·입장료·보험은 별도예요");
     const display = Math.min(100, Math.max(0, (score / MAX_SCORE) * 100));
-    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, weather, N, flightHours) };
+    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, scored, weather, N, flightHours) };
   });
 
   // 현지 물가 선택과 일행 전체 예산 상한을 서로 독립적으로 적용한다.
@@ -339,14 +339,25 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
 }
 
 /** 카드에 보여줄 사유: 점수에 실제로 들어간 요소만, 사람이 읽는 말로 쓴다 */
-function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], w: RegionResult["weather"], N: number, flightHours: number | null): string[] {
+const THEME_ICON: Record<Concept, string> = { 관광: "🏛️", 휴양: "🏖️", 액티비티: "🎢", 미식: "🍜", 쇼핑: "🛍️" };
+
+/** 테마별 대표 명소: 그 테마가 첫 번째(주된) 성격인 곳, 등급 높은 곳, 위키 조회수 상위, 거점에서 가까운 곳 순. 테마끼리 겹치지 않게 */
+export function themeHighlights(interests: Concept[], scored: ScoredPlace[], per = 2): { theme: Concept; names: string[]; count: number }[] {
+  const used = new Set<string>();
+  const fame = (p: PlaceV1, c: Concept) => GRADE_SCORE[p.grade ?? "D"] - p.penalty + (p.concepts[0] === c ? 0.5 : 0) + (p.wikiBoost ? 0.3 : 0) - 0.1 * (p.concepts.length - 1);
+  return interests.map((theme) => {
+    const pool = scored.filter((x) => x.place.concepts.includes(theme)).map((x) => x.place);
+    const picks = pool.filter((p) => !used.has(p.id)).sort((a, b) => fame(b, theme) - fame(a, theme)).slice(0, per);
+    picks.forEach((p) => used.add(p.id));
+    return { theme, names: picks.map((p) => p.name), count: pool.length };
+  }).filter((h) => h.names.length);
+}
+
+function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], scored: ScoredPlace[], w: RegionResult["weather"], N: number, flightHours: number | null): string[] {
   const out: string[] = [];
-  const s = top.filter((t) => t.place.grade === "S").map((t) => t.place.name);
-  const a = top.filter((t) => t.place.grade === "A").map((t) => t.place.name);
-  if (s.length) out.push(`${s.slice(0, 2).join("·")}: 이것 보러 ${region.country}에 가는 곳`);
-  else if (a.length) out.push(`${a.slice(0, 2).join("·")}: 가면 일정을 바꿔서라도 들르는 곳`);
-  const days = tripDays(q.startDate, q.endDate);
   const interests = coreInterests(q);
+  for (const h of themeHighlights(interests, scored)) out.push(`${THEME_ICON[h.theme]} ${h.theme}: ${h.names.join(", ")}${h.count > h.names.length ? ` 등 ${h.count}곳` : ""}`);
+  const days = tripDays(q.startDate, q.endDate);
   const fits = interests.filter((c) => top.some((t) => t.place.concepts.includes(c)));
   if (top.length >= N && fits.length) out.push(`${fits.join("·")} 위주로 ${days}일을 꽉 채울 만큼 갈 곳이 있어요`);
   for (const c of interests.filter((c) => !fits.includes(c))) out.push(`${c}에 맞는 곳은 아직 부족해요`);

@@ -136,7 +136,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(query.totalBudgetKrw).toBe(10_000_000);
   expect(query.roomCount).toBe(3);
   await noHorizontalOverflow(page);
-  await page.locator("button.rank-card").filter({ hasText: "나트랑" }).click();
+  await page.locator(".rank-card").filter({ hasText: "나트랑" }).getByRole("link", { name: "날짜별 일정 보기" }).click();
   await expect(page).toHaveURL(/\/r\/NT$/);
   await expect(page.getByRole("heading", { name: "나트랑 일정", exact: true })).toBeVisible();
 
