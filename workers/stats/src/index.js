@@ -5,10 +5,12 @@
 //  POST /login  {nick, pin, v}  → {token, nick}   (PIN 5번 틀리면 15분 잠금, 반복 시 두 배)
 //  POST /logout {token}
 //  POST /me     {token}         → {nick}
+//  POST /plans  {token, put?, del?} → {plans}  로그인 회원의 '내 여행'(저장 계획) 합치기·내려받기
 //  GET  /users, GET /user?id=, DELETE /user?id=   ← 관리자
 // 회원은 닉네임·생년월일·성별만. PIN은 PBKDF2 해시+솔트로만 저장. 로그인 기기의 화면 이동만 계정에 묶어 기록한다.
 import { DurableObject } from "cloudflare:workers";
 
+import { PLANS_BODY_MAX, PLAN_MAX, PLANS_PER_USER, planOk } from "./lib.js";
 import { STEPS, KEEP_DAYS, LOCK_AFTER, PIN_ITER, kstDay, parseEvent, validateSignup, validPin, nickKey, hashPin, sha256, randomHex, lockMs } from "./lib.js";
 
 const CORS = {
@@ -45,9 +47,12 @@ export default {
 
     // 회원: 앱에서 JSON 본문으로. IP는 잠깐 횟수 제한에만 쓰고 저장하지 않는다.
     const ip = req.headers.get("cf-connecting-ip") || "";
-    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me"].includes(url.pathname)) {
+    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me", "/plans"].includes(url.pathname)) {
+      const text = await req.text();
+      const max = url.pathname === "/plans" ? PLANS_BODY_MAX : 2000;
+      if (text.length > max) return json({ ok: false, error: "저장할 내용이 너무 커요." }, 413);
       let b;
-      try { b = JSON.parse((await req.text()).slice(0, 2000)); } catch { return json({ ok: false, error: "잘못된 요청이에요." }, 400); }
+      try { b = JSON.parse(text); } catch { return json({ ok: false, error: "잘못된 요청이에요." }, 400); }
       if (!b || typeof b !== "object") return json({ ok: false, error: "잘못된 요청이에요." }, 400);
       const r = await stub[url.pathname.slice(1)](b, ip);
       return json(r, r.status ?? (r.ok ? 200 : 400));
@@ -84,6 +89,8 @@ export class Stats extends DurableObject {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (vid TEXT PRIMARY KEY, uid TEXT NOT NULL, since INTEGER NOT NULL)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '')`);
     this.sql.exec(`CREATE INDEX IF NOT EXISTS log_uid ON log (uid, ts)`);
+    // 회원의 '내 여행'. 지운 건 deleted=1로 남겨 다른 기기가 다시 올려도 살아나지 않게
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS plans (uid TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (uid, id))`);
     this.ipHits = new Map(); // 메모리에만: IP별 최근 시도 수 (저장 안 함)
   }
 
@@ -176,6 +183,30 @@ export class Stats extends DurableObject {
     return { ok: true };
   }
 
+  async plans(b) {
+    const s = await this.sessionOf(b.token);
+    if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
+    const now = Date.now();
+    for (const id of Array.isArray(b.del) ? b.del.slice(0, 200) : []) {
+      if (typeof id !== "string" || id.length > 80) continue;
+      this.sql.exec(`INSERT INTO plans (uid, id, data, updated, deleted) VALUES (?, ?, '', ?, 1) ON CONFLICT (uid, id) DO UPDATE SET data = '', updated = excluded.updated, deleted = 1`, s.uid, id, now);
+    }
+    let live = this.sql.exec(`SELECT COUNT(*) AS c FROM plans WHERE uid = ? AND deleted = 0`, s.uid).toArray()[0].c;
+    let skipped = 0;
+    for (const p of Array.isArray(b.put) ? b.put.slice(0, PLANS_PER_USER) : []) {
+      if (!planOk(p)) { skipped++; continue; }
+      const data = JSON.stringify(p);
+      if (data.length > PLAN_MAX) { skipped++; continue; }
+      const cur = this.sql.exec(`SELECT deleted FROM plans WHERE uid = ? AND id = ?`, s.uid, p.id).toArray()[0];
+      if (cur?.deleted) continue; // 다른 기기에서 지운 여행은 되살리지 않음
+      if (!cur && live >= PLANS_PER_USER) { skipped++; continue; }
+      if (!cur) live++;
+      this.sql.exec(`INSERT INTO plans (uid, id, data, updated) VALUES (?, ?, ?, ?) ON CONFLICT (uid, id) DO UPDATE SET data = excluded.data, updated = excluded.updated`, s.uid, p.id, data, now);
+    }
+    const plans = this.sql.exec(`SELECT data FROM plans WHERE uid = ? AND deleted = 0 ORDER BY updated DESC`, s.uid).toArray().map((r) => JSON.parse(r.data));
+    return { ok: true, plans, skipped };
+  }
+
   async users(days) {
     const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
@@ -213,11 +244,12 @@ export class Stats extends DurableObject {
     const daily = rows(`SELECT day, COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits FROM log WHERE uid = ? GROUP BY day ORDER BY day DESC LIMIT 60`, uid);
     const recent = rows(`SELECT ts, step, region, path FROM log WHERE uid = ? AND step IN ('visit','search','flight','hotel','save') ORDER BY ts DESC LIMIT 150`, uid);
     const devices = rows(`SELECT COUNT(*) AS c FROM devices WHERE uid = ?`, uid)[0]?.c ?? 0;
-    return { ok: true, user: u, devices, regions, daily, recent };
+    const saved = rows(`SELECT data FROM plans WHERE uid = ? AND deleted = 0 ORDER BY updated DESC LIMIT 50`, uid).map((r) => { const p = JSON.parse(r.data); return { regionId: p.regionId, regionName: p.regionName, createdAt: p.createdAt, start: p.query?.startDate ?? null, end: p.query?.endDate ?? null }; });
+    return { ok: true, user: u, devices, regions, daily, recent, saved };
   }
 
   async deleteUser(uid) {
-    for (const t of ["log", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+    for (const t of ["log", "plans", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
     return { ok: true };
   }
 

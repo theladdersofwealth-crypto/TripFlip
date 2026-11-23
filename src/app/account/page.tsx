@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AUTH_EVENT, birthFrom8, loadAuth, login, logout, signup } from "@/lib/account";
 import type { Auth } from "@/lib/account";
+import { syncPlans } from "@/lib/planSync";
+import { replacePlans } from "@/lib/flow";
 
 export default function AccountPage() {
   const [auth, setAuth] = useState<Auth | null | undefined>(undefined);
@@ -23,9 +25,11 @@ export default function AccountPage() {
       <div className="card-soft stack" style={{ marginTop: 16 }}>
         <p><b>{auth.nick}</b> 님으로 로그인 중이에요.</p>
         <Link href="/" className="btn btn-primary btn-block">여행지 추천 받기</Link>
-        <button className="btn btn-block" onClick={() => logout()}>로그아웃</button>
+        <Link href="/my-trips" className="btn btn-block">내 여행 (계정에 저장됨)</Link>
+        <button className="btn btn-block" onClick={() => logout(syncPlans, () => replacePlans([]))}>로그아웃</button>
       </div>
-      <p className="xs faint" style={{ marginTop: 12 }}>탈퇴(정보 삭제)를 원하시면 관리자에게 닉네임을 알려 주세요.</p>
+      <p className="xs faint" style={{ marginTop: 12 }}>저장한 여행은 계정에 보관돼 다른 기기에서 로그인해도 보여요. 로그아웃하면 이 기기에서는 지워져요.</p>
+      <p className="xs faint" style={{ marginTop: 4 }}>탈퇴(정보 삭제)를 원하시면 관리자에게 닉네임을 알려 주세요.</p>
     </main>;
   }
 

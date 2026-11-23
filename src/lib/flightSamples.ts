@@ -45,12 +45,8 @@ export const airlineName = (code: string) => AIRLINES[code] ?? `항공사 코드
 
 let latest: Promise<Snapshot | null> | null = null;
 function loadLatest(): Promise<Snapshot | null> {
-  latest ??= fetch(`${BASE}/list?prefix=flight-prices/`, { signal: AbortSignal.timeout(8000) })
+  latest ??= fetch(`${BASE}/flight-latest`, { signal: AbortSignal.timeout(12000) })
     .then((r) => (r.ok ? r.json() : null))
-    .then((l: { keys?: string[] } | null) => {
-      const key = l?.keys?.filter((k) => /^flight-prices\/\d{4}-\d{2}-\d{2}_\d{2}$/.test(k)).sort().at(-1);
-      return key ? fetch(`${BASE}/get?key=${encodeURIComponent(key)}`, { signal: AbortSignal.timeout(12000) }).then((r) => (r.ok ? r.json() : null)) : null;
-    })
     .catch(() => null)
     .then((s) => { if (!s) latest = null; return s; }); // 실패하면 다음에 다시 시도
   return latest;

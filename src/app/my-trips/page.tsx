@@ -8,6 +8,8 @@ import type { LegacyTrip, SavedPlan } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
 import { tripDays } from "@/services/regionScore";
 import { downloadPlan } from "@/lib/planDownload";
+import { PLANS_SYNCED_EVENT } from "@/lib/planSync";
+import { loadAuth } from "@/lib/account";
 
 export default function MyTripsPage() {
   const [plans, setPlans] = useState<SavedPlan[] | null>(null);
@@ -15,7 +17,13 @@ export default function MyTripsPage() {
   const [preview, setPreview] = useState<{ plan: SavedPlan; exists: boolean } | null>(null);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { setPlans(loadPlans()); setLegacy(loadLegacyTrips()); }, []);
+  const [member, setMember] = useState<string | null>(null);
+  useEffect(() => {
+    setPlans(loadPlans()); setLegacy(loadLegacyTrips()); setMember(loadAuth()?.nick ?? null);
+    const on = () => setPlans(loadPlans());
+    window.addEventListener(PLANS_SYNCED_EVENT, on);
+    return () => window.removeEventListener(PLANS_SYNCED_EVENT, on);
+  }, []);
   if (!plans) return null;
 
   const pick = async (f: File | undefined) => {
@@ -38,7 +46,8 @@ export default function MyTripsPage() {
   return (
     <main className="container page" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>내 여행</h1>
-      <p className="xs muted">이 기기·브라우저에 저장돼요. 다른 기기에서 보관하려면 계획 파일을 내려받아 주세요.</p>
+      {member ? <p className="xs muted">{member} 님 계정에 저장돼요. 다른 기기에서 로그인해도 보여요.</p>
+        : <p className="xs muted">이 기기·브라우저에 저장돼요. <Link href="/account">간편 가입·로그인</Link>하면 계정에 보관돼 다른 기기에서도 보여요.</p>}
       <div className="card-soft stack" style={{ marginTop: 12, gap: 8 }}>
         <div className="between"><b className="small">계획 파일 불러오기</b><button className="btn btn-sm" onClick={() => fileRef.current?.click()}>파일 선택</button></div>
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => pick(e.target.files?.[0])} />

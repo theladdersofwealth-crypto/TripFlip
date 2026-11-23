@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { STORAGE_FAIL_EVENT } from "@/lib/flow";
 import { trackPage } from "@/lib/analytics";
 import { AUTH_EVENT, SIGNUP_LATER_KEY, loadAuth, refreshAuth } from "@/lib/account";
+import { PLANS_CHANGED_EVENT } from "@/lib/flow";
+import { syncPlans } from "@/lib/planSync";
 import { Icon } from "./Icon";
 import { useTripStore } from "@/store/TripStore";
 
@@ -27,11 +29,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [nick, setNick] = useState<string | null>(null);
   const [askSignup, setAskSignup] = useState(false);
   useEffect(() => {
-    const on = () => setNick(loadAuth()?.nick ?? null);
-    on();
-    refreshAuth();
+    // 로그인 상태가 바뀌거나(가입·로그인 직후 이 기기 여행을 계정으로 합침) 여행을 저장·삭제하면 계정과 맞춘다
+    let wasIn = !!loadAuth();
+    const on = () => {
+      const a = loadAuth();
+      setNick(a?.nick ?? null);
+      if (a && !wasIn) void syncPlans();
+      wasIn = !!a;
+    };
+    const onPlans = () => { if (loadAuth()) void syncPlans(); };
+    setNick(loadAuth()?.nick ?? null);
+    refreshAuth().then(() => { if (loadAuth()) void syncPlans(); });
     window.addEventListener(AUTH_EVENT, on);
-    return () => window.removeEventListener(AUTH_EVENT, on);
+    window.addEventListener(PLANS_CHANGED_EVENT, onPlans);
+    return () => { window.removeEventListener(AUTH_EVENT, on); window.removeEventListener(PLANS_CHANGED_EVENT, onPlans); };
   }, []);
   useEffect(() => {
     if (path.startsWith("/admin") || path.startsWith("/account") || navigator.webdriver || loadAuth()) { setAskSignup(false); return; }

@@ -72,3 +72,13 @@ test("생년월일 8자리 입력", async () => {
   assert.equal(birthFrom8("19850230"), null);
   assert.equal(birthFrom8("1985012"), null);
 });
+
+test("계정에 올릴 여행 모양 검사", async () => {
+  // @ts-expect-error 순수 JS Worker 모듈
+  const { planOk } = await import("../workers/stats/src/lib.js");
+  const p = { id: "NT-2026-12-20-abc", regionId: "NT", regionName: "나트랑", query: {}, createdAt: "2026-11-24T00:00:00Z" };
+  assert.equal(planOk(p), true);
+  assert.equal(planOk({ ...p, id: "a b" }), false);
+  assert.equal(planOk({ ...p, query: null }), false);
+  assert.equal(planOk(null), false);
+});

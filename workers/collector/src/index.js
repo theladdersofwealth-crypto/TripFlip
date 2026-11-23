@@ -3,7 +3,8 @@
 // - 숙소: Xotelo /api/rates, 고정 목록(hotels.json) × 체크인 14/30/60일 뒤 → KV hotel-rates/날짜/part-NN
 // - 위키 조회수: 매월 2일 5분마다 45건 → KV wiki-pageviews/YYYY-MM/part-NNN (권역 물가는 Xotelo 목록 고장으로 보류)
 // - 평균가: 수집마다 agg/flight|hotel/날짜 에 더하고 최근 14일로 summary/latest 갱신 → GET /summary
-// - 읽기: GET /list?prefix=..., GET /get?key=..., GET /hotel-rates?date=YYYY-MM-DD (조각 합본)
+// - 공개 읽기: GET /summary, GET /flight-latest (앱용)
+// - 잠긴 읽기(헤더 x-read-key 또는 &k= = 시크릿 READ_KEY): /list?prefix=..., /get?key=..., /hotel-rates?date=YYYY-MM-DD, /wiki-pageviews, /discover
 import HOTELS from "./hotels.json";
 import WIKI from "./wiki-titles.json";
 import { buildSummary, mergeFlightAgg, mergeHotelAgg, SUMMARY_DAYS } from "./summary.js";
@@ -59,6 +60,7 @@ async function collectFlights(env, now) {
   }
   const key = `flight-prices/${ymd(now)}_${String(now.getUTCHours()).padStart(2, "0")}`;
   await env.DATA.put(key, JSON.stringify(result), { expirationTtl: TTL });
+  await env.DATA.put("flight-latest-key", key); // 앱이 읽는 /flight-latest 가 목록 조회 없이 찾도록
   await addFlightAgg(env, now, result);
   await rebuildSummary(env, now);
   return key;
@@ -259,6 +261,13 @@ async function discoverStep(env, now) {
 }
 
 // ---------- 진입점 ----------
+function safeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+
 export default {
   async scheduled(event, env, ctx) {
     const now = new Date(event.scheduledTime);
@@ -280,6 +289,8 @@ export default {
     else console.log("숙소 목록 찾기", await discoverStep(env, now));
   },
   async fetch(req, env) {
+    // 헤더 x-read-key 또는 주소 뒤 &k=… (/get 의 ?key= 는 데이터 이름이라 겹치지 않게 k. GPT·제미나이에 주소째 줄 수 있게)
+    const canRead = (r, e) => !!e.READ_KEY && safeEqual(r.headers.get("x-read-key") || new URL(r.url).searchParams.get("k") || "", e.READ_KEY);
     const u = new URL(req.url);
     const json = (v, s = 200) => new Response(JSON.stringify(v), { status: s, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } });
     // 수동 실행(점검용): 헤더 x-run-key 가 시크릿 RUN_KEY 와 같을 때만
@@ -305,6 +316,25 @@ export default {
       }
       if (job === "summary") { await rebuildSummary(env, now); return json({ ok: true }); }
       return json({ error: "job=flight|hotel|wiki|backfill|summary" }, 400);
+    }
+    // 원본 데이터 조회는 잠금: x-read-key 헤더나 &k= 가 시크릿 READ_KEY 와 같을 때만 (앱은 /summary·/flight-latest만 씀)
+    const locked = ["/list", "/get", "/hotel-rates", "/wiki-pageviews", "/discover"];
+    if (locked.includes(u.pathname) && !canRead(req, env)) return json({ error: "권한 없음" }, 403);
+    // 앱이 읽는 최신 항공 스냅샷 1개 (실제 항공편 팝업)
+    if (u.pathname === "/flight-latest") {
+      let key = await env.DATA.get("flight-latest-key");
+      if (!key) {
+        let cursor, keys = [];
+        do {
+          const r = await env.DATA.list({ prefix: "flight-prices/", cursor });
+          keys = keys.concat(r.keys.map((k) => k.name));
+          cursor = r.list_complete ? undefined : r.cursor;
+        } while (cursor);
+        key = keys.filter((k) => /^flight-prices\/\d{4}-\d{2}-\d{2}_\d{2}$/.test(k)).sort().at(-1);
+        if (key) await env.DATA.put("flight-latest-key", key);
+      }
+      const v = key ? await env.DATA.get(key) : null;
+      return v ? new Response(v, { headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", "cache-control": "public, max-age=1800" } }) : json({ error: "없음" }, 404);
     }
     if (u.pathname === "/list") {
       const r = await env.DATA.list({ prefix: u.searchParams.get("prefix") ?? "", cursor: u.searchParams.get("cursor") ?? undefined });
@@ -333,6 +363,6 @@ export default {
       const v = await mergedWiki(env, u.searchParams.get("month") ?? wikiPeriod(new Date()).label);
       return v ? json(v) : json({ error: "없음" }, 404);
     }
-    return json({ ok: true, routes: ["/summary", "/discover", "/list?prefix=flight-prices/", "/get?key=...", "/hotel-rates?date=YYYY-MM-DD", "/wiki-pageviews?month=YYYY-MM"] });
+    return json({ ok: true, routes: ["/summary", "/flight-latest"] });
   },
 };
