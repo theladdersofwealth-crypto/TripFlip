@@ -116,6 +116,7 @@ export default function ResultsPage() {
             <span className="small bold">추천 이유</span>
             {!!r.themes?.length && <div className="theme-rows">{r.themes.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span><b>{t.theme}</b> {t.names.join(", ")}{t.count > t.names.length ? <span className="muted"> 등 {t.count}곳</span> : null}</span></div>)}</div>}
             <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
+            {r.flags.filter((f) => f.includes("적합도를")).map((f) => <span key={f} className="xs warn">⚠ {f}</span>)}
             <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>
             {!r.readiness.ready && <span className="xs muted">{r.filled < r.N ? `하루 ${q.perDay}곳 기준 ${r.N - r.filled}칸은 직접 골라야 해요. ` : ""}{r.readiness.meals < Math.ceil(r.readiness.mealsNeeded / 2) ? "식당은 아직 자료가 적어 현지에서 찾아야 해요. " : ""}자료가 부족한 것이지 여행지가 나쁘다는 뜻은 아니에요.</span>}
             {r.weather.judge === "스콜성 우기" && <span className="badge badge-warn">스콜성 우기</span>}
