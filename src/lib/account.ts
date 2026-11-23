@@ -7,7 +7,7 @@ export const AUTH_KEY = "tripflip:auth";
 export const SIGNUP_LATER_KEY = "tripflip:signup-later";
 export const AUTH_EVENT = "tripflip:auth";
 
-export interface Auth { token: string; nick: string }
+export interface Auth { token: string; nick: string; uid?: string }
 
 export function loadAuth(): Auth | null {
   try {
@@ -23,7 +23,7 @@ function saveAuth(a: Auth | null) {
   window.dispatchEvent(new Event(AUTH_EVENT));
 }
 
-async function post(path: string, body: object): Promise<{ ok: boolean; error?: string; token?: string; nick?: string }> {
+async function post(path: string, body: object): Promise<{ ok: boolean; error?: string; token?: string; nick?: string; uid?: string }> {
   try {
     const res = await fetch(`${STATS_URL}${path}`, { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" }, cache: "no-store" });
     return await res.json();
@@ -45,7 +45,7 @@ export async function signup(f: { nick: string; birth: string; gender: "M" | "F"
   const v = deviceId();
   if (!v) return { ok: false, error: "이 브라우저는 저장이 막혀 있어 가입할 수 없어요." };
   const r = await post("/signup", { ...f, v });
-  if (r.ok && r.token && r.nick) saveAuth({ token: r.token, nick: r.nick });
+  if (r.ok && r.token && r.nick) saveAuth({ token: r.token, nick: r.nick, uid: r.uid });
   return r;
 }
 
@@ -53,16 +53,16 @@ export async function login(nick: string, pin: string) {
   const v = deviceId();
   if (!v) return { ok: false, error: "이 브라우저는 저장이 막혀 있어 로그인할 수 없어요." };
   const r = await post("/login", { nick, pin, v });
-  if (r.ok && r.token && r.nick) saveAuth({ token: r.token, nick: r.nick });
+  if (r.ok && r.token && r.nick) saveAuth({ token: r.token, nick: r.nick, uid: r.uid });
   return r;
 }
 
-/** 로그아웃. 내 여행이 계정에 올라간 게 확인되면 이 기기에서는 지운다(같이 쓰는 폰 보호) */
-export async function logout(beforeLeave?: () => Promise<boolean>, clearLocal?: () => void) {
+/** 로그아웃. 그 계정 여행은 이 기기 화면에서 바로 숨김(서버 사본 삭제). 아직 안 올라간 변경은 남겨 두고 같은 계정으로 다시 로그인할 때만 재시도 */
+export async function logout(beforeLeave?: () => Promise<unknown>) {
   const a = loadAuth();
-  const synced = a && beforeLeave ? await beforeLeave() : false;
+  if (a && beforeLeave) await Promise.race([beforeLeave(), new Promise((r) => setTimeout(r, 4000))]);
+  if (a?.uid) { try { localStorage.removeItem(`tripflip.acct.${a.uid}.plans`); } catch {} }
   saveAuth(null);
-  if (synced) clearLocal?.();
   if (a) await post("/logout", { token: a.token });
 }
 
@@ -71,5 +71,6 @@ export async function refreshAuth() {
   const a = loadAuth();
   if (!a) return;
   const r = await post("/me", { token: a.token });
-  if (!r.ok && r.error !== undefined && !/연결하지 못했/.test(r.error)) saveAuth(null);
+  if (r.ok && r.uid && r.uid !== a.uid && loadAuth()?.token === a.token) saveAuth({ ...a, uid: r.uid, nick: r.nick ?? a.nick });
+  else if (!r.ok && r.error !== undefined && !/연결하지 못했/.test(r.error)) saveAuth(null);
 }

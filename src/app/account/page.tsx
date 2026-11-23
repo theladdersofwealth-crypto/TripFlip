@@ -2,21 +2,30 @@
 // 간편 가입·로그인: 닉네임·생년월일·성별 + PIN 6자리. 가입 없이도 추천·예약은 그대로 쓸 수 있다.
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { NEXT_KEY } from "@/components/AppShell";
 import { AUTH_EVENT, birthFrom8, loadAuth, login, logout, signup } from "@/lib/account";
 import type { Auth } from "@/lib/account";
 import { syncPlans } from "@/lib/planSync";
-import { replacePlans } from "@/lib/flow";
 
 export default function AccountPage() {
   const [auth, setAuth] = useState<Auth | null | undefined>(undefined);
   const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [gate, setGate] = useState(false);
+  const router = useRouter();
   useEffect(() => {
-    const on = () => setAuth(loadAuth());
+    const on = () => {
+      const a = loadAuth();
+      setAuth(a);
+      // 추천 보려다 온 경우: 가입·로그인 끝나면 원래 화면으로
+      if (a) { let next: string | null = null; try { next = sessionStorage.getItem(NEXT_KEY); sessionStorage.removeItem(NEXT_KEY); } catch {} if (next && next.startsWith("/")) router.replace(next); }
+    };
     on();
     if (location.hash === "#login") setMode("login");
+    if (location.hash === "#gate") setGate(true);
     window.addEventListener(AUTH_EVENT, on);
     return () => window.removeEventListener(AUTH_EVENT, on);
-  }, []);
+  }, [router]);
   if (auth === undefined) return null;
 
   if (auth) {
@@ -26,21 +35,22 @@ export default function AccountPage() {
         <p><b>{auth.nick}</b> 님으로 로그인 중이에요.</p>
         <Link href="/" className="btn btn-primary btn-block">여행지 추천 받기</Link>
         <Link href="/my-trips" className="btn btn-block">내 여행 (계정에 저장됨)</Link>
-        <button className="btn btn-block" onClick={() => logout(syncPlans, () => replacePlans([]))}>로그아웃</button>
+        <button className="btn btn-block" onClick={() => logout(syncPlans)}>로그아웃</button>
       </div>
-      <p className="xs faint" style={{ marginTop: 12 }}>저장한 여행은 계정에 보관돼 다른 기기에서 로그인해도 보여요. 로그아웃하면 이 기기에서는 지워져요.</p>
+      <p className="xs faint" style={{ marginTop: 12 }}>저장한 여행은 계정에 보관돼 다른 기기에서 로그인해도 보여요. 로그아웃하면 이 기기 화면에서는 바로 숨겨져요.</p>
       <p className="xs faint" style={{ marginTop: 4 }}>탈퇴(정보 삭제)를 원하시면 관리자에게 닉네임을 알려 주세요.</p>
     </main>;
   }
 
   return <main className="container page" style={{ maxWidth: 420 }}>
     <h1 style={{ fontSize: 22, fontWeight: 900 }}>{mode === "signup" ? "간편 가입" : "로그인"}</h1>
+    {gate && <p className="card-soft small" style={{ marginTop: 10 }}>여행지 추천 결과는 회원만 볼 수 있어요. 30초면 가입돼요. 가입·로그인하면 보던 화면으로 바로 돌아가요.</p>}
     <div className="seg" role="tablist" style={{ marginTop: 12 }}>
       <button role="tab" aria-selected={mode === "signup"} className={mode === "signup" ? "on" : ""} onClick={() => setMode("signup")}>처음이에요</button>
       <button role="tab" aria-selected={mode === "login"} className={mode === "login" ? "on" : ""} onClick={() => setMode("login")}>계정 있어요</button>
     </div>
     {mode === "signup" ? <SignupForm /> : <LoginForm />}
-    <Link href="/" className="btn btn-ghost btn-block" style={{ marginTop: 12 }}>가입 없이 둘러보기</Link>
+    <Link href="/" className="btn btn-ghost btn-block" style={{ marginTop: 12 }}>첫 화면으로</Link>
   </main>;
 }
 

@@ -135,7 +135,7 @@ export class Stats extends DurableObject {
     const uid = randomHex(8), salt = randomHex(16);
     this.sql.exec(`INSERT INTO users (uid, nick, nick_key, birth, gender, salt, pin_hash, iter, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       uid, x.nick, nickKey(x.nick), x.birth, x.gender, salt, await hashPin(x.pin, salt), PIN_ITER, Date.now());
-    return { ok: true, nick: x.nick, token: await this.newSession(uid, v) };
+    return { ok: true, nick: x.nick, uid, token: await this.newSession(uid, v) };
   }
 
   async login(b, ip) {
@@ -158,7 +158,7 @@ export class Stats extends DurableObject {
       return { ok: false, error: `닉네임 또는 PIN이 맞지 않아요. (${LOCK_AFTER - fails}번 더 틀리면 잠겨요)`, status: 401 };
     }
     this.sql.exec(`UPDATE users SET fails = 0, locks = 0, lock_until = 0 WHERE uid = ?`, u.uid);
-    return { ok: true, nick: u.nick, token: await this.newSession(u.uid, v) };
+    return { ok: true, nick: u.nick, uid: u.uid, token: await this.newSession(u.uid, v) };
   }
 
   async sessionOf(token) {
@@ -171,7 +171,7 @@ export class Stats extends DurableObject {
     if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
     // 이 기기가 다른 계정에 묶였으면 다시 이 계정으로
     this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid`, s.vid, s.uid, Date.now());
-    return { ok: true, nick: s.nick };
+    return { ok: true, nick: s.nick, uid: s.uid };
   }
 
   async logout(b) {
@@ -183,28 +183,32 @@ export class Stats extends DurableObject {
     return { ok: true };
   }
 
+  // 항목별 결과를 돌려준다: saved(저장 확인) · deleted(삭제 확인) · gone(다른 기기에서 이미 지움) · rejected(거절, 사유)
+  // 목록에 없는 id는 처리 안 된 것 → 앱은 '동기화 대기'로 남긴다.
   async plans(b) {
     const s = await this.sessionOf(b.token);
     if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
     const now = Date.now();
+    const saved = [], deleted = [], gone = [], rejected = [];
     for (const id of Array.isArray(b.del) ? b.del.slice(0, 200) : []) {
-      if (typeof id !== "string" || id.length > 80) continue;
+      if (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(id)) continue;
       this.sql.exec(`INSERT INTO plans (uid, id, data, updated, deleted) VALUES (?, ?, '', ?, 1) ON CONFLICT (uid, id) DO UPDATE SET data = '', updated = excluded.updated, deleted = 1`, s.uid, id, now);
+      deleted.push(id);
     }
     let live = this.sql.exec(`SELECT COUNT(*) AS c FROM plans WHERE uid = ? AND deleted = 0`, s.uid).toArray()[0].c;
-    let skipped = 0;
     for (const p of Array.isArray(b.put) ? b.put.slice(0, PLANS_PER_USER) : []) {
-      if (!planOk(p)) { skipped++; continue; }
+      if (!planOk(p)) { if (p && typeof p.id === "string") rejected.push({ id: p.id, error: "형식이 맞지 않아요" }); continue; }
       const data = JSON.stringify(p);
-      if (data.length > PLAN_MAX) { skipped++; continue; }
+      if (data.length > PLAN_MAX) { rejected.push({ id: p.id, error: "일정이 너무 커요" }); continue; }
       const cur = this.sql.exec(`SELECT deleted FROM plans WHERE uid = ? AND id = ?`, s.uid, p.id).toArray()[0];
-      if (cur?.deleted) continue; // 다른 기기에서 지운 여행은 되살리지 않음
-      if (!cur && live >= PLANS_PER_USER) { skipped++; continue; }
+      if (cur?.deleted) { gone.push(p.id); continue; } // 다른 기기에서 지운 여행은 되살리지 않음
+      if (!cur && live >= PLANS_PER_USER) { rejected.push({ id: p.id, error: `계정당 ${PLANS_PER_USER}개까지 저장돼요` }); continue; }
       if (!cur) live++;
       this.sql.exec(`INSERT INTO plans (uid, id, data, updated) VALUES (?, ?, ?, ?) ON CONFLICT (uid, id) DO UPDATE SET data = excluded.data, updated = excluded.updated`, s.uid, p.id, data, now);
+      saved.push(p.id);
     }
     const plans = this.sql.exec(`SELECT data FROM plans WHERE uid = ? AND deleted = 0 ORDER BY updated DESC`, s.uid).toArray().map((r) => JSON.parse(r.data));
-    return { ok: true, plans, skipped };
+    return { ok: true, uid: s.uid, plans, saved, deleted, gone, rejected };
   }
 
   async users(days) {

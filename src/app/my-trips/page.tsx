@@ -3,13 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { Empty } from "@/components/ui";
-import { loadLegacyTrips, loadPlans, parsePlanFile, removePlan, savePlan } from "@/lib/flow";
+import { loadGuestPlans, loadLegacyTrips, loadPlans, moveGuestPlansToAccount, parsePlanFile, planState, removePlan, savePlan } from "@/lib/flow";
 import type { LegacyTrip, SavedPlan } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
 import { tripDays } from "@/services/regionScore";
 import { downloadPlan } from "@/lib/planDownload";
-import { PLANS_SYNCED_EVENT } from "@/lib/planSync";
-import { loadAuth } from "@/lib/account";
+import { PLANS_SYNCED_EVENT, syncPlans } from "@/lib/planSync";
+import { AUTH_EVENT, loadAuth } from "@/lib/account";
 
 export default function MyTripsPage() {
   const [plans, setPlans] = useState<SavedPlan[] | null>(null);
@@ -18,11 +18,14 @@ export default function MyTripsPage() {
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [member, setMember] = useState<string | null>(null);
+  const [guestCount, setGuestCount] = useState(0);
+  const [, setTick] = useState(0);
   useEffect(() => {
-    setPlans(loadPlans()); setLegacy(loadLegacyTrips()); setMember(loadAuth()?.nick ?? null);
-    const on = () => setPlans(loadPlans());
+    const on = () => { setPlans(loadPlans()); setMember(loadAuth()?.nick ?? null); setGuestCount(loadAuth() ? loadGuestPlans().length : 0); setTick((n) => n + 1); };
+    on(); setLegacy(loadLegacyTrips());
     window.addEventListener(PLANS_SYNCED_EVENT, on);
-    return () => window.removeEventListener(PLANS_SYNCED_EVENT, on);
+    window.addEventListener(AUTH_EVENT, on);
+    return () => { window.removeEventListener(PLANS_SYNCED_EVENT, on); window.removeEventListener(AUTH_EVENT, on); };
   }, []);
   if (!plans) return null;
 
@@ -48,6 +51,11 @@ export default function MyTripsPage() {
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>내 여행</h1>
       {member ? <p className="xs muted">{member} 님 계정에 저장돼요. 다른 기기에서 로그인해도 보여요.</p>
         : <p className="xs muted">이 기기·브라우저에 저장돼요. <Link href="/account">간편 가입·로그인</Link>하면 계정에 보관돼 다른 기기에서도 보여요.</p>}
+      {member && guestCount > 0 && <div className="card-soft stack" style={{ marginTop: 12, gap: 8 }}>
+        <b className="small">로그인 전에 이 기기에 저장한 여행이 {guestCount}개 있어요</b>
+        <p className="xs muted">내 계정으로 옮기면 다른 기기에서도 보여요. 옮기지 않으면 로그아웃했을 때 이 기기에서만 보여요.</p>
+        <button className="btn btn-sm btn-primary" onClick={() => { moveGuestPlansToAccount(); setGuestCount(loadGuestPlans().length); setPlans(loadPlans()); }}>내 계정으로 옮기기</button>
+      </div>}
       <div className="card-soft stack" style={{ marginTop: 12, gap: 8 }}>
         <div className="between"><b className="small">계획 파일 불러오기</b><button className="btn btn-sm" onClick={() => fileRef.current?.click()}>파일 선택</button></div>
         <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => pick(e.target.files?.[0])} />
@@ -77,6 +85,7 @@ export default function MyTripsPage() {
                   <div>
                     <div style={{ fontSize: 19, fontWeight: 800 }}>{p.regionName}</div>
                     <div className="small muted">{fmtDate(p.query.startDate)} ~ {fmtDate(p.query.endDate)} · {d - 1}박 {d}일 · {p.query.adults + p.query.children.length}명</div>
+                    {member && <SyncBadge id={p.id} />}
                   </div>
                   <Icon name="next" />
                 </Link>
@@ -100,4 +109,12 @@ export default function MyTripsPage() {
       )}
     </main>
   );
+}
+
+function SyncBadge({ id }: { id: string }) {
+  const st = planState(id);
+  if (st.state === "synced") return <span className="chip chip-ok xs" style={{ marginTop: 4 }}>✓ 계정에 저장됨</span>;
+  if (st.state === "waiting") return <span className="chip chip-unknown xs" style={{ marginTop: 4 }}>⏳ 동기화 대기 · 연결되면 자동 저장</span>;
+  if (st.state === "failed") return <span className="chip chip-no xs" style={{ marginTop: 4, color: "var(--danger)" }} onClick={(e) => { e.preventDefault(); void syncPlans(); }}>⚠ 저장 실패{st.error ? ` · ${st.error}` : ""} (눌러서 다시)</span>;
+  return null;
 }

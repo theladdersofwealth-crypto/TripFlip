@@ -4,7 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { BackButton } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { relaxedNotice } from "@/lib/livePrices";
-import { loadBoard, loadPrefs, savePlan, saveQuery, useFlowQuery } from "@/lib/flow";
+import { currentAccount, loadBoard, loadPrefs, planState, savePlan, saveQuery, useFlowQuery } from "@/lib/flow";
+import { syncPlans } from "@/lib/planSync";
 import type { SavedPlan } from "@/lib/flow";
 import { downloadPlan } from "@/lib/planDownload";
 import { roomEstimate } from "@/lib/travelParty";
@@ -30,6 +31,7 @@ export default function BookPage() {
   const [rooms, setRooms] = useState<number | null | undefined>(undefined);
   const [flightPreference, setFlightPreference] = useState<NonNullable<SavedPlan["flightPreference"]>>("any");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState<string | null>(null);
   if (!q) return null;
   if (!r) return <main className="container page"><p className="muted">지역을 찾을 수 없어요.</p></main>;
   const selectedTier = tier ?? q.stay;
@@ -46,10 +48,22 @@ export default function BookPage() {
     const updatedScore = scoreRegions(nextQuery).find((x) => x.region.id === id)?.display ?? r.display;
     return { id: `${id}-${q.startDate}-${Date.now().toString(36)}`, schemaVersion: 2, regionId: id, regionName: r.region.name, query: nextQuery, display: updatedScore, booked, flightPreference, createdAt: new Date().toISOString(), board: { ...board, key: boardKey(id, nextQuery) }, prefs: loadPrefs(id) };
   };
-  const save = () => {
-    if (!savePlan(makePlan())) { setError("이 브라우저에 저장하지 못했어요. 파일로 내려받아 보관해 주세요."); return; }
+  const save = async () => {
+    const plan = makePlan();
+    if (!savePlan(plan)) { setError(currentAccount() && !currentAccount()?.uid ? "계정 확인 중이에요. 잠시 뒤 다시 눌러 주세요." : "이 브라우저에 저장하지 못했어요. 파일로 내려받아 보관해 주세요."); return; }
     saveQuery(nextQuery);
     track("save", id);
+    if (currentAccount()) {
+      // 회원: 서버가 저장을 확인한 뒤에만 '저장 완료'
+      setSaving("계정에 저장하는 중…");
+      await syncPlans();
+      const st = planState(plan.id);
+      if (st.state === "synced") setSaving("✓ 계정에 저장 완료");
+      else if (st.state === "failed") { setSaving(null); setError(`저장 실패${st.error ? `: ${st.error}` : ""}. 내 여행에서 다시 시도할 수 있어요.`); return; }
+      else setSaving("⏳ 인터넷 연결이 안 돼 '동기화 대기'로 이 기기에 보관했어요. 연결되면 자동으로 저장돼요.");
+      setTimeout(() => router.push("/my-trips"), 900);
+      return;
+    }
     router.push("/my-trips");
   };
 
@@ -106,6 +120,7 @@ export default function BookPage() {
     {estimate.budgetStatus === "over" && <p role="status" className="small" style={{ color: "var(--danger)" }}>현재 선택은 입력한 전체 예산을 넘는 것으로 추정돼요.</p>}
     <p className="xs faint" style={{ marginTop: 10 }}>예약과 결제는 외부 사이트에서 진행하며, 예약 전에도 계획을 저장할 수 있어요. 실제 항공시간·숙소 위치에 맞춘 일정 조정은 별도 확인이 필요해요.</p>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
-    <div className="sticky-cta stack" style={{ marginTop: 12 }}><button className="btn btn-primary btn-lg btn-block" onClick={save}>일정과 함께 내 여행에 저장</button><button className="btn btn-block" onClick={() => downloadPlan(makePlan())}>계획 파일 내려받기</button></div>
+    {saving && <p role="status" className="small" style={{ fontWeight: 700 }}>{saving}</p>}
+    <div className="sticky-cta stack" style={{ marginTop: 12 }}><button className="btn btn-primary btn-lg btn-block" onClick={save} disabled={!!saving}>일정과 함께 내 여행에 저장</button><button className="btn btn-block" onClick={() => downloadPlan(makePlan())}>계획 파일 내려받기</button></div>
   </main>;
 }
