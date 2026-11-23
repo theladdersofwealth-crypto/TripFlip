@@ -138,7 +138,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await noHorizontalOverflow(page);
   const themeRow = page.locator(".rank-card .theme-row").first();
   await expect(themeRow).toBeVisible();
-  await expect(themeRow.locator(".theme-count")).toHaveText(/등 \\d+곳/);
+  await expect(themeRow.locator(".theme-count")).toHaveText(/등 \d+곳/);
   // 캡처에서 발생한 긴 대표명 회귀 사례: 실 데이터는 수정하지 않고 DOM에서만 검사.
   await themeRow.locator(".theme-detail").evaluate((el) => {
     el.innerHTML = '<b>액티비티</b> · 순록 유목민 캠프<span class="theme-count muted"> 등 11곳</span>';
