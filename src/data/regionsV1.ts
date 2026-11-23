@@ -6,7 +6,7 @@
 
 export type Concept = "관광" | "휴양" | "액티비티" | "미식" | "쇼핑";
 export type Grade = "S" | "A" | "B" | "C" | "D";
-export type WeatherJudge = "좋음" | "보통" | "스콜성 우기" | "지속형 우기" | "혹서기" | "미확인";
+export type WeatherJudge = "좋음" | "보통" | "스콜성 우기" | "지속형 우기" | "혹서기" | "혹한기" | "미확인";
 
 export const CONCEPTS: Concept[] = ["관광", "휴양", "액티비티", "미식", "쇼핑"];
 export const GRADE_SCORE: Record<Grade, number> = { S: 5, A: 4, B: 3, C: 2, D: 1 };

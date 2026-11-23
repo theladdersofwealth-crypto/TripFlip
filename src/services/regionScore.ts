@@ -116,6 +116,8 @@ export interface RegionResult {
   excluded: { place: PlaceV1; reason: string }[];
   flags: string[];
   reasons: string[];
+  /** 선택 테마별 대표 명소 (추천 이유 맨 위) */
+  themes?: { theme: Concept; icon: string; names: string[]; count: number }[];
   // 숙박은 박수, 식비는 일수로 계산. 실제 날짜별 요금·아동 요금은 미확인이다.
   stay: {
     usd: number | null;
@@ -218,6 +220,7 @@ export function judgeWeather(w: MonthWeather, month: number, year = 2026): { jud
   const days = new Date(year, month, 0).getDate();
   const hits: { judge: WeatherJudge; adj: number }[] = [];
   if (w.tmax >= 33) hits.push({ judge: "혹서기", adj: -1 });
+  if (w.tmax < 5) hits.push({ judge: "혹한기", adj: -1 }); // 낮 최고 5℃ 미만 (11/24 추가: 4월 홉스골 3℃가 "무난"으로 1위 되던 문제)
   // 일조 미확인으로 지속형 우기를 단정하지 않는다.
   if (w.rainDays >= 15 && w.sunHours !== null) hits.push(w.sunHours / days >= 6 ? { judge: "스콜성 우기", adj: -0.5 } : { judge: "지속형 우기", adj: -1 });
   if (hits.length) return hits.reduce((a, b) => (b.adj < a.adj ? b : a));
@@ -284,7 +287,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       if (minors && p.note?.includes("키 제한") && q.children.some((c) => c.height === null)) flags.add("키 제한 확인 필요");
       if (q.pet) flags.add("반려동물 출입 미확인");
       // 동행 적합은 전체 중 일부에만 반영한다. AI의 0점으로 이용 불가를 만들지 않는다.
-      scored.push({ place: p, weight, score: (GRADE_SCORE[p.grade] - p.penalty) * weight * (0.75 + fit.factor * 0.25) });
+      scored.push({ place: p, weight, score: (GRADE_SCORE[p.grade] - p.penalty) * weight * (0.5 + fit.factor * 0.5) });
     }
 
     const w = WEATHER_V1[region.id] ?? (WORLD_WEATHER[region.id] ? { source: WORLD_WEATHER_SOURCE, months: WORLD_WEATHER[region.id] } : undefined);
@@ -310,8 +313,12 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     }
     if (base.stay.budgetStatus === "unknown") base.flags.push("예상 총경비 미확인: 예산 안에 드는지 판단할 수 없어요");
     base.flags.push("경비는 항공·숙박·식비 추정 합계이며 현지 교통·입장료·보험은 별도예요");
+    // 비행 부담: 여행 기간 중 왕복 비행에 쓰는 시간 비율만큼 낮춘다 (형님 11/24, 짧은 일정에 장거리 1위 방지)
+    const transit = flightHours != null ? Math.min(0.5, (flightHours * 2) / (tripDays(q.startDate, q.endDate) * 24)) : 0;
+    if (transit >= 0.1) base.flags.push(`왕복 비행 약 ${Math.round(flightHours! * 2)}시간이 일정의 ${Math.round(transit * 100)}%라 적합도를 낮췄어요`);
+    score *= 1 - transit;
     const display = Math.min(100, Math.max(0, (score / MAX_SCORE) * 100));
-    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, scored, weather, N, flightHours) };
+    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, scored, weather, N, flightHours), themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
   });
 
   // 현지 물가 선택과 일행 전체 예산 상한을 서로 독립적으로 적용한다.
@@ -356,7 +363,6 @@ export function themeHighlights(interests: Concept[], scored: ScoredPlace[], per
 function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], scored: ScoredPlace[], w: RegionResult["weather"], N: number, flightHours: number | null): string[] {
   const out: string[] = [];
   const interests = coreInterests(q);
-  for (const h of themeHighlights(interests, scored)) out.push(`${THEME_ICON[h.theme]} ${h.theme}: ${h.names.join(", ")}${h.count > h.names.length ? ` 등 ${h.count}곳` : ""}`);
   const days = tripDays(q.startDate, q.endDate);
   const fits = interests.filter((c) => top.some((t) => t.place.concepts.includes(c)));
   if (top.length >= N && fits.length) out.push(`${fits.join("·")} 위주로 ${days}일을 꽉 채울 만큼 갈 곳이 있어요`);

@@ -13,7 +13,11 @@ const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], �
 export function hotelCandidates(regionId: string, tier: StayTier): HotelRow[] {
   const sorted = [...(HOTELS[PILOT_TWIN_OF[regionId] ?? regionId] ?? [])].filter((h) => h[1] >= 4.5 && h[2] >= 300).sort((a, b) => a[3] + a[4] - b[3] - b[4]);
   const [from, to] = TIER_RANGE[tier];
-  return sorted.filter((_, i) => i / sorted.length >= from && i / sorted.length < to).sort((a, b) => b[1] - a[1] || b[2] - a[2]).slice(0, 3);
+  // 경비에 넣는 1박 값(구간 중간값)과 가까운 숙소부터 보여 준다. 평점 순으로 고르면 구간 위쪽 고급 숙소만 나와 경비와 어긋난다.
+  const band = sorted.filter((_, i) => i / sorted.length >= from && i / sorted.length < to);
+  const mid = (h: HotelRow) => (h[3] + h[4]) / 2;
+  const center = band.length ? mid(band[Math.floor(band.length / 2)]) : 0;
+  return band.sort((a, b) => Math.abs(mid(a) - center) - Math.abs(mid(b) - center) || b[1] - a[1]).slice(0, 3);
 }
 
 /** 정확한 나이가 없는 기존 연령대 정보는 외부 예약처에 임의 나이로 전달하지 않는다. */
@@ -34,6 +38,13 @@ export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
 /** 항공권: Aviasales(Travelpayouts 제휴) 왕복 검색 */
 export function flightAffiliateUrl(region: RegionV1, q: RegionQuery) {
   return aviasalesSearchUrl({ from: "ICN", to: region.airportCode, startDate: q.startDate, endDate: q.endDate, adults: q.adults, childAges: childAgesForBooking(q), childCount: q.children.length });
+}
+
+/** 부킹닷컴 한국어 검색: 숙소 이름·날짜·인원·객실이 입력된 채로 열린다 */
+export function bookingComUrl(region: RegionV1, q: RegionQuery, name?: string) {
+  const params = new URLSearchParams({ ss: name ?? region.searchName, checkin: q.startDate, checkout: q.endDate, group_adults: String(Math.max(1, q.adults)), group_children: String(q.children.length), no_rooms: String(roomEstimate(q).rooms), lang: "ko" });
+  for (const a of childAgesForBooking(q) ?? []) params.append("age", String(a));
+  return `https://www.booking.com/searchresults.ko.html?${params}`;
 }
 
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {
