@@ -8,3 +8,6 @@ next-env.d.ts
 /playwright-report/
 __pycache__/
 *.pyc
+
+.wrangler/
+.dev.vars
