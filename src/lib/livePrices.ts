@@ -16,7 +16,7 @@ export interface LiveSummary {
   /** 도착 도시코드 → { "YYYY-MM": [원, 표본수] } */
   flights: Record<string, Record<string, [number, number]>>;
   /** 권역(시범 5곳 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수]] 숙소별 평균, 싼 순. 품질 기준 통과 숙소만 */
-  hotels: Record<string, [number, number][]>;
+  hotels: Record<string, [number, number, string?][]>;
   v?: number;
   /** 숙소 기준을 낮춘 권역 id와 그 기준 문구 */
   relaxed?: string[];
@@ -33,7 +33,7 @@ export function liveSummary() {
 }
 
 // 공항 → 여행사 도시 코드 (scripts/build-world-prices.mjs 와 같은 표)
-const CITY: Record<string, string> = { hnd: "TYO", nrt: "TYO", kix: "OSA", cxr: "NHA", pvg: "SHA", pek: "BJS", jfk: "NYC", cdg: "PAR", fco: "ROM", lhr: "LON", cgk: "JKT", mxp: "MIL", yyz: "YTO", yul: "YMQ", sai: "REP", kti: "PNH", cts: "SPK", mfm: "MFM" };
+const CITY: Record<string, string> = { hnd: "TYO", nrt: "TYO", kix: "OSA", cxr: "NHA", pvg: "SHA", pek: "BJS", jfk: "NYC", cdg: "PAR", fco: "ROM", lhr: "LON", cgk: "JKT", mxp: "MIL", yyz: "YTO", yul: "YMQ", sai: "REP", kti: "PNH", xiy: "SIA", cts: "SPK", mfm: "MFM" };
 const AIRPORT = new Map(WORLD_REGIONS.map((r) => [r.id, r.airportCode]));
 const PILOT_CODE: Record<string, string> = { "jap-osaka": "OS", "vie-nhatrang": "NT", "hon-hongkong": "HK", "vie-danang": "DN", "vie-phuquoc": "PQ" };
 
@@ -72,6 +72,13 @@ export function liveHotelPrices(regionKey: string): number[] | null {
   if (!list) return null;
   const prices = list.map(([usd]) => usd).filter((usd) => usd > 0).sort((a, b) => a - b);
   return prices.length >= 5 ? prices : null;
+}
+
+/** 권역의 숙소별 최근 평균 1박 최저가 [USD, 표본수, 숙소 키], 싼 순. 키가 없는 옛 요약이면 null */
+export function liveHotelEntries(regionKey: string): { usd: number; samples: number; key: string }[] | null {
+  const list = live?.hotels[PILOT_CODE[regionKey] ?? regionKey];
+  if (!list || !list.some((x) => typeof x[2] === "string")) return null;
+  return list.filter((x): x is [number, number, string] => x[0] > 0 && typeof x[2] === "string").map(([usd, samples, key]) => ({ usd, samples, key })).sort((a, b) => a.usd - b.usd);
 }
 
 /** 숙소 기준을 낮춰 계산한 권역이면 안내 문구, 아니면 null */

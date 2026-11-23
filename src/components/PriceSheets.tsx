@@ -2,12 +2,12 @@
 // 추천 카드의 경비 내역에서 항공·숙소를 눌렀을 때 뜨는 팝업
 import { useEffect, useState } from "react";
 import type { RegionV1 } from "@/data/regionsV1";
-import type { HotelRow } from "@/data/worldHotels";
 import { HOTEL_KO } from "@/data/hotelKo";
 import { FLIGHT_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
 import { liveFlightInfo, liveSummary } from "@/lib/livePrices";
 import { loadFlightSamples } from "@/lib/flightSamples";
 import type { FlightSample } from "@/lib/flightSamples";
+import type { HotelPick } from "@/services/booking";
 import { bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl } from "@/services/booking";
 import { klookHotelUrl } from "@/services/affiliate";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
@@ -32,6 +32,13 @@ export function flightBasis(regionId: string, startDate: string): string {
   if (info?.basis === "month") return `${Number(info.month!.slice(5))}월 출발 최저가 평균`;
   if (info) return "여러 달 최저가의 중간값";
   return FLIGHT_ESTIMATED.has(key) ? "거리로 추정" : "10/31 수집 최저가";
+}
+
+/** 추천 숙소 카드의 가격 줄: 최근 평균이 있으면 그 값, 없으면 10/31 가격대 */
+export function pickPrice(h: HotelPick): string {
+  if (h.nightUsd != null) return `최근 1박 약 ${man(h.nightUsd * KRW_PER_USD)}`;
+  if (h.lo != null && h.hi != null && h.lo > 0 && h.hi >= h.lo) return `1박 ${Math.round(h.lo * KRW_PER_USD / 10000)}~${Math.round(h.hi * KRW_PER_USD / 10000)}만원(10/31)`;
+  return "";
 }
 
 export function hotelKo(name: string): string {
@@ -95,11 +102,11 @@ function FlightRow({ f, mine }: { f: FlightSample; mine: boolean }) {
 const TIER_TEXT: Record<StayTier, string> = { 가성비: "가격 하위 30%", 가심비: "가격 30~70% 구간", 프리미엄: "가격 70~90% 구간", 하이엔드: "가격 상위 10%" };
 export const tierText = (t: StayTier) => TIER_TEXT[t];
 
-export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelRow; tier: StayTier; region: RegionV1; q: RegionQuery; onClose: () => void }) {
-  const [name, rating, reviews, lo, hi] = hotel;
+export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelPick; tier: StayTier; region: RegionV1; q: RegionQuery; onClose: () => void }) {
+  const { name, rating, reviews, lo, hi, nightUsd, samples } = hotel;
   const info = HOTEL_KO[name];
-  const ta = info?.[1].match(/^g(\d+)-d(\d+)$/);
-  const priced = lo > 0 && hi >= lo;
+  const ta = (hotel.key ?? info?.[1] ?? "").match(/^g(\d+)-d(\d+)$/);
+  const priced = lo != null && hi != null && lo > 0 && hi >= lo;
   return (
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
@@ -111,14 +118,15 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelRo
       </>}>
       {info && <span className="xs muted">{name}</span>}
       <dl className="info-grid">
-        <dt>평점</dt><dd>★ {rating} / 5 · 후기 {reviews.toLocaleString()}개 (트립어드바이저)</dd>
-        <dt>1박 가격대</dt><dd>{priced ? `약 ${man(lo * KRW_PER_USD)} ~ ${man(hi * KRW_PER_USD)} (객실 1개, 세금 포함 여부 미확인)` : "미확인"}</dd>
+        <dt>평점</dt><dd>{rating != null ? `★ ${rating} / 5 · 후기 ${reviews?.toLocaleString() ?? "미확인"}개 (트립어드바이저)` : "숙소 품질 기준 통과 (세부 평점 미확인)"}</dd>
+        {nightUsd != null && <><dt>최근 1박</dt><dd>약 {man(nightUsd * KRW_PER_USD)} (최근 2주 {samples}번 조회한 1박 최저가 평균, 객실 1개)</dd></>}
+        <dt>{nightUsd != null ? "10/31 가격대" : "1박 가격대"}</dt><dd>{priced ? `약 ${man(lo! * KRW_PER_USD)} ~ ${man(hi! * KRW_PER_USD)}` : "미확인"}</dd>
         <dt>숙소 수준</dt><dd>{tier} · {region.name} 품질 기준 통과 숙소 중 {TIER_TEXT[tier]}</dd>
         <dt>객실 종류</dt><dd className="muted">미확인</dd>
         <dt>조식 포함</dt><dd className="muted">미확인</dd>
       </dl>
       <span className="xs muted">객실 종류·조식은 날짜와 요금제마다 달라 지금 자료에는 없어요. 예약 사이트에서 내 날짜로 확인해 주세요.</span>
-      <span className="xs faint">가격대·평점은 10/31 Xotelo(트립어드바이저 기반) 수집값이에요. 한글 이름은 영문을 읽는 대로 옮긴 것이라 공식 한글명과 다를 수 있어요.</span>
+      <span className="xs faint">가격은 Xotelo(트립어드바이저 기반) 수집값이고 세금 포함 여부는 미확인이에요. 한글 이름은 영문을 읽는 대로 옮긴 것이라 공식 한글명과 다를 수 있어요.</span>
     </CenterModal>
   );
 }

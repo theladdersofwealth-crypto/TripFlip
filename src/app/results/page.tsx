@@ -9,8 +9,8 @@ import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { PILOT_TWIN_OF, scoreRegions, tripDays } from "@/services/regionScore";
 import type { RegionQuery, RegionResult } from "@/services/regionScore";
-import type { HotelRow } from "@/data/worldHotels";
-import { FlightSheet, HotelSheet, flightBasis, hotelKo, tierText } from "@/components/PriceSheets";
+import type { HotelPick } from "@/services/booking";
+import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
 import { hotelCandidates } from "@/services/booking";
 import { relaxedNotice } from "@/lib/livePrices";
 import { HOTEL_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
@@ -40,7 +40,7 @@ const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString()}만원`
 function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
   const s = r.stay;
   const tier = q.stay;
-  const [open, setOpen] = useState<"flight" | HotelRow | null>(null);
+  const [open, setOpen] = useState<"flight" | HotelPick | null>(null);
   const hotels = hotelCandidates(r.region.id, tier);
   const estimated = !hotels.length && s.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
   const stop = (e: React.MouseEvent) => e.stopPropagation();
@@ -56,7 +56,7 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
     {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
     {hotels.length ? <div className="hotel-picks">
       <span className="xs bold">{tier} 추천 숙소 · 위 1박 값과 가까운 곳 · 눌러서 정보 보기</span>
-      {hotels.map((h) => <button type="button" key={h[0]} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h[0])}</b><small>★{h[1]} · 후기 {h[2].toLocaleString()}개{h[3] > 0 && h[4] >= h[3] ? ` · 1박 ${Math.round(h[3] * KRW_PER_USD / 10000)}~${Math.round(h[4] * KRW_PER_USD / 10000)}만원` : ""}</small></span><Icon name="next" size={16} /></button>)}
+      {hotels.map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
     </div>
       : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
       : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}

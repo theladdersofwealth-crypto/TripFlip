@@ -65,8 +65,8 @@ export function buildSummary(flightDays, hotelDays, now, relaxed = [], relaxedLa
   }
   const hotels = {};
   for (const [k, [sum, n]] of Object.entries(h)) {
-    const region = k.split("|")[0];
-    (hotels[region] ??= []).push([Math.round(sum / n), n]);
+    const [region, key] = k.split("|");
+    (hotels[region] ??= []).push([Math.round(sum / n), n, key]); // 셋째 칸: 트립어드바이저 숙소 키(앱이 이름을 찾음)
   }
   for (const list of Object.values(hotels)) list.sort((a, b) => a[0] - b[0]);
   return {
@@ -79,6 +79,6 @@ export function buildSummary(flightDays, hotelDays, now, relaxed = [], relaxedLa
     source: { flight: "Travelpayouts 인천발 왕복 최저가(최근 48시간 검색 캐시), 수집 회차별 도착도시·출발월 최저가의 평균", hotel: "Xotelo 1박 최저가(USD, 체크인 14·30·60일 뒤), 숙소별 평균" },
     counts: { flightSnapshots: snapshots, hotelBatches: batches },
     flights, // 도착 도시코드 → { "YYYY-MM": [원, 표본수] }
-    hotels, // 권역(시범 5곳은 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수]] 숙소별 평균, 싼 순. 숙소 목록은 수집 때 4.5점·후기 300개 이상만 담음
+    hotels, // 권역(시범 5곳은 NT·HK·OS·DN·PQ, 나머지는 권역 id) → [[USD, 표본수, 숙소 키]] 숙소별 평균, 싼 순. 숙소 목록은 수집 때 4.5점·후기 300개 이상만 담음
   };
 }
