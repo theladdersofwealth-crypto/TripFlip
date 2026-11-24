@@ -32,7 +32,7 @@ export interface BoardDay { date: string; condition: Condition; weather: DayWeat
 export interface Board { key: string; days: BoardDay[] }
 
 const isDessert = (p: PlaceV1) => p.tags.includes("카페·디저트");
-const isFood = (p: PlaceV1) => isDessert(p) || p.tags.includes("로컬푸드") || /레스토랑|식당|씨푸드|Restaurant|Seafood/i.test(p.name + p.en);
+export const isFood = (p: PlaceV1) => isDessert(p) || p.tags.includes("로컬푸드") || /레스토랑|식당|씨푸드|Restaurant|Seafood/i.test(p.name + p.en);
 const isAllDay = (p: PlaceV1) => PLACE_ATTRS[p.id]?.[0] === "종일" || p.penalty > 0 || p.tags.includes("테마파크");
 
 /** 예전 4칸 저장본도 읽는다. 추가된 칸은 비어 있는 상태로 시작한다. */

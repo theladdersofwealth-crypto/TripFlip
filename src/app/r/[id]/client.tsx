@@ -11,6 +11,8 @@ import { MEAL_STYLES, REST, boardKey, byId, candidates, cellLabel, companionsOf,
 import type { MealStyle } from "@/services/planner";
 import { scoreRegions } from "@/services/regionScore";
 import { useLivePrices } from "@/lib/livePrices";
+import { BookTab, FoodTab, REGION_TABS, SightsTab, TabBar } from "@/components/RegionTabs";
+import type { RegionTab } from "@/components/RegionTabs";
 
 const CONDITIONS: Condition[] = ["보통", "피곤", "매우 피곤"];
 const WEATHERS: DayWeather[] = ["맑음", "비", "강풍"];
@@ -34,6 +36,15 @@ function BoardInner() {
   const [board, setBoard] = useState<Board | null>(null);
   const [pick, setPick] = useState<{ di: number; slot: SlotKey } | null>(null);
   const [toast, setToast] = useState("");
+  const tabParam = sp.get("tab") as RegionTab | null;
+  const [tab, setTabState] = useState<RegionTab>(tabParam && REGION_TABS.includes(tabParam) ? tabParam : "일정");
+  const setTab = (t: RegionTab) => {
+    setTabState(t);
+    const u = new URL(location.href);
+    if (t === "일정") u.searchParams.delete("tab"); else u.searchParams.set("tab", t);
+    history.replaceState(history.state, "", u.toString());
+    window.scrollTo({ top: 0 });
+  };
 
   useEffect(() => {
     if (!q) return;
@@ -76,14 +87,19 @@ function BoardInner() {
       <BackButton href={plan ? "/my-trips" : "/results"} label={plan ? "내 여행" : "추천 목록"} />
       <div className="between" style={{ marginTop: 4 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 900 }}>{r.region.name} 일정</h1>
-          <p className="small muted">동행 {comps.join(" · ")}</p>
+          <h1 style={{ fontSize: 24, fontWeight: 900 }}>{r.region.name}</h1>
+          <p className="small muted">{r.region.country} · 동행 {comps.join(" · ")}</p>
         </div>
         <div style={{ textAlign: "right" }}>
           <span className="rank-score" style={{ fontSize: 26 }}>{Math.round(r.display)}</span><span className="small muted">점</span>
         </div>
       </div>
 
+      <TabBar tab={tab} onTab={setTab} />
+      {tab === "예약" && <BookTab r={r} q={q} />}
+      {tab === "관광지" && <SightsTab r={r} />}
+      {tab === "음식점" && <FoodTab r={r} />}
+      {tab === "일정" && <>
       <div className="grid-2" style={{ marginTop: 12 }}>
         <button className="btn btn-teal" onClick={reopt}><Icon name="sparkle" /> 일정 다시 추천</button>
         <button className="btn" onClick={reset}>처음부터 다시</button>
@@ -140,9 +156,10 @@ function BoardInner() {
 
       {!plan && (
         <div className="sticky-cta" style={{ marginTop: 12 }}>
-          <button className="btn btn-primary btn-lg btn-block" onClick={() => router.push(`/book/${id}`)}>이 지역으로 NEXT <Icon name="next" /></button>
+          <button className="btn btn-primary btn-lg btn-block" onClick={() => setTab("예약")}>이 지역으로 NEXT · 예약 <Icon name="next" /></button>
         </div>
       )}
+      </>}
 
       {pick && (
         <PickSheet

@@ -8,13 +8,7 @@ import { Icon } from "@/components/Icon";
 import { TEMP_GRADE } from "@/data/regionsV1";
 import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
-import { PILOT_TWIN_OF, hotelEstimated, scoreRegions, tripDays } from "@/services/regionScore";
-import type { RegionQuery, RegionResult } from "@/services/regionScore";
-import type { HotelPick } from "@/services/booking";
-import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
-import { hotelCandidates } from "@/services/booking";
-import { relaxedNotice } from "@/lib/livePrices";
-import { KRW_PER_USD } from "@/data/worldPrices";
+import { scoreRegions, tripDays } from "@/services/regionScore";
 import { useLivePrices } from "@/lib/livePrices";
 
 const HERO = ["#102f54,#00838c", "#1d497d,#00acb8", "#0b3a5b,#0ca678", "#3b2f63,#00838c", "#5a3a1a,#d9822b", "#102f54,#7a4fb5"];
@@ -34,37 +28,6 @@ function priceNote(s?: { flight: string; hotel: string; updatedAt: string | null
   if (!s || !s.updatedAt || (s.flight !== "live" && s.hotel !== "live")) return "예상 경비는 10/31 수집 가격과 식비 가정으로 계산했어요.";
   const d = new Date(s.updatedAt);
   return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집한 최저가의 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
-}
-
-const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString()}만원`;
-/** 경비 내역(항공·숙소 누르면 팝업) + 숙소 수준에 맞는 숙소 예시 */
-function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
-  const s = r.stay;
-  const tier = q.stay;
-  const [open, setOpen] = useState<"flight" | HotelPick | null>(null);
-  const hotels = hotelCandidates(r.region.id, tier);
-  const estimated = !hotels.length && s.priceSource.hotel !== "live" && hotelEstimated(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
-  const stop = (e: React.MouseEvent) => e.stopPropagation();
-  return <div className="stay-line" onClick={stop}>
-    <span className="small bold">경비 내역 <span className="xs muted" style={{ fontWeight: 500 }}>· 눌러서 자세히</span></span>
-    <button type="button" className="cost-row" onClick={() => setOpen("flight")}>
-      <span>✈️ 항공 <b>1인 왕복 약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(r.region.id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
-    </button>
-    <div className="cost-row static">
-      <span>🏨 숙소 <b>{s.hotelNightUsd != null ? `1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "가격 미확인"}</b>
-        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 자료 없음 · 나라 물가(세계은행)로 추정, 실측 아님" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
-    </div>
-    {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
-    {hotels.length ? <div className="hotel-picks">
-      <span className="xs bold">{tier} 추천 숙소 · 위 1박 값과 가까운 곳 · 눌러서 정보 보기</span>
-      {hotels.map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
-    </div>
-      : s.priceSource.hotel === "live" ? <span className="xs muted">최근 수집한 이 지역 숙소 가격 기준이에요. 숙소 이름은 아직 정리 중이에요.</span>
-      : estimated ? null : <span className="xs muted">이 지역은 숙소 목록 자료가 아직 없어 숙소 가격은 나라 물가로 추정했어요.</span>}
-    {relaxedNotice(r.region.id) && <span className="xs warn">⚠ {relaxedNotice(r.region.id)}</span>}
-    {open === "flight" && <FlightSheet region={r.region} q={q} flightKrw={s.flightKrw} onClose={() => setOpen(null)} />}
-    {open && open !== "flight" && <HotelSheet hotel={open} tier={tier} region={r.region} q={q} onClose={() => setOpen(null)} />}
-  </div>;
 }
 
 /** 비회원용 흐린 결과: 실제 여행지 이름·점수·경비는 화면(DOM)에 넣지 않고 모양만 같은 가짜 카드를 흐리게 보여 준다 */
@@ -151,22 +114,15 @@ export default function ResultsPage() {
               <div className="rank-hero-name">{r.region.name}</div>
               <div className="rank-hero-sub">{r.region.country} · {r.weather.judge === "미확인" ? "기후 미확인" : `${r.weather.month}월 ${r.weather.judge}`} · 적합도 추정</div>
             </div>
-            <div className="rank-stats">
-              <div><span>일행 예상 경비</span><b>{r.stay.partyTotalKrw == null ? "미확인" : `약 ${Math.round(r.stay.partyTotalKrw / 10000).toLocaleString()}만원`}</b></div>
-              <div><span>예산 대비</span><b className={r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : ""}>{budgetLine(r.stay.partyTotalKrw, q.totalBudgetKrw)}</b></div>
-              <div><span>일정 준비</span><b className={r.readiness.ready ? "ok" : "warn"}>{r.readiness.ready ? "바로 가능" : "보완 필요"}</b></div>
+            <div className="rank-brief">
+              <span className="small">{r.themes?.length ? r.themes.slice(0, 2).map((t) => `${t.icon} ${t.names[0]}`).join(" · ") : r.reasons[0] ?? ""}</span>
             </div>
-            <span className="xs muted">{r.stay.nights}박 · {r.stay.rooms}객실{r.stay.roomEstimated ? " 가정" : " 검색 조건"} · 항공·숙소·식비 예상</span>
-            <StayLine r={r} q={q} />
-            <span className="small bold">추천 이유</span>
-            {!!r.themes?.length && <div className="theme-rows">{r.themes.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span className="theme-detail"><b>{t.theme}</b> · {t.names[0]}<span className="theme-count muted"> 등 {t.count}곳</span></span></div>)}</div>}
-            <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>
-            {r.flags.filter((f) => f.includes("적합도를")).map((f) => <span key={f} className="xs warn">⚠ {f}</span>)}
-            <span className={`badge ${r.readiness.ready ? "badge-ok" : "badge-muted"}`}>관광 후보 {Math.min(r.filled, r.N)}/{r.N}곳 · 식당 {r.readiness.meals ? `${r.readiness.meals}곳 등록` : "자료 없음"}</span>
-            {!r.readiness.ready && <span className="xs muted">{r.filled < r.N ? `하루 ${q.perDay}곳 기준 ${r.N - r.filled}칸은 직접 골라야 해요. ` : ""}{r.readiness.meals < Math.ceil(r.readiness.mealsNeeded / 2) ? "식당은 아직 자료가 적어 현지에서 찾아야 해요. " : ""}자료가 부족한 것이지 여행지가 나쁘다는 뜻은 아니에요.</span>}
-            {r.weather.judge === "스콜성 우기" && <span className="badge badge-warn">스콜성 우기</span>}
-            {r.overFlight && <span className="badge badge-warn">희망 비행시간 초과</span>}
-            <Link href={`/r/${r.region.id}`} className="row small" style={{ color: "var(--teal-dark)", fontWeight: 700 }} onClick={(e) => e.stopPropagation()}>날짜별 일정 보기 <Icon name="next" size={16} /></Link>
+            <div className="rank-brief">
+              <b className="small">일행 {r.stay.partyTotalKrw == null ? "경비 미확인" : `약 ${Math.round(r.stay.partyTotalKrw / 10000).toLocaleString()}만원`}</b>
+              <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, q.totalBudgetKrw)}</span>
+            </div>
+            {(r.flags.some((f) => f.includes("적합도를")) || r.overFlight || r.weather.judge === "스콜성 우기") && <span className="xs warn">⚠ {[r.flags.some((f) => f.includes("적합도를")) ? "일부 추정값" : "", r.overFlight ? "희망 비행시간 초과" : "", r.weather.judge === "스콜성 우기" ? "스콜성 우기" : ""].filter(Boolean).join(" · ")}</span>}
+            <Link href={`/r/${r.region.id}`} className="row small" style={{ color: "var(--teal-dark)", fontWeight: 700 }} onClick={(e) => e.stopPropagation()}>자세히 보기 · 예약·일정·관광지·음식점 <Icon name="next" size={16} /></Link>
           </article>
         ))}
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}

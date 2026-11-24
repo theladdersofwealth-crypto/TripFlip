@@ -15,6 +15,11 @@ async function pickRange(page: import("@playwright/test").Page, start: string, e
   }
 }
 
+// 추천 결과는 회원 전용(PR #32) → 테스트는 가짜 로그인 상태로 시작
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem("tripflip:auth", JSON.stringify({ token: "e2e", nick: "e2e" })));
+});
+
 test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
@@ -135,7 +140,14 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(query.totalBudgetKrw).toBe(10_000_000);
   expect(query.roomCount).toBe(3);
   await noHorizontalOverflow(page);
-  const themeRow = page.locator(".rank-card .theme-row").first();
+  await expect(page.locator(".rank-card .rank-brief").first()).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("results-brief.png") });
+  await page.locator(".rank-card").filter({ hasText: "나트랑" }).getByRole("link", { name: /^자세히 보기/ }).click();
+  await expect(page).toHaveURL(/\/r\/NT$/);
+  await expect(page.getByRole("heading", { name: "나트랑", exact: true })).toBeVisible();
+  // 추천 이유(테마별 대표 명소)는 관광지 탭 맨 위로 옮김(11/24)
+  await page.getByRole("tab", { name: "관광지", exact: true }).click();
+  const themeRow = page.locator(".why-box .theme-row").first();
   await expect(themeRow).toBeVisible();
   await expect(themeRow.locator(".theme-count")).toHaveText(/등 \d+곳/);
   // 캡처에서 발생한 긴 대표명 회귀 사례: 실 데이터는 수정하지 않고 DOM에서만 검사.
@@ -145,9 +157,9 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   for (const width of [390, 375, 320]) {
     await page.setViewportSize({ width, height: 844 });
     await noHorizontalOverflow(page);
-    const clippedCount = await page.locator(".rank-card .theme-count").evaluateAll((items) =>
+    const clippedCount = await page.locator(".why-box .theme-count").evaluateAll((items) =>
       items.some((el) => {
-        const card = el.closest(".rank-card");
+        const card = el.closest(".why-box");
         if (!card) return true;
         const countRect = el.getBoundingClientRect();
         const cardRect = card.getBoundingClientRect();
@@ -164,9 +176,14 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
     }
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator(".rank-card").filter({ hasText: "나트랑" }).getByRole("link", { name: "날짜별 일정 보기" }).click();
-  await expect(page).toHaveURL(/\/r\/NT$/);
-  await expect(page.getByRole("heading", { name: "나트랑 일정", exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("tab-sights.png") });
+  await page.getByRole("tab", { name: "예약", exact: true }).click();
+  await expect(page.getByText("공항 픽업", { exact: true })).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("tab-book.png"), fullPage: true });
+  await page.getByRole("tab", { name: "음식점", exact: true }).click();
+  await expect(page.locator(".place-row").first()).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("tab-food.png") });
+  await page.getByRole("tab", { name: "일정", exact: true }).click();
 
   const days = page.locator(".day-card");
   await expect(days).toHaveCount(11);
@@ -191,7 +208,9 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(page.getByLabel("조식 시간", { exact: true })).toBeDisabled();
   await expect(page.locator(".tt")).not.toContainText("조식");
   await page.getByRole("link", { name: "나트랑 일정", exact: true }).click();
-  await page.getByRole("button", { name: "이 지역으로 NEXT", exact: true }).click();
+  await page.getByRole("button", { name: /^이 지역으로 NEXT/ }).click();
+  await expect(page.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("link", { name: /^예약 상태 체크하고/ }).click();
   await expect(page).toHaveURL(/\/book\/NT$/);
   await page.getByLabel("숙소 수준", { exact: true }).selectOption("프리미엄");
   await page.getByLabel("항공 선호", { exact: true }).selectOption("lowcost");
