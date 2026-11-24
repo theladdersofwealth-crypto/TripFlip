@@ -105,7 +105,7 @@ export type CjProgram = { domain: string; linkId: string };
 export const CJ = {
   publisherId: "8119812", // 형님 CJ 퍼블리셔(계정) 번호 — 링크에는 안 들어감, 기록용
   pid: "101921886", // 홍보 사이트 tripflip.co.kr
-  agoda: { domain: "", linkId: "" } as CjProgram, // 샘플 딥링크 받으면 채움
+  agoda: { domain: "www.tkqlhce.com", linkId: "17095166" } as CjProgram, // Agoda APAC(광고주 7538034) 텍스트 링크, 11/24 형님 CJ 화면
 };
 
 export function cjLink(url: string, prog: CjProgram, pid: string = CJ.pid): string {
