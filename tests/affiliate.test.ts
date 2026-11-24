@@ -51,3 +51,18 @@ test("Aviasales·공항 픽업도 제휴로 감싼다", () => {
   assert.equal(a.searchParams.get("campaign_id"), "100");
   assert.equal(new URL(welcomePickupsUrl()).searchParams.get("p"), "8919");
 });
+
+test("클룩 호텔: 도시 번호 아는 권역은 날짜·인원·객실 채움, 모르면 첫 화면", () => {
+  const stay = { startDate: "2027-01-13", endDate: "2027-01-20", adults: 2, children: 2, rooms: 1 };
+  const u = new URL(new URL(klookHotelUrl("vie-nhatrang", stay)).searchParams.get("u")!);
+  assert.equal(u.pathname, "/ko/hotels/searchresult/");
+  assert.equal(u.searchParams.get("city_id"), "208");
+  assert.equal(u.searchParams.get("check_in"), "2027-01-13");
+  assert.equal(u.searchParams.get("check_out"), "2027-01-20");
+  assert.equal(u.searchParams.get("adult_num"), "2");
+  assert.equal(u.searchParams.get("child_num"), "2");
+  assert.equal(u.searchParams.get("room_num"), "1");
+  assert.equal(new URL(klookHotelUrl("vie-nhatrang", stay)).searchParams.get("p"), "4110");
+  assert.equal(new URL(klookHotelUrl("jap-osaka", stay)).searchParams.get("u"), "https://www.klook.com/ko/hotels/");
+  assert.equal(new URL(klookHotelUrl("vie-nhatrang", { ...stay, endDate: "" })).searchParams.get("u"), "https://www.klook.com/ko/hotels/");
+});

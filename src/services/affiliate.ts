@@ -33,10 +33,30 @@ export function kkdaySearchUrl(searchName: string, tp?: { marker: string; trs: s
   return tpLink(`https://www.kkday.com/ko/product/productlist?keyword=${encodeURIComponent(searchName)}`, prog, tp);
 }
 
-/** 클룩 호텔(한국어). 도시별 번호를 몰라 호텔 첫 화면으로 보내고, 도시·날짜는 클룩에서 고른다. */
-export function klookHotelUrl(tp?: { marker: string; trs: string }, prog: TpProgram = TP.klook): string {
-  return tpLink("https://www.klook.com/ko/hotels/", prog, tp);
+/**
+ * 클룩 도시 번호(클룩 주소 /city/{번호}-… 와 호텔 검색 city_id 가 같은 번호).
+ * 검색으로 확인한 곳만 넣는다. 없는 권역은 호텔 첫 화면으로 보내고 도시·날짜는 클룩에서 고른다.
+ * 확인: 나트랑 klook.com/city/208-nha-trang, 두바이 klook.com/city/78-dubai (2026-11-24)
+ */
+export const KLOOK_CITY: Record<string, number> = { "vie-nhatrang": 208, NT: 208, "uni-dubai": 78 };
+
+export type KlookStay = { startDate: string; endDate: string; adults: number; children: number; rooms: number };
+
+/** 클룩 호텔(한국어). 도시 번호를 알면 날짜·인원·객실이 채워진 검색 결과로, 모르면 호텔 첫 화면으로. */
+export function klookHotelUrl(regionId?: string, stay?: KlookStay, tp?: { marker: string; trs: string }, prog: TpProgram = TP.klook): string {
+  const city = regionId ? KLOOK_CITY[regionId] : undefined;
+  const ok = stay && /^\d{4}-\d{2}-\d{2}$/.test(stay.startDate) && /^\d{4}-\d{2}-\d{2}$/.test(stay.endDate) && stay.endDate > stay.startDate;
+  if (!city || !ok) return tpLink("https://www.klook.com/ko/hotels/", prog, tp);
+  const params = new URLSearchParams({
+    city_id: String(city), stype: "city", svalue: String(city),
+    check_in: stay.startDate, check_out: stay.endDate,
+    adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)), room_num: String(Math.max(1, stay.rooms)),
+  });
+  return tpLink(`https://www.klook.com/ko/hotels/searchresult/?${params}`, prog, tp);
 }
+
+/** 클룩 호텔 버튼이 날짜·인원까지 채워 여는지 */
+export const klookHotelPrefilled = (regionId?: string) => !!(regionId && KLOOK_CITY[regionId]);
 
 /**
  * Aviasales 왕복 검색. 주소 형식: /search/{출발}{DDMM}{도착}{DDMM}{성인}{어린이}{유아}
