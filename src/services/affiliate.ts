@@ -10,7 +10,7 @@ export type TpProgram = { p: string; campaignId: string };
 
 export const TP = {
   marker: "798059", // 형님 파트너 번호
-  trs: "605469", // 프로젝트 Tripflip (tripflip.pages.dev)
+  trs: "605929", // 프로젝트 Tripflip (tripflip.co.kr, 11/24 새로 만듦. 옛 605469는 삭제 예정)
   klook: { p: "4110", campaignId: "137" } as TpProgram,
   kkday: { p: "9074", campaignId: "633" } as TpProgram,
   aviasales: { p: "4114", campaignId: "100" } as TpProgram,
