@@ -93,3 +93,22 @@ export function aviasalesSearchUrl(
 export function welcomePickupsUrl(tp?: { marker: string; trs: string }, prog: TpProgram = TP.welcomePickups): string {
   return tpLink("https://www.welcomepickups.com/", prog, tp);
 }
+
+/**
+ * CJ Affiliate 딥링크(아고다 APAC 등). 형님 CJ → Links → Deep Link Generator 로 만든 샘플 링크에서 값을 옮긴다.
+ * 링크 모양: https://{domain}/click-{pid}-{linkId}?url={원래 주소 인코딩}
+ *  - pid: 홍보 사이트(tripflip.co.kr) 번호 101921886
+ *  - domain·linkId: 샘플 링크에서 확인(추측 금지). 비어 있으면 감싸지 않고 원래 주소로 보낸다.
+ */
+export type CjProgram = { domain: string; linkId: string };
+
+export const CJ = {
+  publisherId: "8119812", // 형님 CJ 퍼블리셔(계정) 번호 — 링크에는 안 들어감, 기록용
+  pid: "101921886", // 홍보 사이트 tripflip.co.kr
+  agoda: { domain: "", linkId: "" } as CjProgram, // 샘플 딥링크 받으면 채움
+};
+
+export function cjLink(url: string, prog: CjProgram, pid: string = CJ.pid): string {
+  if (!pid || !prog.domain || !prog.linkId) return url;
+  return `https://${prog.domain}/click-${pid}-${prog.linkId}?url=${encodeURIComponent(url)}`;
+}
