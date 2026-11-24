@@ -33,6 +33,24 @@ const store = {
   get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k: string, v: string | null) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
 };
+// 관리자 비밀번호는 localStorage + 쿠키(400일) 두 곳에 둔다. 한쪽이 지워져도 다른 쪽에서 되살리고,
+// 열 때마다 다시 써서 만료를 늘린다(사파리가 스크립트 저장소를 정리해도 덜 풀리게).
+const COOKIE = "tf_admin";
+const savedKey = {
+  get: (): string => {
+    const ls = store.get(KEY_STORE);
+    if (ls) return ls;
+    try { const m = document.cookie.match(/(?:^|;\s*)tf_admin=([^;]*)/); return m ? decodeURIComponent(m[1]) : ""; } catch { return ""; }
+  },
+  set: (v: string | null) => {
+    store.set(KEY_STORE, v);
+    try {
+      document.cookie = v
+        ? `${COOKIE}=${encodeURIComponent(v)}; Max-Age=${400 * 86400}; Path=/admin; SameSite=Strict${location.protocol === "https:" ? "; Secure" : ""}`
+        : `${COOKIE}=; Max-Age=0; Path=/admin`;
+    } catch {}
+  },
+};
 
 export default function AdminPage() {
   const [key, setKey] = useState("");
@@ -45,7 +63,7 @@ export default function AdminPage() {
   const [tab, setTab] = useState<"stats" | "members">("stats");
 
   useEffect(() => {
-    setKey(store.get(KEY_STORE) ?? "");
+    const k = savedKey.get(); if (k) savedKey.set(k); setKey(k);
     setNoTrack(store.get(NO_TRACK_KEY) === "1");
   }, []);
 
@@ -56,7 +74,7 @@ export default function AdminPage() {
     setError("");
     fetch(`${STATS_URL}/stats?days=${days}`, { headers: { authorization: `Bearer ${key}` }, cache: "no-store" })
       .then(async (res) => {
-        if (res.status === 401) { store.set(KEY_STORE, null); if (alive) { setKey(""); setError("비밀번호가 맞지 않아요."); } return; }
+        if (res.status === 401) { savedKey.set(null); if (alive) { setKey(""); setError("비밀번호가 맞지 않아요."); } return; }
         if (!res.ok) throw new Error(String(res.status));
         const j = (await res.json()) as Stats;
         if (alive) setData(j);
@@ -69,9 +87,10 @@ export default function AdminPage() {
   if (!key) {
     return <main className="container page" style={{ maxWidth: 420 }}>
       <h1 style={{ fontSize: 22, fontWeight: 900 }}>관리자</h1>
-      <form className="stack" style={{ marginTop: 16 }} onSubmit={(e) => { e.preventDefault(); if (!input.trim()) return; store.set(KEY_STORE, input.trim()); setKey(input.trim()); setInput(""); }}>
+      <form className="stack" style={{ marginTop: 16 }} onSubmit={(e) => { e.preventDefault(); if (!input.trim()) return; savedKey.set(input.trim()); setKey(input.trim()); setInput(""); }}>
         <label className="field"><span className="label">비밀번호</span><input className="input" type="password" autoComplete="current-password" value={input} onChange={(e) => setInput(e.target.value)} /></label>
         <button className="btn btn-primary btn-block" type="submit">들어가기</button>
+        <p className="xs faint">한 번 들어가면 이 기기·이 브라우저에서 계속 유지돼요(나가기 누르기 전까지). 카톡 등 앱 안 브라우저·개인정보 보호 모드는 저장이 안 될 수 있어요.</p>
         {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
       </form>
     </main>;
@@ -80,7 +99,7 @@ export default function AdminPage() {
   return <main className="container page admin" style={{ maxWidth: 760 }}>
     <div className="between">
       <h1 style={{ fontSize: 22, fontWeight: 900 }}>관리자 통계</h1>
-      <button className="btn btn-ghost" onClick={() => { store.set(KEY_STORE, null); setKey(""); setData(null); }}>나가기</button>
+      <button className="btn btn-ghost" onClick={() => { savedKey.set(null); setKey(""); setData(null); }}>나가기</button>
     </div>
     <div className="seg" role="tablist" style={{ marginTop: 8 }}>
       <button role="tab" aria-selected={tab === "stats"} className={tab === "stats" ? "on" : ""} onClick={() => setTab("stats")}>방문 통계</button>
