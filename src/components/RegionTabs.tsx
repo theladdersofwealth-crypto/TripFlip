@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
+import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
 import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept, PlaceV1 } from "@/data/regionsV1";
@@ -91,18 +92,24 @@ function PlaceRow({ p, food }: { p: PlaceV1; food?: boolean }) {
   const [open, setOpen] = useState(false);
   const attr = PLACE_ATTRS[p.id];
   const sub = food ? [p.dining?.kind === "cafe" ? "☕ 카페" : "🍽 식당", p.dining?.cuisine, p.dining?.address].filter(Boolean).join(" · ") : [p.tags.slice(0, 2).join("·"), p.travel].filter(Boolean).join(" · ");
-  return <div className="place-row">
-    <div className="between"><b>{p.name}</b>{p.grade && <span className={`grade-pill ${GRADE_CLS[p.grade] ?? "gC"}`}>{p.grade}</span>}</div>
-    <span className="xs muted">{sub || "정보 미확인"}</span>
+  const ref = useThumbRef();
+  const img = usePlaceImage(p, ref);
+  return <div className="place-row" ref={ref}>
+    <PlaceThumb p={p} img={img} size="wide" />
+    <div className="place-head"><div className="place-head-copy">
+      <div className="between"><b>{p.name}</b>{p.grade && <span className={`grade-pill ${GRADE_CLS[p.grade] ?? "gC"}`}>{p.grade}</span>}</div>
+      <span className="xs muted">{sub || "정보 미확인"}</span>
+      <button type="button" className="xs link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "상세 닫기 ▴" : "상세 보기 ▾"}</button>
+    </div></div>
     {open && <div className="place-more xs">
       {!food && <div>컨셉: {p.concepts.join(" · ")}</div>}
       {!food && <div>권장 시간: {attr ? `${attr[0]} · 약 ${attr[1] >= 60 ? `${Math.round(attr[1] / 6) / 10}시간` : `${attr[1]}분`}` : "미확인"}</div>}
       {p.note && <div>{p.note}</div>}
       {food && <div>평점·가격·영업시간: 미확인{p.dining?.source ? ` (출처 ${p.dining.source})` : ""}</div>}
       {p.en && p.en !== p.name && <div className="faint">{p.en}</div>}
+      <ThumbCredit img={img} />
       <a href={mapUrl(p)} {...ext} style={{ color: "var(--teal-dark)", fontWeight: 700 }}>구글 지도에서 보기 ›</a>
     </div>}
-    <button type="button" className="xs link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "상세 닫기 ▴" : "상세 보기 ▾"}</button>
   </div>;
 }
 
@@ -126,7 +133,7 @@ export function SightsTab({ r }: { r: RegionResult }) {
       </div>
       <div className="stack" style={{ gap: 8 }}>{list.slice(0, shown).map((p) => <PlaceRow key={p.id} p={p} />)}</div>
       {list.length > shown && <button type="button" className="btn btn-block" style={{ marginTop: 10 }} onClick={() => setShown(shown + 15)}>더 보기 ({list.length - shown}곳)</button>}
-      <p className="xs faint" style={{ marginTop: 10 }}>등급은 AI 추정이에요. 이동시간은 거점에서 직선거리로 잡은 구간이라 실제와 달라요.</p>
+      <p className="xs faint" style={{ marginTop: 10 }}>사진은 위키미디어 공용(작가·라이선스는 상세 보기)이고, 없는 곳은 색 블록으로 보여요. 등급은 AI 추정이에요. 이동시간은 거점에서 직선거리로 잡은 구간이라 실제와 달라요.</p>
     </>}
   </div>;
 }

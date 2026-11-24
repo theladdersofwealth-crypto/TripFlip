@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { BackButton } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
+import type { PlaceV1 } from "@/data/regionsV1";
 import { loadBoard, saveBoard, useFlowQuery } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
 import type { Board, Condition, DayWeather, SlotKey } from "@/services/planner";
@@ -142,21 +144,18 @@ function BoardInner({ regionId }: { regionId?: string }) {
               const c = d.cells[k];
               const p = c.v && !isSpecial(c.v) ? byId(c.v) : undefined;
 
-              return (
-                <button key={k} type="button" className={`board-cell slot-${slotKind(k, c.v)} ${c.lock ? "locked" : ""}`} onClick={() => setPick({ di, slot: k })}>
-                  <span className="k">{k}</span>
-                  <span className="v">
-
-                    {c.cont ? <span className="muted">{cellLabel(c.v)} · 계속</span> : <span className={isSpecial(c.v) ? "muted" : ""}>{!c.v && (k === "야간" || k === "디저트") ? "추천 후보 보강 필요 · 직접 선택 가능" : cellLabel(c.v)}</span>}
-                    {p?.dining?.cuisine && !c.cont && <span className="xs faint">{p.dining.cuisine}</span>}
-                  </span>
-                  {c.lock && <span className="lock-badge"><Icon name="lock" size={12} />고정</span>}
-                </button>
-              );
+              return <BoardCell key={k} k={k} p={p} cls={`board-cell slot-${slotKind(k, c.v)} ${c.lock ? "locked" : ""}`} onClick={() => setPick({ di, slot: k })}>
+                <span className="v">
+                  {c.cont ? <span className="muted">{cellLabel(c.v)} · 계속</span> : <span className={isSpecial(c.v) ? "muted" : ""}>{!c.v && (k === "야간" || k === "디저트") ? "추천 후보 보강 필요 · 직접 선택 가능" : cellLabel(c.v)}</span>}
+                  {p?.dining?.cuisine && !c.cont && <span className="xs faint">{p.dining.cuisine}</span>}
+                </span>
+                {c.lock && <span className="lock-badge"><Icon name="lock" size={12} />고정</span>}
+              </BoardCell>;
             })}
           </div>
         ))}
       </div>
+      <p className="xs faint" style={{ marginTop: 8 }}>사진: 위키미디어 공용(작가·라이선스는 관광지 탭 &gt; 상세 보기). 사진 없는 곳은 색 블록으로 보여요.</p>
 
       {!plan && (
         <div className="sticky-cta" style={{ marginTop: 12 }}>
@@ -233,16 +232,36 @@ function PickSheet({ regionId, board, di, slot, q, onClose, onPick, onToggleLock
         {list.slice(0, shown).map(({ p, e, allDay, distance }) => {
           const selected = cur.v === p.id;
           const location = meal ? distance?.km == null ? "위치 확인 필요" : `${distance.from} 기준 직선 약 ${distance.km < 1 ? Math.round(distance.km * 1000) + "m" : distance.km.toFixed(1) + "km"}` : `이동 약 ${travelMin(p)}분 · ${allDay ? "종일" : p.tags.slice(0, 2).join("·")}`;
-          return <article key={p.id} className={`choice-card ${selected ? "selected" : ""}`}>
-            <button type="button" className="choice-main" disabled={!!e.blockedBy} onClick={() => onPick(p.id, true)}><span className="choice-copy"><b>{p.name}</b>{p.wikiBoost && <span className="xs" style={{ color: "var(--teal, #0f8b8d)", fontWeight: 700 }}>🔥 위키 조회수 상위</span>}<span className="small muted">{meal ? p.dining?.cuisine ?? (slot === "디저트" ? "카페·디저트" : "식당") : e.label}</span><span className="xs muted">{location}</span></span><span className="choice-select">{selected ? "선택됨" : "선택"}</span></button>
-            <details className="choice-detail"><summary>정보·출처</summary><div className="xs muted">{p.dining?.address && <p>{p.dining.address}</p>}<p>{meal ? "영업시간·가격·아기의자·키즈메뉴는 방문 전에 확인해 주세요." : e.parts.join(" · ") || "이동·체류시간과 적합도는 추정이에요."}</p>{p.dining ? <><p>가이드 등록 자료 · 조회 {p.dining.checkedAt}. 음식 종류는 설명에 따른 분류예요.</p><a href={p.dining.sourceUrl} target="_blank" rel="noopener noreferrer">{p.dining.source} 원문</a><span> · CC BY-SA 4.0</span></> : <p>기존 후보 자료 · 현장 정보 확인 필요</p>}</div></details>
-          </article>;
+          return <ChoiceItem key={p.id} p={p} className={`choice-card ${selected ? "selected" : ""}`}>{(img) => <>
+            <button type="button" className="choice-main" disabled={!!e.blockedBy} onClick={() => onPick(p.id, true)}><PlaceThumb p={p} img={img} size={60} /><span className="choice-copy"><b>{p.name}</b>{p.wikiBoost && <span className="xs" style={{ color: "var(--teal, #0f8b8d)", fontWeight: 700 }}>🔥 위키 조회수 상위</span>}<span className="small muted">{meal ? p.dining?.cuisine ?? (slot === "디저트" ? "카페·디저트" : "식당") : e.label}</span><span className="xs muted">{location}</span></span><span className="choice-select">{selected ? "선택됨" : "선택"}</span></button>
+            <details className="choice-detail"><summary>정보·출처</summary><div className="xs muted">{p.dining?.address && <p>{p.dining.address}</p>}<p>{meal ? "영업시간·가격·아기의자·키즈메뉴는 방문 전에 확인해 주세요." : e.parts.join(" · ") || "이동·체류시간과 적합도는 추정이에요."}</p>{p.dining ? <><p>가이드 등록 자료 · 조회 {p.dining.checkedAt}. 음식 종류는 설명에 따른 분류예요.</p><a href={p.dining.sourceUrl} target="_blank" rel="noopener noreferrer">{p.dining.source} 원문</a><span> · CC BY-SA 4.0</span></> : <p>기존 후보 자료 · 현장 정보 확인 필요</p>}<ThumbCredit img={img} /></div></details>
+          </>}</ChoiceItem>;
         })}
         {shown < list.length && <button type="button" className="btn btn-block" onClick={() => setShown((n) => n + 8)}>후보 더 보기 ({list.length - shown}곳)</button>}
       </div>
       <div className="choice-footer"><button type="button" className="text-button xs" onClick={onToggleLock}>{cur.lock ? "선택 고정 풀기" : "현재 일정 고정"}</button>{meal && <a className="xs muted" href="/dining/catalog.json" target="_blank" rel="noopener noreferrer">자료: Wikivoyage · CC BY-SA 4.0</a>}</div>
     </div>
   </div>;
+}
+
+/** 일정판 한 칸: 장소가 정해진 칸은 구간 이름 → 사진 → 장소 이름 순서로 크게 보여 준다 */
+function BoardCell({ k, p, cls, onClick, children }: { k: string; p?: PlaceV1; cls: string; onClick: () => void; children: React.ReactNode }) {
+  const ref = useThumbRef();
+  const img = usePlaceImage(p ?? NO_PLACE, ref);
+  if (!p) return <button type="button" className={cls} onClick={onClick}><span className="k">{k}</span>{children}</button>;
+  return <button ref={ref as unknown as React.RefObject<HTMLButtonElement>} type="button" className={`${cls} rich`} onClick={onClick}>
+    <span className="k">{k}</span>
+    <PlaceThumb p={p} img={img} size="wide" />
+    <span className="rich-row">{children}</span>
+  </button>;
+}
+const NO_PLACE = { id: "", region: "", name: "", en: "", concepts: [], tags: [], travel: "", penalty: 0, grade: null } as PlaceV1;
+
+/** 일정 고르기 카드 한 장: 썸네일 조회용 ref를 잡아 둔다 */
+function ChoiceItem({ p, className, children }: { p: PlaceV1; className: string; children: (img: ReturnType<typeof usePlaceImage>) => React.ReactNode }) {
+  const ref = useThumbRef();
+  const img = usePlaceImage(p, ref);
+  return <article ref={ref} className={className}>{children(img)}</article>;
 }
 
 /** PC(넓은 화면) 추천 결과의 오른쪽 상세 칸 */
