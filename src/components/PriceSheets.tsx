@@ -111,10 +111,10 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelPi
   return (
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
-        <a className="btn btn-primary btn-block" href={klookStayUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">{klookStayPrefilled(region) ? "클룩 호텔 (제휴 · 날짜·인원 입력됨)" : "클룩 호텔 (제휴 · 도시·날짜는 클룩에서 선택)"} <Icon name="link" /></a>
-        <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
-        <a className="btn btn-block" href={bookingComUrl(region, q, name)} target="_blank" rel="noopener noreferrer">부킹닷컴 (숙소·날짜·인원 입력됨) <Icon name="link" /></a>
-        <a className="btn btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer">아고다 (숙소·날짜·인원 입력됨) <Icon name="link" /></a>
+        <a className="btn btn-primary btn-block" href={bookingComUrl(region, q, name)} target="_blank" rel="noopener noreferrer">부킹닷컴에서 이 숙소 보기 (날짜·인원 입력됨) <Icon name="link" /></a>
+        <a className="btn btn-block" href={klookStayUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">클룩에서 {region.name} 호텔 둘러보기 (제휴{klookStayPrefilled(region) ? " · 날짜·인원 입력됨" : ""}) <Icon name="link" /></a>
+        <p className="xs faint" style={{ textAlign: "center" }}>클룩은 숙소 이름으로 바로 열 수 없어 목록에서 &quot;{info?.[0] ?? name}&quot;을 검색해 주세요. {AFFILIATE_NOTE}</p>
+        <a className="btn btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer">아고다에서 이 숙소 보기 (날짜·인원 입력됨) <Icon name="link" /></a>
         {ta && <a className="btn btn-block" href={`https://www.tripadvisor.co.kr/Hotel_Review-g${ta[1]}-d${ta[2]}.html`} target="_blank" rel="noopener noreferrer">트립어드바이저 사진·후기 <Icon name="link" /></a>}
         <a className="btn btn-block" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`} target="_blank" rel="noopener noreferrer">구글 지도에서 위치 보기 <Icon name="link" /></a>
       </>}>
