@@ -8,7 +8,7 @@ import { liveFlightInfo, liveSummary } from "@/lib/livePrices";
 import { loadFlightSamples } from "@/lib/flightSamples";
 import type { FlightSample } from "@/lib/flightSamples";
 import type { HotelPick } from "@/services/booking";
-import { bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl, klookHotelStayUrl } from "@/services/booking";
+import { agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl, klookHotelStayUrl } from "@/services/booking";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
@@ -64,7 +64,8 @@ export function FlightSheet({ region, q, flightKrw, onClose }: { region: RegionV
   return (
     <CenterModal open onClose={onClose} title={`✈️ 인천 ↔ ${region.name} 항공`}
       foot={<>
-        <a className="btn btn-primary btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아비아세일즈로 내 날짜 검색 (제휴) <Icon name="link" /></a>
+        <a className="btn btn-primary btn-block" href={agodaFlightUrl()} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 (한국어) <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아비아세일즈로 내 날짜 검색 (제휴) <Icon name="link" /></a>
         <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         <a className="btn btn-block" href={flightSearchUrl(region, q)} target="_blank" rel="noopener noreferrer">스카이스캐너 한국어로 검색 <Icon name="link" /></a>
       </>}>

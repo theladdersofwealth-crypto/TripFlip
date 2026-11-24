@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { aviasalesSearchUrl, kkdaySearchUrl, klookHotelUrl, klookSearchUrl, tpLink, welcomePickupsUrl } from "../src/services/affiliate";
+import { agodaFlightsUrl, aviasalesSearchUrl, kkdaySearchUrl, klookHotelUrl, klookSearchUrl, tpLink, welcomePickupsUrl } from "../src/services/affiliate";
 
 test("제휴 값이 없으면 원래 주소 그대로", () => {
   assert.equal(klookSearchUrl("Nha Trang", { marker: "", trs: "" }), "https://www.klook.com/ko/search/result/?query=Nha%20Trang");
@@ -103,4 +103,8 @@ test("CJ 설정이 있으면 click-{pid}-{linkId}?url= 로 감싸고 날짜·인
   assert.equal(inner.searchParams.get("checkOut"), "2026-12-23");
   assert.equal(inner.searchParams.get("adults"), "2");
   assert.equal(inner.searchParams.get("childages"), "4");
+});
+
+test("아고다 항공은 한국어 항공 첫 화면을 CJ 딥링크로 감싼다", () => {
+  assert.equal(agodaFlightsUrl(), "https://www.tkqlhce.com/click-101921886-17095166?url=https%3A%2F%2Fwww.agoda.com%2Fko-kr%2Fflights");
 });
