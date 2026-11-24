@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { readFile } from "node:fs/promises";
 import type { SavedPlan } from "../../src/lib/flow";
 
 async function noHorizontalOverflow(page: Page) {
@@ -221,14 +220,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.reload();
   await expect(page.getByRole("link", { name: /^나트랑/ })).toBeVisible();
 
-  const downloadEvent = page.waitForEvent("download");
-  await page.getByRole("button", { name: "계획 파일 내려받기", exact: true }).click();
-  const download = await downloadEvent;
-  expect(download.suggestedFilename()).toBe("TripFlip-NT-2027-05-07.json");
-  const payload = JSON.parse(await readFile((await download.path())!, "utf8"));
-  expect(payload.format).toBe("tripflip-plan");
-  expect(payload.version).toBe(2);
-  expect(payload.plan).toEqual(original);
+  await expect(page.getByRole("button", { name: "계획 파일 내려받기" })).toHaveCount(0);
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");

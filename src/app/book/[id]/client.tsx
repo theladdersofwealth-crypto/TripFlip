@@ -7,7 +7,6 @@ import { relaxedNotice } from "@/lib/livePrices";
 import { currentAccount, loadBoard, loadPrefs, planState, savePlan, saveQuery, useFlowQuery } from "@/lib/flow";
 import { syncPlans } from "@/lib/planSync";
 import type { SavedPlan } from "@/lib/flow";
-import { downloadPlan } from "@/lib/planDownload";
 import { roomEstimate } from "@/lib/travelParty";
 import { fmtDate } from "@/services/itineraryV1";
 import { boardKey, emptyBoard } from "@/services/planner";
@@ -123,6 +122,6 @@ export default function BookPage() {
     <p className="xs faint" style={{ marginTop: 10 }}>예약과 결제는 외부 사이트에서 진행하며, 예약 전에도 계획을 저장할 수 있어요. 실제 항공시간·숙소 위치에 맞춘 일정 조정은 별도 확인이 필요해요.</p>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
     {saving && <p role="status" className="small" style={{ fontWeight: 700 }}>{saving}</p>}
-    <div className="sticky-cta stack" style={{ marginTop: 12 }}><button className="btn btn-primary btn-lg btn-block" onClick={save} disabled={!!saving}>일정과 함께 내 여행에 저장</button><button className="btn btn-block" onClick={() => downloadPlan(makePlan())}>계획 파일 내려받기</button></div>
+    <div className="sticky-cta stack" style={{ marginTop: 12 }}><button className="btn btn-primary btn-lg btn-block" onClick={save} disabled={!!saving}>일정과 함께 내 여행에 저장</button></div>
   </main>;
 }

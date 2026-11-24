@@ -1,22 +1,18 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { Empty } from "@/components/ui";
-import { loadGuestPlans, loadLegacyTrips, loadPlans, moveGuestPlansToAccount, parsePlanFile, planState, removePlan, savePlan } from "@/lib/flow";
+import { loadGuestPlans, loadLegacyTrips, loadPlans, moveGuestPlansToAccount, planState, removePlan } from "@/lib/flow";
 import type { LegacyTrip, SavedPlan } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
 import { tripDays } from "@/services/regionScore";
-import { downloadPlan } from "@/lib/planDownload";
 import { PLANS_SYNCED_EVENT, syncPlans } from "@/lib/planSync";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
 
 export default function MyTripsPage() {
   const [plans, setPlans] = useState<SavedPlan[] | null>(null);
   const [legacy, setLegacy] = useState<LegacyTrip[]>([]);
-  const [preview, setPreview] = useState<{ plan: SavedPlan; exists: boolean } | null>(null);
-  const [importMsg, setImportMsg] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
   const [member, setMember] = useState<string | null>(null);
   const [guestCount, setGuestCount] = useState(0);
   const [, setTick] = useState(0);
@@ -29,50 +25,16 @@ export default function MyTripsPage() {
   }, []);
   if (!plans) return null;
 
-  const pick = async (f: File | undefined) => {
-    setImportMsg(null); setPreview(null);
-    if (!f) return;
-    const r = parsePlanFile(await f.text());
-    if ("error" in r) { setImportMsg(r.error); return; }
-    setPreview({ plan: r.plan, exists: plans.some((p) => p.id === r.plan.id) });
-  };
-  const restore = (asCopy: boolean) => {
-    if (!preview) return;
-    const plan = asCopy ? { ...preview.plan, id: crypto.randomUUID(), createdAt: new Date().toISOString() } : preview.plan;
-    const ok = savePlan(plan);
-    setPlans(loadPlans());
-    setPreview(null);
-    setImportMsg(ok ? `${plan.regionName} 계획을 불러왔어요.` : "불러왔지만 이 브라우저에 저장하지 못했어요. 새로고침 전에 다시 파일로 보관해 주세요.");
-    if (fileRef.current) fileRef.current.value = "";
-  };
-
   return (
     <main className="container page" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>내 여행</h1>
-      {member ? <p className="xs muted">{member} 님 계정에 저장돼요. 다른 기기에서 로그인해도 보여요.</p>
+      {member ? <p className="xs muted">{member} 님 계정에 자동 저장돼요 · 다른 폰에서 로그인하면 그대로 보여요.</p>
         : <p className="xs muted">이 기기·브라우저에 저장돼요. <Link href="/account">간편 가입·로그인</Link>하면 계정에 보관돼 다른 기기에서도 보여요.</p>}
       {member && guestCount > 0 && <div className="card-soft stack" style={{ marginTop: 12, gap: 8 }}>
         <b className="small">로그인 전에 이 기기에 저장한 여행이 {guestCount}개 있어요</b>
         <p className="xs muted">내 계정으로 옮기면 다른 기기에서도 보여요. 옮기지 않으면 로그아웃했을 때 이 기기에서만 보여요.</p>
         <button className="btn btn-sm btn-primary" onClick={() => { moveGuestPlansToAccount(); setGuestCount(loadGuestPlans().length); setPlans(loadPlans()); }}>내 계정으로 옮기기</button>
       </div>}
-      <div className="card-soft stack" style={{ marginTop: 12, gap: 8 }}>
-        <div className="between"><b className="small">계획 파일 불러오기</b><button className="btn btn-sm" onClick={() => fileRef.current?.click()}>파일 선택</button></div>
-        <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => pick(e.target.files?.[0])} />
-        <p className="xs muted">다른 기기·주소에서 내려받은 계획 파일(.json)을 이 브라우저로 옮겨요. 확인 전에는 저장하지 않아요.</p>
-        {importMsg && <p className="xs" role="status">{importMsg}</p>}
-        {preview && (() => { const d = tripDays(preview.plan.query.startDate, preview.plan.query.endDate); return (
-          <div className="card stack restore-preview" style={{ gap: 6 }}>
-            <b>{preview.plan.regionName}</b>
-            <span className="small muted">{fmtDate(preview.plan.query.startDate)} ~ {fmtDate(preview.plan.query.endDate)} · {d - 1}박 {d}일 · 일정 {preview.plan.board ? "포함" : "없음"} · 시간 설정 {preview.plan.prefs ? "포함" : "기본값"}</span>
-            {preview.exists && <p className="xs form-error">같은 계획이 이미 있어요. 덮어쓰지 않으려면 ‘사본으로 추가’를 고르세요.</p>}
-            <div className="row-wrap">
-              {preview.exists ? <><button className="btn btn-sm btn-primary" onClick={() => restore(true)}>사본으로 추가</button><button className="btn btn-sm" onClick={() => restore(false)}>기존 계획 덮어쓰기</button></> : <button className="btn btn-sm btn-primary" onClick={() => restore(false)}>내 여행에 추가</button>}
-              <button className="btn btn-sm btn-ghost" onClick={() => { setPreview(null); if (fileRef.current) fileRef.current.value = ""; }}>취소</button>
-            </div>
-          </div>
-        ); })()}
-      </div>
       {plans.length === 0 ? (legacy.length ? null : 
         <Empty icon="suitcase" title="아직 저장된 여행이 없어요" desc="추천받은 지역을 예약하고 저장하면 여기에 모여요." action={<Link href="/" className="btn btn-primary">여행지 추천받기</Link>} />
       ) : (
@@ -94,7 +56,7 @@ export default function MyTripsPage() {
                   <span className={`badge ${p.booked.hotel ? "badge-ok" : "badge-muted"}`}>숙소 {p.booked.hotel ? "예약 완료" : "미예약"}</span>
                   <span className="badge badge-muted">추천 {Math.round(p.display)}점</span>
                 </div>
-                <div className="between"><button className="btn btn-sm" onClick={() => downloadPlan(p)}>계획 파일 내려받기</button><button className="btn btn-sm btn-ghost" onClick={() => { removePlan(p.id); setPlans(loadPlans()); }}>삭제</button></div>
+                <div className="between"><span /><button className="btn btn-sm btn-ghost" onClick={() => { removePlan(p.id); setPlans(loadPlans()); }}>삭제</button></div>
               </div>
             );
           })}
