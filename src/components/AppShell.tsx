@@ -52,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => { window.removeEventListener(AUTH_EVENT, on); window.removeEventListener(PLANS_CHANGED_EVENT, onPlans); window.removeEventListener("online", onPlans); };
   }, []);
   useEffect(() => {
-    if (path.startsWith("/admin") || path.startsWith("/account") || navigator.webdriver || loadAuth()) { setAskSignup(false); return; }
+    if (path.startsWith("/admin") || path.startsWith("/account") || path.startsWith("/legal") || navigator.webdriver || loadAuth()) { setAskSignup(false); return; }
     let later = false;
     try { later = localStorage.getItem(SIGNUP_LATER_KEY) === "1"; } catch { later = true; }
     if (!later) setAskSignup(true);
@@ -87,6 +87,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
       {hide ? <main className="container page"><p className="muted small">{ready ? "회원만 볼 수 있어요. 로그인 화면으로 이동해요…" : "불러오는 중…"}</p></main> : children}
+      {!path.startsWith("/admin") && <footer className="site-footer"><Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link></footer>}
       <nav className="bottom-nav" aria-label="주요 메뉴">
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} className={isActive(n.href) ? "active" : ""}>

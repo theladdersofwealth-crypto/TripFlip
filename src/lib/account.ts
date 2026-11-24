@@ -66,6 +66,24 @@ export async function logout(beforeLeave?: () => Promise<unknown>) {
   if (a) await post("/logout", { token: a.token });
 }
 
+/** 본인 탈퇴: 서버에서 계정·내 여행·이용 기록을 지우고 이 기기에서도 로그아웃 */
+export async function withdraw(pin: string) {
+  const a = loadAuth();
+  if (!a) return { ok: false, error: "로그인 상태가 아니에요." };
+  const r = await post("/withdraw", { token: a.token, pin });
+  if (r.ok) {
+    if (a.uid) { try { localStorage.removeItem(`tripflip.acct.${a.uid}.plans`); localStorage.removeItem(`tripflip.acct.${a.uid}.pending`); } catch {} }
+    saveAuth(null);
+  }
+  return r;
+}
+
+/** 만 나이 (YYYY-MM-DD, 오늘은 한국 날짜) */
+export function ageOn(birth: string, today = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)) {
+  const [by, bm, bd] = birth.split("-").map(Number), [ty, tm, td] = today.split("-").map(Number);
+  return ty - by - (tm < bm || (tm === bm && td < bd) ? 1 : 0);
+}
+
 /** 앱을 열 때 로그인 상태 확인(서버에서 지워진 계정이면 로그아웃) */
 export async function refreshAuth() {
   const a = loadAuth();

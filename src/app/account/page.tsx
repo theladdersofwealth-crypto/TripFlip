@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NEXT_KEY } from "@/components/AppShell";
-import { AUTH_EVENT, birthFrom8, loadAuth, login, logout, signup } from "@/lib/account";
+import { AUTH_EVENT, ageOn, birthFrom8, loadAuth, login, logout, signup, withdraw } from "@/lib/account";
 import type { Auth } from "@/lib/account";
 import { syncPlans } from "@/lib/planSync";
 
@@ -38,7 +38,7 @@ export default function AccountPage() {
         <button className="btn btn-block" onClick={() => logout(syncPlans)}>로그아웃</button>
       </div>
       <p className="xs faint" style={{ marginTop: 12 }}>저장한 여행은 계정에 보관돼 다른 기기에서 로그인해도 보여요. 로그아웃하면 이 기기 화면에서는 바로 숨겨져요.</p>
-      <p className="xs faint" style={{ marginTop: 4 }}>탈퇴(정보 삭제)를 원하시면 관리자에게 닉네임을 알려 주세요.</p>
+      <Withdraw />
     </main>;
   }
 
@@ -52,6 +52,31 @@ export default function AccountPage() {
     {mode === "signup" ? <SignupForm /> : <LoginForm />}
     <Link href="/" className="btn btn-ghost btn-block" style={{ marginTop: 12 }}>첫 화면으로</Link>
   </main>;
+}
+
+function Withdraw() {
+  const [open, setOpen] = useState(false);
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  if (!open) return <button type="button" className="btn btn-ghost btn-block xs" style={{ marginTop: 20, color: "var(--faint)" }} onClick={() => setOpen(true)}>회원 탈퇴</button>;
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (pin.length !== 6) return setError("PIN 6자리를 넣어 주세요.");
+    setBusy(true);
+    const r = await withdraw(pin);
+    setBusy(false);
+    if (!r.ok) { setError(r.error ?? "탈퇴하지 못했어요."); setPin(""); }
+  };
+  return <form className="card-soft stack" style={{ marginTop: 20 }} onSubmit={submit}>
+    <b>회원 탈퇴</b>
+    <p className="small">계정과 계정에 저장한 여행, 이용 기록이 바로 지워지고 되돌릴 수 없어요. 확인을 위해 PIN을 한 번 더 넣어 주세요.</p>
+    <PinField label="PIN 6자리" value={pin} onChange={setPin} auto="current-password" />
+    <button className="btn btn-block" type="submit" disabled={busy} style={{ color: "var(--danger)" }}>{busy ? "삭제 중…" : "탈퇴하고 모든 정보 지우기"}</button>
+    <button type="button" className="btn btn-ghost btn-block" onClick={() => { setOpen(false); setPin(""); setError(""); }}>취소</button>
+    {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
+  </form>;
 }
 
 const pinOnly = (s: string) => s.replace(/\D/g, "").slice(0, 6);
@@ -78,6 +103,7 @@ function SignupForm() {
     const b = birthFrom8(birth);
     if (!/^[가-힣A-Za-z0-9_]{2,12}$/.test(nick.trim())) return setError("닉네임은 한글·영문·숫자 2~12자로 정해 주세요.");
     if (!b) return setError("생년월일 8자리를 확인해 주세요. 예: 19850127");
+    if (ageOn(b) < 14) return setError("만 14세 이상만 가입할 수 있어요.");
     if (!gender) return setError("성별을 골라 주세요.");
     if (pin.length !== 6) return setError("PIN은 숫자 6자리예요.");
     if (pin !== pin2) return setError("PIN 확인이 달라요.");
@@ -100,7 +126,7 @@ function SignupForm() {
     <PinField label="PIN 확인" value={pin2} onChange={setPin2} auto="new-password" />
     <label className="check-row consent-row small">
       <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-      <span>(필수) 닉네임·생년월일·성별과 앱 이용 기록(본 화면·권역, 예약 버튼 클릭)을 서비스 개선 통계용으로 모으는 데 동의해요. 탈퇴 요청 시 지웁니다.</span>
+      <span>(필수) 만 14세 이상이며, <Link href="/legal/terms" target="_blank">이용약관</Link>과 닉네임·생년월일·성별·이용 기록(본 화면·권역, 예약 버튼 클릭) 수집·국외 보관(Cloudflare)을 담은 <Link href="/legal/privacy" target="_blank">개인정보처리방침</Link>에 동의해요. 탈퇴하면 바로 지워요.</span>
     </label>
     <button className="btn btn-primary btn-block" type="submit" disabled={busy}>{busy ? "가입 중…" : "가입하기"}</button>
     {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}

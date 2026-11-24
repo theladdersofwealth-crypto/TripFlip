@@ -10,6 +10,7 @@ import type { FlightSample } from "@/lib/flightSamples";
 import type { HotelPick } from "@/services/booking";
 import { bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl } from "@/services/booking";
 import { klookHotelUrl } from "@/services/affiliate";
+import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { CenterModal } from "@/components/ui";
@@ -65,6 +66,7 @@ export function FlightSheet({ region, q, flightKrw, onClose }: { region: RegionV
     <CenterModal open onClose={onClose} title={`✈️ 인천 ↔ ${region.name} 항공`}
       foot={<>
         <a className="btn btn-primary btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아비아세일즈로 내 날짜 검색 (제휴) <Icon name="link" /></a>
+        <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         <a className="btn btn-block" href={flightSearchUrl(region, q)} target="_blank" rel="noopener noreferrer">스카이스캐너 한국어로 검색 <Icon name="link" /></a>
       </>}>
       <div className="sheet-box">
@@ -111,6 +113,7 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelPi
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
         <a className="btn btn-primary btn-block" href={klookHotelUrl()} target="_blank" rel="noopener noreferrer sponsored">클룩 호텔 (제휴 · 숙소·날짜는 클룩에서 선택) <Icon name="link" /></a>
+        <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         <a className="btn btn-block" href={bookingComUrl(region, q, name)} target="_blank" rel="noopener noreferrer">부킹닷컴 (숙소·날짜·인원 입력됨) <Icon name="link" /></a>
         <a className="btn btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer">아고다 (숙소·날짜·인원 입력됨) <Icon name="link" /></a>
         {ta && <a className="btn btn-block" href={`https://www.tripadvisor.co.kr/Hotel_Review-g${ta[1]}-d${ta[2]}.html`} target="_blank" rel="noopener noreferrer">트립어드바이저 사진·후기 <Icon name="link" /></a>}

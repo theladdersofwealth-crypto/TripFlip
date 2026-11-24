@@ -16,6 +16,7 @@ import type { StayTier } from "@/services/regionScore";
 import { hotelKo, pickPrice } from "@/components/PriceSheets";
 import { bookingComUrl, STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
+import { AFFILIATE_NOTE } from "@/lib/legal";
 import { kkdaySearchUrl, klookHotelUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
 import { track } from "@/lib/analytics";
 
@@ -70,6 +71,7 @@ export default function BookPage() {
   return <main className="container page" style={{ maxWidth: 560 }}>
     <BackButton href={`/r/${id}`} label={`${r.region.name} 일정`} />
     <h1 style={{ fontSize: 24, fontWeight: 900, marginTop: 4 }}>항공·숙소 비교</h1>
+    <p className="xs muted" style={{ marginTop: 4 }}>ⓘ {AFFILIATE_NOTE}</p>
     <p className="small muted">{r.region.name} · {fmtDate(q.startDate)} ~ {fmtDate(q.endDate)} · {days - 1}박 {days}일 · {q.adults + q.children.length}명</p>
     <div className="stack" style={{ marginTop: 16 }}>
       <section className={`book-card ${booked.flight ? "done" : ""}`}>
