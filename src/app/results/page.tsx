@@ -31,7 +31,14 @@ export default function ResultsPage() {
   const wide = useWide();
   const [sel, setSel] = useState<string | null>(null);
   useEffect(() => { const r = new URLSearchParams(location.search).get("r"); if (r) setSel(r); }, []);
-  if (!q || member === null) return null;
+  if (!q || member === null) return (
+    <main className="container page" style={{ maxWidth: 560 }} aria-busy="true">
+      <p className="small muted" role="status">추천 여행지를 불러오는 중…</p>
+      <div className="stack" style={{ marginTop: 12 }}>
+        {[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 128 }} />)}
+      </div>
+    </main>
+  );
   const ranked = results.filter((r) => r.status === "ranked").slice(0, 10);
   const split = wide && member && ranked.length > 0;
   const picked = ranked.some((r) => r.region.id === sel) ? sel! : ranked[0]?.region.id ?? null;

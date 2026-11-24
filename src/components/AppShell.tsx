@@ -4,7 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { STORAGE_FAIL_EVENT } from "@/lib/flow";
 import { trackPage } from "@/lib/analytics";
-import { AUTH_EVENT, SIGNUP_LATER_KEY, loadAuth, refreshAuth } from "@/lib/account";
+import { AUTH_EVENT, loadAuth, refreshAuth } from "@/lib/account";
+import { AFFILIATE_SHORT, CONTACT_EMAIL } from "@/lib/legal";
 import { PLANS_CHANGED_EVENT } from "@/lib/flow";
 import { syncPlans } from "@/lib/planSync";
 import { Icon } from "./Icon";
@@ -25,9 +26,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(STORAGE_FAIL_EVENT, on);
   }, []);
   useEffect(() => { trackPage(path); }, [path]);
-  // 간편 회원: 로그인 닉네임 표시 + 첫 방문 때 한 번 가입 권유(건너뛰기 가능)
+  // 간편 회원: 로그인 닉네임 표시. 가입 안내는 첫 방문 팝업 대신 추천 결과(흐린 카드)에서만 한다(11/25)
   const [nick, setNick] = useState<string | null>(null);
-  const [askSignup, setAskSignup] = useState(false);
   // 권역 일정·예약 화면은 회원만(형님 결정 11/24). 추천 결과(/results)는 비회원에게 흐리게 보여 주고 가입 안내(결과 화면에서 처리)
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -51,16 +51,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("online", onPlans);
     return () => { window.removeEventListener(AUTH_EVENT, on); window.removeEventListener(PLANS_CHANGED_EVENT, onPlans); window.removeEventListener("online", onPlans); };
   }, []);
-  useEffect(() => {
-    if (path.startsWith("/admin") || path.startsWith("/account") || path.startsWith("/legal") || navigator.webdriver || loadAuth()) { setAskSignup(false); return; }
-    let later = false;
-    try { later = localStorage.getItem(SIGNUP_LATER_KEY) === "1"; } catch { later = true; }
-    if (!later) setAskSignup(true);
-  }, [path]);
-  const signupLater = () => {
-    try { localStorage.setItem(SIGNUP_LATER_KEY, "1"); } catch {}
-    setAskSignup(false);
-  };
   const isActive = (href: string) => (href === "/" ? !path.startsWith("/my-trips") : path.startsWith(href));
   return (
     <>
@@ -87,7 +77,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
       {hide ? <main className="container page"><p className="muted small">{ready ? "회원만 볼 수 있어요. 로그인 화면으로 이동해요…" : "불러오는 중…"}</p></main> : children}
-      {!path.startsWith("/admin") && <footer className="site-footer"><Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link></footer>}
+      {!path.startsWith("/admin") && (
+        <footer className="site-footer">
+          <div><Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link>·<a href={`mailto:${CONTACT_EMAIL}`}>문의하기</a></div>
+          <p>트립플립(TripFlip) · 문의 {CONTACT_EMAIL}</p>
+          <p>{AFFILIATE_SHORT}</p>
+        </footer>
+      )}
       <nav className="bottom-nav" aria-label="주요 메뉴">
         {NAV.map((n) => (
           <Link key={n.href} href={n.href} className={isActive(n.href) ? "active" : ""}>
@@ -97,19 +93,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ))}
       </nav>
       {toast && <div className="toast" role="status">{toast}</div>}
-      {askSignup && (
-        <div className="center-modal-back" role="dialog" aria-modal="true" aria-label="간편 가입 안내">
-          <div className="center-modal">
-            <div className="center-modal-head"><h3>30초 간편 가입</h3></div>
-            <p className="small">닉네임·생년월일·성별과 PIN 6자리면 끝이에요. 가입하면 추천 여행지를 바로 볼 수 있어요.</p>
-            <div className="center-modal-foot">
-              <Link href="/account" className="btn btn-primary btn-block" onClick={signupLater}>가입하기</Link>
-              <Link href="/account#login" className="btn btn-block" onClick={signupLater}>이미 계정이 있어요</Link>
-              <button type="button" className="btn btn-ghost btn-block" onClick={signupLater}>나중에 할게요</button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
