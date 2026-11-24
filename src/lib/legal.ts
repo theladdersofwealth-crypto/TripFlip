@@ -1,5 +1,5 @@
 // 개인정보처리방침·이용약관 공통 값
-export const CONTACT_EMAIL = "ohysky0127@gmail.com";
+export const CONTACT_EMAIL = "tripflip.help@gmail.com";
 export const LEGAL_EFFECTIVE = "2026년 11월 24일";
 export const SITE = "tripflip.co.kr";
 /** 예약 버튼 근처 제휴 고지 한 줄 */
