@@ -95,7 +95,8 @@ function PlaceRow({ p, food }: { p: PlaceV1; food?: boolean }) {
   const ref = useThumbRef();
   const img = usePlaceImage(p, ref);
   return <div className="place-row" ref={ref}>
-    <div className="place-head"><PlaceThumb p={p} img={img} /><div className="place-head-copy">
+    <PlaceThumb p={p} img={img} size="wide" />
+    <div className="place-head"><div className="place-head-copy">
       <div className="between"><b>{p.name}</b>{p.grade && <span className={`grade-pill ${GRADE_CLS[p.grade] ?? "gC"}`}>{p.grade}</span>}</div>
       <span className="xs muted">{sub || "정보 미확인"}</span>
       <button type="button" className="xs link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "상세 닫기 ▴" : "상세 보기 ▾"}</button>

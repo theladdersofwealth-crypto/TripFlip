@@ -27,8 +27,11 @@ function slotKind(k: string, v: string | null) {
   return "sight";
 }
 
-function BoardInner() {
-  const { id } = useParams<{ id: string }>();
+/** regionId가 있으면 PC 추천 결과 오른쪽 칸에 끼워 넣는 모드(주소·뒤로가기 없음) */
+function BoardInner({ regionId }: { regionId?: string }) {
+  const params = useParams<{ id: string }>();
+  const id = regionId ?? params.id;
+  const embedded = !!regionId;
   const sp = useSearchParams();
   const plan = sp.get("plan");
   const router = useRouter();
@@ -42,6 +45,7 @@ function BoardInner() {
   const [tab, setTabState] = useState<RegionTab>(tabParam && REGION_TABS.includes(tabParam) ? tabParam : "일정");
   const setTab = (t: RegionTab) => {
     setTabState(t);
+    if (embedded) { document.querySelector(".pc-detail")?.scrollTo({ top: 0 }); return; }
     const u = new URL(location.href);
     if (t === "일정") u.searchParams.delete("tab"); else u.searchParams.set("tab", t);
     history.replaceState(history.state, "", u.toString());
@@ -86,7 +90,7 @@ function BoardInner() {
 
   return (
     <>
-      <BackButton href={plan ? "/my-trips" : "/results"} label={plan ? "내 여행" : "추천 목록"} />
+      {!embedded && <BackButton href={plan ? "/my-trips" : "/results"} label={plan ? "내 여행" : "추천 목록"} />}
       <div className="between" style={{ marginTop: 4 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900 }}>{r.region.name}</h1>
@@ -140,21 +144,18 @@ function BoardInner() {
               const c = d.cells[k];
               const p = c.v && !isSpecial(c.v) ? byId(c.v) : undefined;
 
-              return (
-                <button key={k} type="button" className={`board-cell slot-${slotKind(k, c.v)} ${c.lock ? "locked" : ""}`} onClick={() => setPick({ di, slot: k })}>
-                  <span className="k">{k}</span>
-                  <span className="v">
-
-                    {c.cont ? <span className="muted">{cellLabel(c.v)} · 계속</span> : <span className={isSpecial(c.v) ? "muted" : ""}>{!c.v && (k === "야간" || k === "디저트") ? "추천 후보 보강 필요 · 직접 선택 가능" : cellLabel(c.v)}</span>}
-                    {p?.dining?.cuisine && !c.cont && <span className="xs faint">{p.dining.cuisine}</span>}
-                  </span>
-                  {c.lock && <span className="lock-badge"><Icon name="lock" size={12} />고정</span>}
-                </button>
-              );
+              return <BoardCell key={k} k={k} p={p} cls={`board-cell slot-${slotKind(k, c.v)} ${c.lock ? "locked" : ""}`} onClick={() => setPick({ di, slot: k })}>
+                <span className="v">
+                  {c.cont ? <span className="muted">{cellLabel(c.v)} · 계속</span> : <span className={isSpecial(c.v) ? "muted" : ""}>{!c.v && (k === "야간" || k === "디저트") ? "추천 후보 보강 필요 · 직접 선택 가능" : cellLabel(c.v)}</span>}
+                  {p?.dining?.cuisine && !c.cont && <span className="xs faint">{p.dining.cuisine}</span>}
+                </span>
+                {c.lock && <span className="lock-badge"><Icon name="lock" size={12} />고정</span>}
+              </BoardCell>;
             })}
           </div>
         ))}
       </div>
+      <p className="xs faint" style={{ marginTop: 8 }}>사진: 위키미디어 공용(작가·라이선스는 관광지 탭 &gt; 상세 보기). 사진 없는 곳은 색 블록으로 보여요.</p>
 
       {!plan && (
         <div className="sticky-cta" style={{ marginTop: 12 }}>
@@ -243,11 +244,29 @@ function PickSheet({ regionId, board, di, slot, q, onClose, onPick, onToggleLock
   </div>;
 }
 
+/** 일정판 한 칸: 장소가 정해진 칸은 구간 이름 → 사진 → 장소 이름 순서로 크게 보여 준다 */
+function BoardCell({ k, p, cls, onClick, children }: { k: string; p?: PlaceV1; cls: string; onClick: () => void; children: React.ReactNode }) {
+  const ref = useThumbRef();
+  const img = usePlaceImage(p ?? NO_PLACE, ref);
+  if (!p) return <button type="button" className={cls} onClick={onClick}><span className="k">{k}</span>{children}</button>;
+  return <button ref={ref as unknown as React.RefObject<HTMLButtonElement>} type="button" className={`${cls} rich`} onClick={onClick}>
+    <span className="k">{k}</span>
+    <PlaceThumb p={p} img={img} size="wide" />
+    <span className="rich-row">{children}</span>
+  </button>;
+}
+const NO_PLACE = { id: "", region: "", name: "", en: "", concepts: [], tags: [], travel: "", penalty: 0, grade: null } as PlaceV1;
+
 /** 일정 고르기 카드 한 장: 썸네일 조회용 ref를 잡아 둔다 */
 function ChoiceItem({ p, className, children }: { p: PlaceV1; className: string; children: (img: ReturnType<typeof usePlaceImage>) => React.ReactNode }) {
   const ref = useThumbRef();
   const img = usePlaceImage(p, ref);
   return <article ref={ref} className={className}>{children(img)}</article>;
+}
+
+/** PC(넓은 화면) 추천 결과의 오른쪽 상세 칸 */
+export function RegionBoard({ id }: { id: string }) {
+  return <Suspense><BoardInner key={id} regionId={id} /></Suspense>;
 }
 
 export default function BoardPage() {

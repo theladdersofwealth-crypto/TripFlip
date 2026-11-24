@@ -41,11 +41,13 @@ export function usePlaceImage(p: PlaceV1, el: React.RefObject<HTMLElement | null
   return img;
 }
 
-export function PlaceThumb({ p, img, size = 64 }: { p: PlaceV1; img: ThumbInfo | null; size?: number }) {
+/** size=숫자면 정사각 썸네일, "wide"면 카드 폭 가득(이름 위 사진) */
+export function PlaceThumb({ p, img, size = 64 }: { p: PlaceV1; img: ThumbInfo | null; size?: number | "wide" }) {
   const [broken, setBroken] = useState(false);
   const [ico, bg] = fallbackOf(p);
   useEffect(() => setBroken(false), [img?.src]);
-  return <span className="place-thumb" style={{ width: size, height: size, background: bg }} aria-hidden>
+  const box = size === "wide" ? { background: bg } : { width: size, height: size, background: bg };
+  return <span className={`place-thumb${size === "wide" ? " wide" : ""}`} style={box} aria-hidden>
     {img && !broken ? <img src={img.src} alt="" loading="lazy" decoding="async" onError={() => setBroken(true)} /> : <span className="place-thumb-ico">{ico}</span>}
   </span>;
 }
