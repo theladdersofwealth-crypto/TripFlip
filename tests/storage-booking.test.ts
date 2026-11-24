@@ -71,3 +71,23 @@ test("운영 앱의 예전 키로 저장한 일정도 동일 조건이면 고정
   assert.equal(loadBoard("NT", boardKey("NT", { ...q, perDay: 3 })), null);
   assert.equal(loadBoard("NT", boardKey("NT", { ...q, endDate: "2027-05-11" })), null);
 });
+
+test("숙소 팝업 맨 위 아고다 링크: 모든 권역·숙소에서 CJ로 감싸지고 숙소 이름·날짜·인원이 유지된다", async () => {
+  const { HOTELS } = await import("../src/data/worldHotels");
+  const q = { ...DEFAULT_QUERY, adults: 2 };
+  let n = 0;
+  const region = REGIONS_V1[0];
+  for (const rows of Object.values(HOTELS)) {
+    for (const [name] of rows) {
+      const w = new URL(hotelSearchUrl(region, q, name));
+      assert.equal(w.origin + w.pathname, "https://www.tkqlhce.com/click-101921886-17095166");
+      const a = new URL(w.searchParams.get("url")!);
+      assert.equal(a.searchParams.get("textToSearch"), name);
+      assert.equal(a.searchParams.get("checkIn"), q.startDate);
+      assert.equal(a.searchParams.get("checkOut"), q.endDate);
+      assert.equal(a.searchParams.get("adults"), "2");
+      n++;
+    }
+  }
+  assert.ok(n > 1000, `숙소 ${n}곳`);
+});

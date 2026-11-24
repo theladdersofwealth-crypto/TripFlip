@@ -216,7 +216,9 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByLabel("항공 선호", { exact: true }).selectOption("lowcost");
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("2");
   const flight = new URL(await page.getByRole("link", { name: "스카이스캐너", exact: true }).getAttribute("href") ?? "");
-  const hotel = new URL(await page.getByRole("link", { name: "아고다 검색", exact: true }).getAttribute("href") ?? "");
+  const cj = new URL(await page.getByRole("link", { name: "아고다 검색", exact: true }).getAttribute("href") ?? "");
+  expect(cj.hostname).toBe("www.tkqlhce.com"); // CJ 딥링크로 감싼 아고다
+  const hotel = new URL(cj.searchParams.get("url") ?? "");
   expect(flight.searchParams.get("adultsv2")).toBe("4");
   expect(flight.searchParams.get("childrenv2")).toBe("1|8");
   expect(hotel.searchParams.get("rooms")).toBe("2");

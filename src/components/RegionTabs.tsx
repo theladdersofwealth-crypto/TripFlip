@@ -62,10 +62,10 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         {(all ? hotels : hotels.slice(0, 3)).map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
         {hotels.length > 3 && !all && <button type="button" className="xs link-btn" onClick={() => setAll(true)}>숙소 더 보기 ({hotels.length}곳) ▾</button>}
       </div>}
-      <a className="btn btn-teal btn-block" href={klookStayUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>클룩 {r.region.name} 호텔 <Icon name="link" /></a>
+      <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
       <div className="grid-2">
+        <a className="btn btn-block" href={klookStayUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
         <a className="btn btn-block" href={bookingComUrl(r.region, q)} onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>
-        <a className="btn btn-block" href={hotelSearchUrl(r.region, q)} onClick={() => track("hotel", id)} {...ext}>아고다 <Icon name="link" /></a>
       </div>
       {relaxedNotice(id) && <span className="xs warn">⚠ {relaxedNotice(id)}</span>}
     </section>
