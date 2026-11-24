@@ -52,6 +52,9 @@ test("간편 가입 입력 검사와 PIN 해시", async () => {
   assert.match(validateSignup({ ...ok, birth: "1985-02-30" }).error, /생년월일/);
   assert.match(validateSignup({ ...ok, birth: "2030-01-01" }, "2026-11-24").error, /생년월일/);
   assert.match(validateSignup({ ...ok, gender: "X" }).error, /성별/);
+  // 만 14세 미만 가입 차단 (생일 전날까지는 13세)
+  assert.match(validateSignup({ ...ok, birth: "2012-11-25" }, "2026-11-24").error, /14세/);
+  assert.equal(validateSignup({ ...ok, birth: "2012-11-24" }, "2026-11-24").error, undefined);
   assert.match(validateSignup({ ...ok, nick: "a" }).error, /닉네임/);
   assert.match(validateSignup({ ...ok, nick: "<b>" }).error, /닉네임/);
   assert.match(validateSignup({ ...ok, agree: false }).error, /동의/);

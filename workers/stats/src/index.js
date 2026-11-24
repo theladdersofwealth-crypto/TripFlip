@@ -5,6 +5,7 @@
 //  POST /login  {nick, pin, v}  → {token, nick}   (PIN 5번 틀리면 15분 잠금, 반복 시 두 배)
 //  POST /logout {token}
 //  POST /me     {token}         → {nick}
+//  POST /withdraw {token, pin} → 본인 탈퇴: 계정·내 여행·이용 기록·로그인 기기 모두 삭제
 //  POST /plans  {token, put?, del?} → {plans}  로그인 회원의 '내 여행'(저장 계획) 합치기·내려받기
 //  GET  /users, GET /user?id=, DELETE /user?id=   ← 관리자
 // 회원은 닉네임·생년월일·성별만. PIN은 PBKDF2 해시+솔트로만 저장. 로그인 기기의 화면 이동만 계정에 묶어 기록한다.
@@ -47,7 +48,7 @@ export default {
 
     // 회원: 앱에서 JSON 본문으로. IP는 잠깐 횟수 제한에만 쓰고 저장하지 않는다.
     const ip = req.headers.get("cf-connecting-ip") || "";
-    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me", "/plans"].includes(url.pathname)) {
+    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me", "/plans", "/withdraw"].includes(url.pathname)) {
       const text = await req.text();
       const max = url.pathname === "/plans" ? PLANS_BODY_MAX : 2000;
       if (text.length > max) return json({ ok: false, error: "저장할 내용이 너무 커요." }, 413);
@@ -181,6 +182,18 @@ export class Stats extends DurableObject {
       this.sql.exec(`DELETE FROM devices WHERE vid = ? AND uid = ?`, s.vid, s.uid);
     }
     return { ok: true };
+  }
+
+  /** 본인 탈퇴. 실수 방지로 PIN 한 번 더 확인 */
+  async withdraw(b, ip) {
+    const s = await this.sessionOf(b.token);
+    if (!s) return { ok: false, error: "로그인이 풀렸어요. 다시 로그인해 주세요.", status: 401 };
+    const pin = validPin(b.pin);
+    if (!pin) return { ok: false, error: "PIN 6자리를 넣어 주세요." };
+    if (this.throttled("w", ip, 10)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
+    const u = this.sql.exec(`SELECT salt, pin_hash, iter FROM users WHERE uid = ?`, s.uid).toArray()[0];
+    if (!u || (await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) return { ok: false, error: "PIN이 맞지 않아요.", status: 401 };
+    return this.deleteUser(s.uid);
   }
 
   // 항목별 결과를 돌려준다: saved(저장 확인) · deleted(삭제 확인) · gone(다른 기기에서 이미 지움) · rejected(거절, 사유)

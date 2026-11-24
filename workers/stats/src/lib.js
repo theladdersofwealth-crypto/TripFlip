@@ -37,12 +37,21 @@ export function validateSignup(b, today = kstDay()) {
   const m = birth.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   const d = m && new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
   if (!m || !d || d.toISOString().slice(0, 10) !== birth || +m[1] < 1900 || birth > today) return { error: "생년월일을 다시 확인해 주세요." };
+  if (ageOn(birth, today) < MIN_AGE) return { error: `만 ${MIN_AGE}세 이상만 가입할 수 있어요.` };
   const gender = b.gender === "M" || b.gender === "F" ? b.gender : null;
   if (!gender) return { error: "성별을 골라 주세요." };
   const pin = validPin(b.pin);
   if (!pin) return { error: "PIN은 숫자 6자리예요." };
   if (b.agree !== true) return { error: "개인정보 수집에 동의해 주세요." };
   return { nick, birth, gender, pin };
+}
+
+export const MIN_AGE = 14; // 만 14세 미만은 법정대리인 동의가 필요해 가입을 받지 않음
+
+/** 만 나이 (birth·today 모두 YYYY-MM-DD) */
+export function ageOn(birth, today = kstDay()) {
+  const [by, bm, bd] = birth.split("-").map(Number), [ty, tm, td] = today.split("-").map(Number);
+  return ty - by - (tm < bm || (tm === bm && td < bd) ? 1 : 0);
 }
 
 export const validPin = (p) => (typeof p === "string" && /^\d{6}$/.test(p) ? p : null);
