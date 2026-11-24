@@ -13,3 +13,8 @@ class_name = "Stats"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Stats"]
+
+# 관리자 통계(/stats)·회원 이용 기록(/users)에서 뺄 회원 닉네임(쉼표로 여러 명). 운영자 본인 테스트 계정 등.
+# 이 회원이 로그인했던 기기의 방문 기록도 함께 빠진다. 기록 자체는 지우지 않으므로 여기서 빼면 다시 보인다.
+[vars]
+HIDE_NICKS = "너만은잡는다"

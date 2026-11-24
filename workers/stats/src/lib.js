@@ -83,3 +83,9 @@ export const PLANS_BODY_MAX = 3000000;
 export function planOk(p) {
   return !!p && typeof p === "object" && typeof p.id === "string" && /^[A-Za-z0-9_-]{1,80}$/.test(p.id) && typeof p.regionId === "string" && typeof p.regionName === "string" && !!p.query && typeof p.query === "object" && typeof p.createdAt === "string";
 }
+
+// ── 관리자 통계에서 뺄 회원(운영자 본인 테스트 계정 등) ──────────
+/** wrangler.toml 의 HIDE_NICKS("닉1,닉2") → 비교용 닉네임 목록 */
+export function hiddenNickKeys(raw) {
+  return [...new Set(String(raw ?? "").split(",").map(nickKey).filter(Boolean))];
+}

@@ -85,3 +85,10 @@ test("계정에 올릴 여행 모양 검사", async () => {
   assert.equal(planOk({ ...p, query: null }), false);
   assert.equal(planOk(null), false);
 });
+
+test("관리자 통계에서 뺄 닉네임 목록", async () => {
+  const { hiddenNickKeys, nickKey } = await import("../workers/stats/src/lib.js");
+  assert.deepEqual(hiddenNickKeys(" 너만은잡는다 , Abc,,abc "), ["너만은잡는다", "abc"]);
+  assert.deepEqual(hiddenNickKeys(undefined), []);
+  assert.equal(hiddenNickKeys("너만은잡는다")[0], nickKey("너만은잡는다"));
+});

@@ -8,10 +8,12 @@
 //  POST /withdraw {token, pin} → 본인 탈퇴: 계정·내 여행·이용 기록·로그인 기기 모두 삭제
 //  POST /plans  {token, put?, del?} → {plans}  로그인 회원의 '내 여행'(저장 계획) 합치기·내려받기
 //  GET  /users, GET /user?id=, DELETE /user?id=   ← 관리자
+// HIDE_NICKS(wrangler.toml)에 적은 회원과 그 회원이 로그인했던 기기는 /stats·/users 집계와 목록에서 빠진다(기록은 지우지 않음).
 // 회원은 닉네임·생년월일·성별만. PIN은 PBKDF2 해시+솔트로만 저장. 로그인 기기의 화면 이동만 계정에 묶어 기록한다.
 import { DurableObject } from "cloudflare:workers";
 
 import { PLANS_BODY_MAX, PLAN_MAX, PLANS_PER_USER, planOk } from "./lib.js";
+import { hiddenNickKeys } from "./lib.js";
 import { STEPS, KEEP_DAYS, LOCK_AFTER, PIN_ITER, kstDay, parseEvent, validateSignup, validPin, nickKey, hashPin, sha256, randomHex, lockMs } from "./lib.js";
 
 const CORS = {
@@ -93,6 +95,25 @@ export class Stats extends DurableObject {
     // 회원의 '내 여행'. 지운 건 deleted=1로 남겨 다른 기기가 다시 올려도 살아나지 않게
     this.sql.exec(`CREATE TABLE IF NOT EXISTS plans (uid TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (uid, id))`);
     this.ipHits = new Map(); // 메모리에만: IP별 최근 시도 수 (저장 안 함)
+    // 통계에서 뺄 기기: 숨긴 회원이 한 번이라도 로그인한 기기(로그아웃해도 이용 기록에 남은 기기는 계속 뺀다)
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS hidden_vids (vid TEXT PRIMARY KEY)`);
+    this.hiddenKeys = hiddenNickKeys(env.HIDE_NICKS);
+  }
+
+  /** 숨긴 회원 uid 목록 (닉네임 기준) */
+  hiddenUids() {
+    if (!this.hiddenKeys.length) return [];
+    return this.sql.exec(`SELECT uid FROM users WHERE nick_key IN (${this.hiddenKeys.map(() => "?").join(",")})`, ...this.hiddenKeys).toArray().map((r) => r.uid);
+  }
+
+  /** 숨긴 회원이 쓴 기기를 hidden_vids에 모은다(지난 기록 포함). 집계 전에 부른다 */
+  syncHidden() {
+    const uids = this.hiddenUids();
+    this.sql.exec(`DELETE FROM hidden_vids`); // 목록에서 뺀 회원은 다시 보이게 매번 새로 만든다
+    for (const uid of uids) {
+      for (const t of ["devices", "sessions", "log"]) this.sql.exec(`INSERT OR IGNORE INTO hidden_vids (vid) SELECT DISTINCT vid FROM ${t} WHERE uid = ?`, uid);
+    }
+    return uids;
   }
 
   /** IP당 1시간 limit번까지. 넘으면 true */
@@ -225,6 +246,7 @@ export class Stats extends DurableObject {
   }
 
   async users(days) {
+    const hidden = new Set(this.syncHidden());
     const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
     const all = rows(`SELECT u.uid, u.nick, u.birth, u.gender, u.created, MAX(l.ts) AS last,
@@ -242,7 +264,7 @@ export class Stats extends DurableObject {
     const list = all.map((u) => {
       const p = period.get(u.uid) ?? { visits: 0, days: 0, regions: 0, flight: 0, hotel: 0, save: 0 };
       return { ...u, last: u.last ?? null, visits: p.visits, days: p.days, regions: p.regions, flight: p.flight, hotel: p.hotel, save: p.save };
-    }).sort((a, b) => (b.last ?? b.created) - (a.last ?? a.created));
+    }).filter((u) => !hidden.has(u.uid)).sort((a, b) => (b.last ?? b.created) - (a.last ?? a.created));
     return { ok: true, days, from, users: list };
   }
 
@@ -271,14 +293,15 @@ export class Stats extends DurableObject {
   }
 
   async stats(days) {
+    const hidden = this.syncHidden();
     const today = kstDay();
     const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
 
     // 날짜별: 방문자(고유 기기), 화면 조회수(visit 횟수), 신규 방문자, 단계별 고유 기기
-    const daily = rows(`SELECT day, COUNT(DISTINCT vid) AS visitors, SUM(CASE WHEN step = 'visit' THEN n ELSE 0 END) AS views FROM hits WHERE day >= ? GROUP BY day`, from);
-    const newBy = rows(`SELECT first_day AS day, COUNT(*) AS c FROM visitors WHERE first_day >= ? GROUP BY first_day`, from);
-    const stepDaily = rows(`SELECT day, step, COUNT(DISTINCT vid) AS c FROM hits WHERE day >= ? GROUP BY day, step`, from);
+    const daily = rows(`SELECT day, COUNT(DISTINCT vid) AS visitors, SUM(CASE WHEN step = 'visit' THEN n ELSE 0 END) AS views FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY day`, from);
+    const newBy = rows(`SELECT first_day AS day, COUNT(*) AS c FROM visitors WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND first_day >= ? GROUP BY first_day`, from);
+    const stepDaily = rows(`SELECT day, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY day, step`, from);
     const byDay = new Map();
     for (let t = Date.parse(from + "T00:00:00Z"); ; t += 86400000) {
       const d = new Date(t).toISOString().slice(0, 10);
@@ -290,13 +313,13 @@ export class Stats extends DurableObject {
     for (const r of stepDaily) if (byDay.has(r.day)) byDay.get(r.day).steps[r.step] = r.c;
 
     // 기간 전체 퍼널: 단계별 고유 기기 수 (항공·숙소 링크는 '예약처 이동'으로 합침)
-    const funnelRows = rows(`SELECT step, COUNT(DISTINCT vid) AS c FROM hits WHERE day >= ? GROUP BY step`, from);
+    const funnelRows = rows(`SELECT step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY step`, from);
     const funnel = Object.fromEntries(STEPS.map((s) => [s, 0]));
     for (const r of funnelRows) funnel[r.step] = r.c;
-    funnel.outbound = rows(`SELECT COUNT(DISTINCT vid) AS c FROM hits WHERE day >= ? AND step IN ('flight','hotel')`, from)[0]?.c ?? 0;
+    funnel.outbound = rows(`SELECT COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? AND step IN ('flight','hotel')`, from)[0]?.c ?? 0;
 
     // 권역별: 상세 본 기기, 예약처 이동, 저장
-    const regionRows = rows(`SELECT region, step, COUNT(DISTINCT vid) AS c FROM hits WHERE day >= ? AND region != '' AND step IN ('region','book','flight','hotel','save') GROUP BY region, step`, from);
+    const regionRows = rows(`SELECT region, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? AND region != '' AND step IN ('region','book','flight','hotel','save') GROUP BY region, step`, from);
     const regions = new Map();
     for (const r of regionRows) {
       const x = regions.get(r.region) ?? { region: r.region, views: 0, book: 0, flight: 0, hotel: 0, save: 0 };
@@ -304,12 +327,13 @@ export class Stats extends DurableObject {
       regions.set(r.region, x);
     }
 
-    const total = rows(`SELECT COUNT(*) AS c FROM visitors`)[0]?.c ?? 0;
+    const total = rows(`SELECT COUNT(*) AS c FROM visitors WHERE vid NOT IN (SELECT vid FROM hidden_vids)`)[0]?.c ?? 0;
     const kstStart = Date.parse(today + "T00:00:00+09:00");
+    const notHidden = (col) => (hidden.length ? ` AND ${col} NOT IN (${hidden.map(() => "?").join(",")})` : "");
     const members = {
-      total: rows(`SELECT COUNT(*) AS c FROM users`)[0]?.c ?? 0,
-      today: rows(`SELECT COUNT(*) AS c FROM users WHERE created >= ?`, kstStart)[0]?.c ?? 0,
-      activeToday: rows(`SELECT COUNT(DISTINCT uid) AS c FROM log WHERE day = ?`, today)[0]?.c ?? 0,
+      total: rows(`SELECT COUNT(*) AS c FROM users WHERE 1${notHidden("uid")}`, ...hidden)[0]?.c ?? 0,
+      today: rows(`SELECT COUNT(*) AS c FROM users WHERE created >= ?${notHidden("uid")}`, kstStart, ...hidden)[0]?.c ?? 0,
+      activeToday: rows(`SELECT COUNT(DISTINCT uid) AS c FROM log WHERE day = ?${notHidden("uid")}`, today, ...hidden)[0]?.c ?? 0,
     };
     return {
       ok: true,
