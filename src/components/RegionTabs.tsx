@@ -13,7 +13,7 @@ import { relaxedNotice } from "@/lib/livePrices";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { track } from "@/lib/analytics";
 import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
-import { bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
+import { agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
 import type { HotelPick } from "@/services/booking";
 import { isFood, placesOf } from "@/services/planner";
 import { PILOT_TWIN_OF, hotelEstimated } from "@/services/regionScore";
@@ -49,8 +49,9 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
       <button type="button" className="cost-row" onClick={() => setOpen("flight")}>
         <span>1인 왕복 <b>약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
       </button>
+      <a className="btn btn-teal btn-block" href={agodaFlightUrl()} onClick={() => track("flight", id)} {...aff}>아고다 항공 <Icon name="link" /></a>
       <div className="grid-2">
-        <a className="btn btn-teal btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
         <a className="btn btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} {...ext}>스카이스캐너 <Icon name="link" /></a>
       </div>
     </section>

@@ -108,6 +108,17 @@ export const CJ = {
   agoda: { domain: "www.tkqlhce.com", linkId: "17095166" } as CjProgram, // Agoda APAC(광고주 7538034) 텍스트 링크, 11/24 형님 CJ 화면
 };
 
+/**
+ * 아고다 항공(한국어) 첫 화면. 출발지·날짜·인원을 넣는 주소 형식은 아직 확인 못 해 첫 화면으로 보낸다.
+ * 링크는 숙소에서 이미 쓰는 아고다 CJ 딥링크(17095166)로 감싼다.
+ * CJ 'Landing Page - Flights'(17374355)가 ?url= 딥링크를 받는지 확인되면 그 번호로 바꿀 수 있다.
+ * 주의: 아고다 CJ 수수료(6%)는 숙박 완료 건 기준이라 항공은 수수료가 없을 수 있다.
+ */
+export const AGODA_FLIGHTS_KO = "https://www.agoda.com/ko-kr/flights";
+export function agodaFlightsUrl(prog: CjProgram = CJ.agoda): string {
+  return cjLink(AGODA_FLIGHTS_KO, prog);
+}
+
 export function cjLink(url: string, prog: CjProgram, pid: string = CJ.pid): string {
   if (!pid || !prog.domain || !prog.linkId) return url;
   return `https://${prog.domain}/click-${pid}-${prog.linkId}?url=${encodeURIComponent(url)}`;
