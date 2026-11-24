@@ -74,3 +74,14 @@ test("클룩 도시 번호 목록: 시범·세계 권역 둘 다", () => {
     assert.equal(u.searchParams.get("city_id"), n);
   }
 });
+
+test("클룩 호텔 상세: 번호 있는 숙소는 그 숙소로, 날짜·인원 채움", async () => {
+  const { klookHotelDetailUrl } = await import("../src/services/affiliate");
+  const stay = { startDate: "2027-01-13", endDate: "2027-01-20", adults: 2, children: 2, rooms: 1 };
+  const u = new URL(new URL(klookHotelDetailUrl("The Ritz-Carlton, Osaka", stay)!).searchParams.get("u")!);
+  assert.equal(u.pathname, "/ko/hotels/detail/276398-the-ritz-carlton-osaka/");
+  assert.equal(u.searchParams.get("check_in"), "2027-01-13");
+  assert.equal(u.searchParams.get("adult_num"), "2");
+  assert.equal(u.searchParams.get("child_num"), "2");
+  assert.equal(klookHotelDetailUrl("없는 호텔", stay), null);
+});

@@ -4,7 +4,7 @@ import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
-import { aviasalesSearchUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
+import { aviasalesSearchUrl, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
 import { liveHotelEntries } from "@/lib/livePrices";
 import { HOTEL_NAMES } from "@/data/hotelNames";
 import { HOTEL_KO } from "@/data/hotelKo";
@@ -100,5 +100,9 @@ export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) 
 /** 클룩 호텔(제휴). 도시 번호를 아는 권역은 날짜·인원·객실이 채워져 열린다. */
 export function klookStayUrl(region: RegionV1, q: RegionQuery) {
   return klookHotelUrl(region.id, { startDate: q.startDate, endDate: q.endDate, adults: q.adults, children: q.children.length, rooms: roomEstimate(q).rooms });
+}
+/** 그 숙소의 클룩 상세(제휴). 클룩 번호를 모르는 숙소는 null. */
+export function klookHotelStayUrl(name: string, q: RegionQuery) {
+  return klookHotelDetailUrl(name, { startDate: q.startDate, endDate: q.endDate, adults: q.adults, children: q.children.length, rooms: roomEstimate(q).rooms });
 }
 export const klookStayPrefilled = (region: RegionV1) => klookHotelPrefilled(region.id);
