@@ -5,6 +5,7 @@
  * 값이 비어 있으면 제휴 없이 원래 주소로 보낸다(링크가 깨지지 않게).
  */
 import { KLOOK_CITY } from "@/data/klookCities";
+import { KLOOK_HOTEL } from "@/data/klookHotels";
 
 export type TpProgram = { p: string; campaignId: string };
 
@@ -50,6 +51,19 @@ export function klookHotelUrl(regionId?: string, stay?: KlookStay, tp?: { marker
     adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)), room_num: String(Math.max(1, stay.rooms)),
   });
   return tpLink(`https://www.klook.com/ko/hotels/searchresult/?${params}`, prog, tp);
+}
+
+const slug = (name: string) => name.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 -]/g, "").trim().replace(/ /g, "-");
+
+/** 클룩 호텔 상세(그 숙소). 번호를 모르면 null. 날짜가 맞으면 체크인·체크아웃·인원·객실도 넣는다. */
+export function klookHotelDetailUrl(hotelName: string, stay?: KlookStay, tp?: { marker: string; trs: string }, prog: TpProgram = TP.klook): string | null {
+  const id = KLOOK_HOTEL[hotelName];
+  if (!id) return null;
+  const base = `https://www.klook.com/ko/hotels/detail/${id}-${slug(hotelName)}/`;
+  const ok = stay && /^\d{4}-\d{2}-\d{2}$/.test(stay.startDate) && /^\d{4}-\d{2}-\d{2}$/.test(stay.endDate) && stay.endDate > stay.startDate;
+  if (!ok) return tpLink(base, prog, tp);
+  const params = new URLSearchParams({ check_in: stay.startDate, check_out: stay.endDate, room_num: String(Math.max(1, stay.rooms)), adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)) });
+  return tpLink(`${base}?${params}`, prog, tp);
 }
 
 /** 클룩 호텔 버튼이 날짜·인원까지 채워 여는지 */
