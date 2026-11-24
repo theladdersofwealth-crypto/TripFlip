@@ -11,6 +11,8 @@ import { loadQuery, saveQuery } from "@/lib/flow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
+import { HomePreview } from "@/components/HomePreview";
+import { useWide } from "@/lib/useWide";
 import type { IntensityV1, PriceLevel, RegionQuery, StayTier } from "@/services/regionScore";
 
 const INTENSITY: { v: IntensityV1; label: string }[] = [
@@ -42,6 +44,7 @@ export default function Home() {
   const [choice, setChoice] = useState<number | null>(null); // 방금 끝낸 단계 → "다음 단계 / 이대로 추천" 고르기
   const stepRefs = useRef<(HTMLElement | null)[]>([]);
   const moved = useRef(false);
+  const wide = useWide(); // PC: 왼쪽 조건 + 오른쪽 추천 미리보기
   useEffect(() => {
     const saved = loadQuery();
     setQ(normalizeParty({ ...saved, dateWindow: undefined, interests: saved.interests?.length ? saved.interests : [saved.main, ...saved.subs] }));
@@ -103,6 +106,12 @@ export default function Home() {
     router.prefetch("/results");
     setTimeout(() => startTransition(() => router.push("/results")), 1800);
   };
+  const openRegion = (id: string) => {
+    if (error) return;
+    saveQuery(normalizeParty(q));
+    track("search");
+    router.push(`/results?r=${encodeURIComponent(id)}`);
+  };
   const curQ = open == null ? null : STEPS[open].qs[qi];
   const activeSlot = curQ === "who" || curQ === "when" || curQ === "vibe" ? curQ : curQ === "intensity" ? "vibe" : curQ === "budget" || curQ === "stay" ? "s3" : null;
   const slotJump = (t: string) => { if (t === "s3") openStep(2); else openStep(0, Math.max(0, STEPS[0].qs.indexOf(t as Q))); };
@@ -145,7 +154,7 @@ export default function Home() {
       </>;
     }
   };
-  return (
+  const form = (
     <main className="container page discovery-form" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
       <div className="bp-sticky"><BoardingPass compact q={q} members={members} days={days} interests={interests} active={activeSlot} onSlot={slotJump} /></div>
@@ -200,4 +209,9 @@ export default function Home() {
       )}
     </main>
   );
+  if (!wide) return form;
+  return <div className="container page pc-home">
+    {form}
+    <aside className="pc-preview" aria-label="추천 미리보기"><HomePreview q={q} ready={done[0]} blocked={error} onOpen={openRegion} save={() => saveQuery(normalizeParty(q))} /></aside>
+  </div>;
 }
