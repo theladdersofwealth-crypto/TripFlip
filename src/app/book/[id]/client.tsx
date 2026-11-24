@@ -101,11 +101,11 @@ export default function BookPage() {
           <p className="xs faint">최근 수집한 1박 최저가 평균(없으면 10/31 가격대)이에요. 날짜별 실시간 요금·청결 기준·정원은 재확인이 필요해요.</p>
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
         <div className="grid-2">
-          <a className="btn btn-teal btn-block" href={klookStayUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 호텔 <Icon name="link" /></a>
+          <a className="btn btn-teal btn-block" href={klookStayUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 {r.region.name} 호텔 목록 <Icon name="link" /></a>
           <a className="btn btn-block" href={bookingComUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">부킹닷컴 <Icon name="link" /></a>
           <a className="btn btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">아고다 검색 <Icon name="link" /></a>
         </div>
-        <p className="xs faint">{klookStayPrefilled(r.region) ? "클룩·부킹닷컴·아고다 모두 날짜·인원이 입력된 채로 열려요." : `클룩 호텔은 ${r.region.name} 도시 번호를 아직 몰라 열린 화면에서 도시·날짜를 골라 주세요. 부킹닷컴·아고다는 날짜·인원이 입력된 채로 열려요.`} 숙소 후보를 누르면 부킹닷컴에서 그 숙소로 열려요.</p>
+        <p className="xs faint">{klookStayPrefilled(r.region) ? "클룩·부킹닷컴·아고다 모두 날짜·인원이 입력된 채로 열려요. 클룩은 도시 호텔 목록으로 열려요." : `클룩 호텔은 ${r.region.name} 도시 번호를 아직 몰라 열린 화면에서 도시·날짜를 골라 주세요. 부킹닷컴·아고다는 날짜·인원이 입력된 채로 열려요.`} 숙소 후보를 누르면 부킹닷컴에서 그 숙소로 열려요.</p>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
       <section className="book-card">
