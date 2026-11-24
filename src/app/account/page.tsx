@@ -1,5 +1,5 @@
 "use client";
-// 간편 가입·로그인: 닉네임·생년월일·성별 + PIN 6자리. 가입 없이도 추천·예약은 그대로 쓸 수 있다.
+// 간편 가입·로그인: 닉네임·생년월일·성별 + PIN 6자리. 비회원은 추천 결과가 흐리게 보이고, 일정·예약은 회원만.
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -44,7 +44,7 @@ export default function AccountPage() {
 
   return <main className="container page" style={{ maxWidth: 420 }}>
     <h1 style={{ fontSize: 22, fontWeight: 900 }}>{mode === "signup" ? "간편 가입" : "로그인"}</h1>
-    {gate && <p className="card-soft small" style={{ marginTop: 10 }}>여행지 추천 결과는 회원만 볼 수 있어요. 30초면 가입돼요. 가입·로그인하면 보던 화면으로 바로 돌아가요.</p>}
+    {gate && <p className="card-soft small" style={{ marginTop: 10 }}>가입하면 추천 여행지를 볼 수 있어요. 30초면 가입돼요. 가입·로그인하면 보던 화면으로 바로 돌아가요.</p>}
     <div className="seg" role="tablist" style={{ marginTop: 12 }}>
       <button role="tab" aria-selected={mode === "signup"} className={mode === "signup" ? "on" : ""} onClick={() => setMode("signup")}>처음이에요</button>
       <button role="tab" aria-selected={mode === "login"} className={mode === "login" ? "on" : ""} onClick={() => setMode("login")}>계정 있어요</button>

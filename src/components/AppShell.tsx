@@ -28,7 +28,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // 간편 회원: 로그인 닉네임 표시 + 첫 방문 때 한 번 가입 권유(건너뛰기 가능)
   const [nick, setNick] = useState<string | null>(null);
   const [askSignup, setAskSignup] = useState(false);
-  // 여행지 추천 결과·일정·예약 화면은 회원만(형님 결정 11/24). 비회원은 가입·로그인 화면으로, 로그인하면 원래 화면으로 돌아감
+  // 권역 일정·예약 화면은 회원만(형님 결정 11/24). 추천 결과(/results)는 비회원에게 흐리게 보여 주고 가입 안내(결과 화면에서 처리)
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const blocked = ready && membersOnly(path) && !nick;
@@ -100,7 +100,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="center-modal-back" role="dialog" aria-modal="true" aria-label="간편 가입 안내">
           <div className="center-modal">
             <div className="center-modal-head"><h3>30초 간편 가입</h3></div>
-            <p className="small">닉네임·생년월일·성별과 PIN 6자리면 끝이에요. 여행지 추천 결과는 회원만 볼 수 있어요.</p>
+            <p className="small">닉네임·생년월일·성별과 PIN 6자리면 끝이에요. 가입하면 추천 여행지를 바로 볼 수 있어요.</p>
             <div className="center-modal-foot">
               <Link href="/account" className="btn btn-primary btn-block" onClick={signupLater}>가입하기</Link>
               <Link href="/account#login" className="btn btn-block" onClick={signupLater}>이미 계정이 있어요</Link>
@@ -114,8 +114,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 export const NEXT_KEY = "tripflip:after-login";
-/** 회원 전용 화면: 추천 결과·권역 일정·일차·예약 비교 */
-export const membersOnly = (path: string) => /^\/(results|r|book)(\/|$)/.test(path);
+/** 회원 전용 화면: 권역 일정·일차·예약 비교(추천 결과는 비회원에게 흐리게 보여 줌) */
+export const membersOnly = (path: string) => /^\/(r|book)(\/|$)/.test(path);
 
 export function BackButton({ href, label = "뒤로" }: { href?: string; label?: string }) {
   if (href) return <Link href={href} className="back-btn"><Icon name="back" />{label}</Link>;
