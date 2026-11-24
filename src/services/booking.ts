@@ -4,7 +4,7 @@ import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
-import { aviasalesSearchUrl, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
+import { aviasalesSearchUrl, CJ, cjLink, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
 import { liveHotelEntries } from "@/lib/livePrices";
 import { HOTEL_NAMES } from "@/data/hotelNames";
 import { HOTEL_KO } from "@/data/hotelKo";
@@ -94,7 +94,8 @@ export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) 
   const params = new URLSearchParams({ textToSearch: name ?? region.searchName, checkIn: q.startDate, checkOut: q.endDate, los: String(los), rooms: String(roomEstimate(q).rooms), adults: String(q.adults), children: String(q.children.length) });
   const ages = childAgesForBooking(q);
   if (ages?.length) params.set("childages", ages.join(","));
-  return `https://www.agoda.com/ko-kr/search?${params}`;
+  // CJ 아고다 설정이 채워지면 CJ 딥링크로 감싼다(비어 있으면 원래 주소).
+  return cjLink(`https://www.agoda.com/ko-kr/search?${params}`, CJ.agoda);
 }
 
 /** 클룩 호텔(제휴). 도시 번호를 아는 권역은 날짜·인원·객실이 채워져 열린다. */

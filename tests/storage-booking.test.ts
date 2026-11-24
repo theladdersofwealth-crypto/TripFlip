@@ -34,7 +34,11 @@ test("예약 링크는 실제 자녀 나이와 선택한 객실 수를 사용한
     { id: "c", name: "성인 자녀", relationship: "child", age: 20, mobility: "standard", stroller: false, preferences: [] },
   ] });
   assert.deepEqual(childAgesForBooking(q), [2]);
-  const hotel = new URL(hotelSearchUrl(REGIONS_V1[0], q));
+  const wrapped = new URL(hotelSearchUrl(REGIONS_V1[0], q));
+  // 아고다 버튼은 CJ 딥링크(…/click-PID-링크번호?url=아고다주소)로 감싸진다. 날짜·인원은 안쪽 주소에 그대로.
+  assert.equal(wrapped.origin + wrapped.pathname, "https://www.tkqlhce.com/click-101921886-17095166");
+  const hotel = new URL(wrapped.searchParams.get("url")!);
+  assert.equal(hotel.origin + hotel.pathname, "https://www.agoda.com/ko-kr/search");
   assert.equal(hotel.searchParams.get("rooms"), "3");
   assert.equal(hotel.searchParams.get("adults"), "2");
   assert.equal(hotel.searchParams.get("childages"), "2");

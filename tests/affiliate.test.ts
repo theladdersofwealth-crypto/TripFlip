@@ -85,3 +85,22 @@ test("클룩 호텔 상세: 번호 있는 숙소는 그 숙소로, 날짜·인�
   assert.equal(u.searchParams.get("child_num"), "2");
   assert.equal(klookHotelDetailUrl("없는 호텔", stay), null);
 });
+
+import { CJ, cjLink } from "../src/services/affiliate";
+
+test("CJ 설정이 비어 있으면 아고다 주소 그대로", () => {
+  const u = "https://www.agoda.com/ko-kr/search?checkIn=2026-12-20&adults=2";
+  assert.equal(cjLink(u, { domain: "", linkId: "" }), u);
+  if (!CJ.agoda.domain) assert.equal(cjLink(u, CJ.agoda), u);
+});
+
+test("CJ 설정이 있으면 click-{pid}-{linkId}?url= 로 감싸고 날짜·인원이 그대로 남는다", () => {
+  const u = "https://www.agoda.com/ko-kr/search?textToSearch=Nha%20Trang&checkIn=2026-12-20&checkOut=2026-12-23&los=3&rooms=1&adults=2&children=1&childages=4";
+  const w = new URL(cjLink(u, { domain: "cj.example", linkId: "999" }, "101921886"));
+  assert.equal(w.origin + w.pathname, "https://cj.example/click-101921886-999");
+  const inner = new URL(w.searchParams.get("url")!);
+  assert.equal(inner.searchParams.get("checkIn"), "2026-12-20");
+  assert.equal(inner.searchParams.get("checkOut"), "2026-12-23");
+  assert.equal(inner.searchParams.get("adults"), "2");
+  assert.equal(inner.searchParams.get("childages"), "4");
+});
