@@ -5,8 +5,9 @@ import { WORLD_PLACES, WORLD_REGIONS } from "@/data/worldV1";
 import { applyWikiBoost } from "@/data/wikiBoost";
 import { openDuring } from "@/data/seasonal";
 import { WORLD_WEATHER, WORLD_WEATHER_SOURCE } from "@/data/worldWeather";
-import { COUNTRY_PRICE_LEVEL, FLIGHT_ESTIMATED, FLIGHT_KRW, FOOD_USD_US, HOTEL_ESTIMATED, HOTEL_MEDIAN_USD, KRW_PER_USD } from "@/data/worldPrices";
+import { COUNTRY_PRICE_LEVEL as WB_PRICE_LEVEL, FLIGHT_ESTIMATED, FLIGHT_KRW, FOOD_USD_US, HOTEL_ESTIMATED, HOTEL_MEDIAN_USD, KRW_PER_USD } from "@/data/worldPrices";
 import { HOTELS } from "@/data/worldHotels";
+import { EXTRA_PRICE_LEVEL, HOTEL_ESTIMATE_USD } from "@/data/hotelEstimates";
 import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
 import { DINING_PLACES } from "@/data/dining";
@@ -139,6 +140,13 @@ export interface RegionResult {
 
 const MAX_SCORE = 5.5;
 
+// 나라 물가: 10/31 자료 + 새 권역 나라(세계은행 PLI, 11/24 추가)
+const COUNTRY_PRICE_LEVEL: Record<string, number> = { ...WB_PRICE_LEVEL, ...EXTRA_PRICE_LEVEL };
+/** 숙소 1박이 실측이 아니라 나라 물가로 추정한 값인 권역인지 (권역 키 = 시범 5곳은 세계 id) */
+export function hotelEstimated(key: string) {
+  return HOTEL_ESTIMATED.has(key) || HOTEL_ESTIMATE_USD[key] != null;
+}
+
 const TIER_RANGE: Record<StayTier, [number, number]> = { 가성비: [0, 0.3], 가심비: [0.3, 0.7], 프리미엄: [0.7, 0.9], 하이엔드: [0.9, 1.01] };
 const TIER_FACTOR: Record<StayTier, number> = { 가성비: 0.67, 가심비: 1, 프리미엄: 1.67, 하이엔드: 2.78 };
 
@@ -148,7 +156,8 @@ function hotelPrice(key: string, tier: StayTier): number | null {
     .filter((h) => h[1] >= 4.5 && h[2] >= 300 && h[3] > 0 && h[4] >= h[3])
     .map((h) => (h[3] + h[4]) / 2).sort((a, b) => a - b);
   // 숙소 목록이 없는 권역은 중간값에 숙소 수준 배수를 곱한다(목록 있는 51개 권역의 수준별 중간값 ÷ 전체 중간값)
-  const byTier = () => HOTEL_MEDIAN_USD[key] != null ? Math.round(HOTEL_MEDIAN_USD[key] * TIER_FACTOR[tier]) : null;
+  const base = HOTEL_MEDIAN_USD[key] ?? HOTEL_ESTIMATE_USD[key];
+  const byTier = () => base != null ? Math.round(base * TIER_FACTOR[tier]) : null;
   if (!prices.length) return byTier();
   const [from, to] = TIER_RANGE[tier];
   const selected = prices.filter((_, i) => i / prices.length >= from && i / prices.length < to);
@@ -321,7 +330,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const key = PILOT_TWIN_OF[region.id] ?? region.id;
     const unknown = [
       base.stay.flightKrw == null || (base.stay.priceSource.flight !== "live" && FLIGHT_ESTIMATED.has(key)) ? "항공" : "",
-      base.stay.hotelNightUsd == null || (base.stay.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(key)) ? "숙소" : "",
+      base.stay.hotelNightUsd == null || (base.stay.priceSource.hotel !== "live" && hotelEstimated(key)) ? "숙소" : "",
       weather.judge === "미확인" ? "날씨" : "",
     ].filter(Boolean);
     if (unknown.length) {

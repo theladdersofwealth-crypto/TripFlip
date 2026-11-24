@@ -8,13 +8,13 @@ import { Icon } from "@/components/Icon";
 import { TEMP_GRADE } from "@/data/regionsV1";
 import { useFlowQuery } from "@/lib/flow";
 import { coreInterests, membersOf } from "@/lib/travelParty";
-import { PILOT_TWIN_OF, scoreRegions, tripDays } from "@/services/regionScore";
+import { PILOT_TWIN_OF, hotelEstimated, scoreRegions, tripDays } from "@/services/regionScore";
 import type { RegionQuery, RegionResult } from "@/services/regionScore";
 import type { HotelPick } from "@/services/booking";
 import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
 import { hotelCandidates } from "@/services/booking";
 import { relaxedNotice } from "@/lib/livePrices";
-import { HOTEL_ESTIMATED, KRW_PER_USD } from "@/data/worldPrices";
+import { KRW_PER_USD } from "@/data/worldPrices";
 import { useLivePrices } from "@/lib/livePrices";
 
 const HERO = ["#102f54,#00838c", "#1d497d,#00acb8", "#0b3a5b,#0ca678", "#3b2f63,#00838c", "#5a3a1a,#d9822b", "#102f54,#7a4fb5"];
@@ -43,7 +43,7 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
   const tier = q.stay;
   const [open, setOpen] = useState<"flight" | HotelPick | null>(null);
   const hotels = hotelCandidates(r.region.id, tier);
-  const estimated = !hotels.length && s.priceSource.hotel !== "live" && HOTEL_ESTIMATED.has(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
+  const estimated = !hotels.length && s.priceSource.hotel !== "live" && hotelEstimated(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
   const stop = (e: React.MouseEvent) => e.stopPropagation();
   return <div className="stay-line" onClick={stop}>
     <span className="small bold">경비 내역 <span className="xs muted" style={{ fontWeight: 500 }}>· 눌러서 자세히</span></span>
@@ -52,7 +52,7 @@ function StayLine({ r, q }: { r: RegionResult; q: RegionQuery }) {
     </button>
     <div className="cost-row static">
       <span>🏨 숙소 <b>{s.hotelNightUsd != null ? `1박 약 ${man(s.hotelNightUsd * KRW_PER_USD)}${estimated ? "(추정)" : ""} × ${s.rooms}실 × ${s.nights}박` : "가격 미확인"}</b>
-        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 자료 없음 · 현지 물가로 추정" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
+        <small>{s.hotelNightUsd != null ? (estimated ? "숙소 자료 없음 · 나라 물가(세계은행)로 추정, 실측 아님" : `${tier}(${tierText(tier)}) 숙소 1박 최저가의 중간값`) : "숙소 가격 자료 없음"}</small></span>
     </div>
     {s.foodPerDayUsd != null && <div className="cost-row static"><span>🍽️ 식비 <b>1인 하루 약 {man(s.foodPerDayUsd * KRW_PER_USD)}</b><small>나라 물가로 잡은 가정치(실측 아님)</small></span></div>}
     {hotels.length ? <div className="hotel-picks">
