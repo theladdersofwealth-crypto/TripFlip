@@ -25,8 +25,11 @@ function slotKind(k: string, v: string | null) {
   return "sight";
 }
 
-function BoardInner() {
-  const { id } = useParams<{ id: string }>();
+/** regionId가 있으면 PC 추천 결과 오른쪽 칸에 끼워 넣는 모드(주소·뒤로가기 없음) */
+function BoardInner({ regionId }: { regionId?: string }) {
+  const params = useParams<{ id: string }>();
+  const id = regionId ?? params.id;
+  const embedded = !!regionId;
   const sp = useSearchParams();
   const plan = sp.get("plan");
   const router = useRouter();
@@ -40,6 +43,7 @@ function BoardInner() {
   const [tab, setTabState] = useState<RegionTab>(tabParam && REGION_TABS.includes(tabParam) ? tabParam : "일정");
   const setTab = (t: RegionTab) => {
     setTabState(t);
+    if (embedded) { document.querySelector(".pc-detail")?.scrollTo({ top: 0 }); return; }
     const u = new URL(location.href);
     if (t === "일정") u.searchParams.delete("tab"); else u.searchParams.set("tab", t);
     history.replaceState(history.state, "", u.toString());
@@ -84,7 +88,7 @@ function BoardInner() {
 
   return (
     <>
-      <BackButton href={plan ? "/my-trips" : "/results"} label={plan ? "내 여행" : "추천 목록"} />
+      {!embedded && <BackButton href={plan ? "/my-trips" : "/results"} label={plan ? "내 여행" : "추천 목록"} />}
       <div className="between" style={{ marginTop: 4 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 900 }}>{r.region.name}</h1>
@@ -239,6 +243,11 @@ function PickSheet({ regionId, board, di, slot, q, onClose, onPick, onToggleLock
       <div className="choice-footer"><button type="button" className="text-button xs" onClick={onToggleLock}>{cur.lock ? "선택 고정 풀기" : "현재 일정 고정"}</button>{meal && <a className="xs muted" href="/dining/catalog.json" target="_blank" rel="noopener noreferrer">자료: Wikivoyage · CC BY-SA 4.0</a>}</div>
     </div>
   </div>;
+}
+
+/** PC(넓은 화면) 추천 결과의 오른쪽 상세 칸 */
+export function RegionBoard({ id }: { id: string }) {
+  return <Suspense><BoardInner key={id} regionId={id} /></Suspense>;
 }
 
 export default function BoardPage() {

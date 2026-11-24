@@ -701,3 +701,17 @@ article.rank-card { cursor: pointer; }
 .note-box { background: #fff8e1; color: #7a5d00; border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; }
 .empty-tab { text-align: center; color: var(--muted); margin: 48px 0; line-height: 1.8; }
 .rank-brief { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+
+/* ---------- PC(넓은 화면, 1200px+) 2단: 모바일 화면은 그대로 ---------- */
+@media (min-width: 1200px) {
+  .header .container { max-width: 1680px; padding: 0 32px; }
+  .pc-split { max-width: 1680px; display: grid; grid-template-columns: 500px minmax(0, 1fr); gap: 28px; align-items: start; padding-left: 32px; padding-right: 32px; }
+  .pc-detail { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 4px 28px 0; box-shadow: 0 8px 28px rgba(16, 47, 84, 0.06); }
+  .pc-detail .tabs { top: 0; margin: 0 -28px; padding: 0 28px; }
+  .pc-detail .sticky-cta { bottom: 0; }
+  .rank-card.picked { outline: 3px solid var(--teal); outline-offset: 2px; }
+  .pc-home { max-width: 1680px; display: grid; grid-template-columns: 540px minmax(0, 1fr); gap: 28px; align-items: start; padding-left: 32px; padding-right: 32px; }
+  .pc-home > .discovery-form { max-width: none; padding: 0; margin: 0; }
+  .pc-preview { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 20px 24px; }
+  .pc-preview .rank-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+}
