@@ -82,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
       {saveFailed && (
         <div className="save-warning" role="alert">
-          <p><b>이 브라우저에 저장하지 못했어요.</b> 지금 입력한 내용은 이 창에서 그대로 쓰지만, 새로고침하거나 창을 닫으면 사라져요. 예약 단계의 ‘계획 파일 내려받기’로 보관해 주세요.</p>
+          <p><b>이 브라우저에 저장하지 못했어요.</b> 지금 입력한 내용은 이 창에서 그대로 쓰지만, 새로고침하거나 창을 닫으면 사라져요. 로그인하면 저장할 때 계정에 보관돼요.</p>
           <button type="button" className="icon-btn" aria-label="안내 닫기" onClick={() => setSaveFailed(false)}>×</button>
         </div>
       )}
