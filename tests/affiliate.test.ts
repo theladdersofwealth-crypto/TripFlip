@@ -63,6 +63,14 @@ test("클룩 호텔: 도시 번호 아는 권역은 날짜·인원·객실 채�
   assert.equal(u.searchParams.get("child_num"), "2");
   assert.equal(u.searchParams.get("room_num"), "1");
   assert.equal(new URL(klookHotelUrl("vie-nhatrang", stay)).searchParams.get("p"), "4110");
-  assert.equal(new URL(klookHotelUrl("jap-osaka", stay)).searchParams.get("u"), "https://www.klook.com/ko/hotels/");
+  assert.equal(new URL(klookHotelUrl("zzz-none", stay)).searchParams.get("u"), "https://www.klook.com/ko/hotels/");
   assert.equal(new URL(klookHotelUrl("vie-nhatrang", { ...stay, endDate: "" })).searchParams.get("u"), "https://www.klook.com/ko/hotels/");
+});
+
+test("클룩 도시 번호 목록: 시범·세계 권역 둘 다", () => {
+  const stay = { startDate: "2027-01-13", endDate: "2027-01-20", adults: 2, children: 0, rooms: 1 };
+  for (const [id, n] of [["jap-osaka", "29"], ["OS", "29"], ["tha-bangkok", "4"], ["uni-dubai", "78"]] as const) {
+    const u = new URL(new URL(klookHotelUrl(id, stay)).searchParams.get("u")!);
+    assert.equal(u.searchParams.get("city_id"), n);
+  }
 });

@@ -4,6 +4,8 @@
  * 링크 안의 marker(파트너 번호)·trs(프로젝트 번호)·p(프로그램 번호)·campaign_id 를 넣는다.
  * 값이 비어 있으면 제휴 없이 원래 주소로 보낸다(링크가 깨지지 않게).
  */
+import { KLOOK_CITY } from "@/data/klookCities";
+
 export type TpProgram = { p: string; campaignId: string };
 
 export const TP = {
@@ -33,12 +35,7 @@ export function kkdaySearchUrl(searchName: string, tp?: { marker: string; trs: s
   return tpLink(`https://www.kkday.com/ko/product/productlist?keyword=${encodeURIComponent(searchName)}`, prog, tp);
 }
 
-/**
- * 클룩 도시 번호(클룩 주소 /city/{번호}-… 와 호텔 검색 city_id 가 같은 번호).
- * 검색으로 확인한 곳만 넣는다. 없는 권역은 호텔 첫 화면으로 보내고 도시·날짜는 클룩에서 고른다.
- * 확인: 나트랑 klook.com/city/208-nha-trang, 두바이 klook.com/city/78-dubai (2026-11-24)
- */
-export const KLOOK_CITY: Record<string, number> = { "vie-nhatrang": 208, NT: 208, "uni-dubai": 78 };
+export { KLOOK_CITY };
 
 export type KlookStay = { startDate: string; endDate: string; adults: number; children: number; rooms: number };
 
