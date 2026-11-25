@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { CompanionChooser } from "@/components/CompanionChooser";
 import { DateEditor } from "@/components/DateEditor";
@@ -12,7 +13,6 @@ import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
 import { HomePreview } from "@/components/HomePreview";
-import { HomeFaq } from "@/components/HomeFaq";
 import { useWide } from "@/lib/useWide";
 import type { IntensityV1, PriceLevel, RegionQuery, StayTier } from "@/services/regionScore";
 
@@ -197,7 +197,7 @@ export default function Home() {
         <div className="accuracy-head"><b>{reflect}</b><span className="xs muted">{!done[0] ? "1단계를 마치면 추천받을 수 있어요" : doneCount < STEPS.length ? "조건을 더 넣으면 순위에 더 반영돼요" : "모든 조건 반영 완료"}</span></div>
         <div className="accuracy-bar"><span style={{ width: `${Math.round((doneCount / STEPS.length) * 100)}%` }} /></div>
       </div>
-      <HomeFaq />
+      <Link href="/guide" className="home-faq-link small">자주 묻는 질문 ›</Link>
       {done[0] && choice == null && open == null && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 조건 ${doneCount}/${STEPS.length}`}</button>
       </div>}

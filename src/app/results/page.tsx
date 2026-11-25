@@ -2,14 +2,16 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BackButton } from "@/components/AppShell";
-import { GUEST_OPEN, GuestPreview, RankCards, priceNote } from "@/components/RankList";
+import { GUEST_OPEN, GuestPreview, RankCards } from "@/components/RankList";
 import { RegionBoard } from "@/app/r/[id]/client";
 import { useWide } from "@/lib/useWide";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
-import { TEMP_GRADE } from "@/data/regionsV1";
-import { useFlowQuery } from "@/lib/flow";
+import { saveQuery, useFlowQuery } from "@/lib/flow";
+import { decodeShare } from "@/lib/shareLink";
+import { ShareButton } from "@/components/ShareButton";
+import type { RegionQuery } from "@/services/regionScore";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
 import { useLivePrices } from "@/lib/livePrices";
@@ -24,7 +26,17 @@ export default function ResultsPage() {
     window.addEventListener(AUTH_EVENT, on);
     return () => window.removeEventListener(AUTH_EVENT, on);
   }, []);
-  const q = useFlowQuery();
+  const own = useFlowQuery();
+  // 공유받은 링크(?s=): 링크에 담긴 조건으로 계산하고, 이후 일정·상세도 같은 조건으로 보이게 마지막 조건으로 저장한다
+  const [shared, setShared] = useState<{ q: RegionQuery | null; bad: boolean } | null>(null);
+  useEffect(() => {
+    const s = new URLSearchParams(location.search).get("s");
+    if (!s) { setShared({ q: null, bad: false }); return; }
+    const sq = decodeShare(s);
+    if (sq) saveQuery(sq);
+    setShared({ q: sq, bad: !sq });
+  }, []);
+  const q = shared === null ? null : shared.q ?? own;
   const priceVersion = useLivePrices();
   const results = useMemo(() => (q ? scoreRegions(q) : []), [q, priceVersion]);
   // PC(넓은 화면): 왼쪽 추천 순위 + 오른쪽 권역 상세(예약·일정·관광지·음식점). 첫 화면 미리보기에서 고른 권역(?r=)부터 연다
@@ -45,7 +57,6 @@ export default function ResultsPage() {
   const others = results.filter((r) => (r.status === "데이터 부족" || r.status === "조건 충족 장소 없음") && !r.region.tier);
   const days = tripDays(q.startDate, q.endDate);
   const members = membersOf(q);
-  const excludedBudget = results.filter((r) => r.status === "예산 밖").length;
   const who = [`성인 ${q.adults}명`, q.children.length ? `자녀 ${q.children.length}명` : "", q.pet ? "반려동물" : ""].filter(Boolean).join(" · ");
   return (
     <main className={split ? "container page pc-split" : "container page"} style={split ? undefined : { maxWidth: 560 }}>
@@ -53,8 +64,13 @@ export default function ResultsPage() {
       <BackButton href="/" label="조건 선택" />
       <div className="between">
         <h1 style={{ fontSize: 24, fontWeight: 900 }}>추천 여행지</h1>
-        <Link href="/" className="btn btn-sm">조건 수정</Link>
+        <div className="row-wrap" style={{ gap: 6 }}>
+          {ranked.length > 0 && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
+          <Link href="/" className="btn btn-sm">조건 수정</Link>
+        </div>
       </div>
+      {shared?.q && <div className="card-soft small" role="status" style={{ marginTop: 10 }}>공유받은 추천이에요. <Link href="/" style={{ color: "var(--teal-dark)", fontWeight: 600 }}>내 조건으로 다시 추천받기 ›</Link></div>}
+      {shared?.bad && <div className="card-soft small muted" role="status" style={{ marginTop: 10 }}>공유 링크를 열 수 없어서(날짜가 지났거나 주소가 잘림) 내 조건으로 보여 드려요.</div>}
       <p className="small muted" style={{ marginTop: 8 }}>이번 일행과 여행 조건에 대한 적합도예요. 조건을 바꾸면 순위도 달라져요.</p>
       <div className="row-wrap" style={{ margin: "10px 0 14px" }}>
         <span className="chip"><Icon name="calendar" />{days - 1}박 {days}일</span>
@@ -72,14 +88,6 @@ export default function ResultsPage() {
         <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={(id) => router.push(`/r/${id}`)} />
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>}
-      <div className="stack" style={{ marginTop: 18, gap: 6 }}>
-        <Link href="/data-status" className="xs" style={{ color: "var(--teal-dark)" }}>데이터 출처와 확인 상태 보기</Link>
-        <p className="xs faint">{priceNote(ranked[0]?.stay.priceSource)}</p>
-        {TEMP_GRADE && <p className="xs faint">장소 등급과 적합도는 추정값이에요. 자료의 양과 확인 수준은 지역마다 달라요.</p>}
-        <p className="xs faint">날씨 표시는 월별 기후 경향이며 여행일의 실제 예보가 아니에요. 경비에는 현지 교통비·입장료 등이 포함되지 않아요.</p>
-        {excludedBudget > 0 && <p className="xs faint">선택한 지역 물가 또는 예산 상한을 벗어난 {excludedBudget}개 권역은 결과에서 제외했어요. 실제 예약 가격은 달라질 수 있어요.</p>}
-        {q.price !== "상관없음" && <p className="xs faint">지역 물가 &lsquo;{q.price}&rsquo;만 표시해요. 물가를 확인할 수 없는 {results.filter((r) => r.status === "물가 미확인").length}개 권역은 별도 확인이 필요해요.</p>}
-      </div>
       </div>
       {split && picked && <aside className="pc-detail" aria-label="선택한 권역 상세"><RegionBoard id={picked} /></aside>}
     </main>
