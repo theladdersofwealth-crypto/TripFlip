@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BackButton } from "@/components/AppShell";
-import { GuestPreview, RankCards, priceNote } from "@/components/RankList";
+import { GUEST_OPEN, GuestPreview, RankCards, priceNote } from "@/components/RankList";
 import { RegionBoard } from "@/app/r/[id]/client";
 import { useWide } from "@/lib/useWide";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
@@ -16,7 +16,7 @@ import { useLivePrices } from "@/lib/livePrices";
 
 export default function ResultsPage() {
   const router = useRouter();
-  // 비회원이면 결과를 흐리게(형님 11/24: 아예 안 보이면 의미 없음). 로그인하면 같은 결과 그대로 선명하게
+  // 비회원: 1~3위는 실제로 보여 주고 4위부터 흐린 가짜 카드+가입 안내(형님 11/25). 로그인하면 전체 그대로
   const [member, setMember] = useState<boolean | null>(null);
   useEffect(() => {
     const on = () => setMember(!!loadAuth());
@@ -65,7 +65,10 @@ export default function ResultsPage() {
       </div>
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}
       {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href="/" className="btn btn-sm">조건 다시 선택하기</Link></div>}
-      {!member && ranked.length > 0 ? <GuestPreview count={ranked.length} /> : <div className="stack">
+      {!member && ranked.length > 0 ? <div className="stack">
+        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={(id) => router.push(`/r/${id}`)} />
+        {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} />}
+      </div> : <div className="stack">
         <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={(id) => router.push(`/r/${id}`)} />
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>}
