@@ -90,6 +90,8 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewO
               <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, budget)}</span>
             </div>
             {(r.flags.some((f) => f.includes("적합도를")) || r.overFlight || r.weather.judge === "스콜성 우기") && <span className="xs warn">⚠ {[r.flags.some((f) => f.includes("적합도를")) ? "일부 추정값" : "", r.overFlight ? "희망 비행시간 초과" : "", r.weather.judge === "스콜성 우기" ? "스콜성 우기" : ""].filter(Boolean).join(" · ")}</span>}
+            {r.admissionNeedsCheck && <span className="xs muted">일부 장소 입장 조건 확인 필요</span>}
+            {r.sightseeing.relaxed && <span className="xs muted">여유로운 일정 중심</span>}
             {previewOnly ? (
               <button type="button" className="row small" style={{ ...detailStyle, background: "none", border: 0, padding: 0, alignSelf: "flex-start", textAlign: "left" }} onClick={(e) => { e.stopPropagation(); go(r.region.id); }}>{detailLabel}</button>
             ) : (
