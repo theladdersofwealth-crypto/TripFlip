@@ -48,7 +48,7 @@ export const DEFAULT_QUERY: RegionQuery = {
   maxFlightHours: 8,
 };
 
-const K = { query: "tripflip.flow.query", prefs: "tripflip.flow.prefs", plans: "tripflip.flow.plans", boards: "tripflip.flow.boards" };
+const K = { query: "tripflip.flow.query", homeDraft: "tripflip.flow.home-draft", prefs: "tripflip.flow.prefs", plans: "tripflip.flow.plans", boards: "tripflip.flow.boards" };
 
 // 브라우저 저장이 실패한 값은 이 탭 메모리에 들고 있다가 읽을 때 우선 사용한다.
 // (저장 실패 후 예전 저장값·기본값으로 조용히 되돌아가는 문제 방지. 새로고침하면 사라진다.)
@@ -79,12 +79,32 @@ function write(key: string, v: unknown): boolean {
   }
 }
 
-export function loadQuery(): RegionQuery {
+const queryShape = (q: RegionQuery | null | undefined): q is RegionQuery =>
+  !!q && typeof q.startDate === "string" && typeof q.endDate === "string" && Array.isArray(q.children) && Array.isArray(q.subs);
+
+function committedQuery(): RegionQuery | null {
   const raw = read<RegionQuery | null>(K.query, null);
-  if (!raw || typeof raw !== "object" || !Array.isArray(raw.children) || !Array.isArray(raw.subs) || travelDateError(raw)) return normalizeParty(DEFAULT_QUERY);
-  return normalizeParty({ ...DEFAULT_QUERY, ...raw });
+  return queryShape(raw) && !travelDateError(raw) ? normalizeParty({ ...DEFAULT_QUERY, ...raw }) : null;
 }
+export const loadQuery = (): RegionQuery => committedQuery() ?? normalizeParty(DEFAULT_QUERY);
 export const saveQuery = (q: RegionQuery) => write(K.query, q);
+
+export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null };
+type HomeDraft = { q: RegionQuery; progress: HomeProgress; base: string };
+
+// 홈에서 아직 추천에 적용하지 않은 편집은 기존 결과·일정과 별도. 다른 화면에서 조건을
+// 바꿨으면(공유 조건 적용, 예약 저장 등) 예전 홈 초안으로 새 조건을 덮지 않는다.
+export function loadHomeDraft(): { q: RegionQuery; progress: HomeProgress | null; hasSearch: boolean } {
+  const committed = committedQuery();
+  const draft = read<HomeDraft | null>(K.homeDraft, null);
+  if (draft?.base === JSON.stringify(committed) && queryShape(draft.q)) {
+    return { q: draft.q, progress: draft.progress, hasSearch: !!committed };
+  }
+  return { q: committed ?? normalizeParty(DEFAULT_QUERY), progress: null, hasSearch: !!committed };
+}
+export function saveHomeDraft(q: RegionQuery, progress: HomeProgress) {
+  write(K.homeDraft, { q, progress, base: JSON.stringify(committedQuery()) });
+}
 export const loadPrefs = (regionId: string, planId?: string | null) => ({ ...DEFAULT_PREFS, ...((planId ? loadPlans().find((p) => p.id === planId)?.prefs : undefined) ?? read<Record<string, DayPrefs>>(K.prefs, {})[regionId]) });
 export function savePrefs(regionId: string, p: DayPrefs, planId?: string | null) {
   if (planId) {

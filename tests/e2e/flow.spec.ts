@@ -245,6 +245,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
+  await page.getByRole("button", { name: /^1단계 · 기본/ }).click();
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
   await pickRange(page, "2027-06-01", "2027-06-04");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
