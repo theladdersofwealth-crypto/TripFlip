@@ -8,7 +8,7 @@ import { Icon } from "@/components/Icon";
 import { PlaceCard, PlaceDetail } from "@/components/PlaceCard";
 import { RestaurantCard, RestaurantDetail } from "@/components/RestaurantCard";
 import { WeatherBadge } from "@/components/WeatherBadge";
-import { DemoBadge, Empty, PremiumBadge, Sheet } from "@/components/ui";
+import { DemoBadge, Empty, Sheet } from "@/components/ui";
 import { getDestination, getPlaces, getRestaurants, getZones } from "@/data/repository";
 import { estimateTravel } from "@/services/routing";
 import { DEMO_RAIN_SIMULATION, EMPTY_WEATHER, isRainy } from "@/services/weather";
@@ -49,7 +49,7 @@ export default function TripPage() {
   if (!trip) {
     return (
       <main className="container page">
-        <Empty icon="suitcase" title="여행을 찾을 수 없어요" desc="삭제되었거나 다른 기기에서 만든 여행이에요. (저장은 이 기기에만 돼요)" action={<Link href="/trips" className="btn btn-primary">내 여행 보기</Link>} />
+        <Empty icon="suitcase" title="여행을 찾을 수 없어요" desc="삭제되었거나 다른 기기에서 만든 여행이에요. (저장은 이 기기에만 돼요)" action={<Link href="/my-trips" className="btn btn-primary">내 여행 보기</Link>} />
       </main>
     );
   }
@@ -97,7 +97,7 @@ export default function TripPage() {
 
   return (
     <main className="container page">
-      <BackButton href="/trips" label="내 여행" />
+      <BackButton href="/my-trips" label="내 여행" />
       <div className="trip-head stack" style={{ gap: 6 }}>
         <div className="between">
           <h1>{trip.title}</h1>
@@ -239,15 +239,6 @@ export default function TripPage() {
             <button className="btn btn-primary" onClick={() => save({ ...trip, updatedAt: new Date().toISOString() }, "내 여행에 저장했어요 (이 기기에 보관)")}><Icon name="check" />여행 저장</button>
             <span className="xs faint">수정할 때마다 자동 저장돼요 · 마지막 저장 {new Date(trip.updatedAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
           </div>
-          <Link href="/premium" className="card stack" style={{ gap: 8 }}>
-            <div className="between"><b>Premium으로 더 똑똑하게</b><PremiumBadge /></div>
-            <ul className="small muted" style={{ margin: 0, paddingLeft: 18 }}>
-              <li>날씨 대응 자동 재최적화</li>
-              <li>숙소별 일정 비교</li>
-              <li>PDF·공유 여행계획서</li>
-            </ul>
-            <span className="small bold" style={{ color: "var(--teal-dark)" }}>출시 기념 90일 무료 →</span>
-          </Link>
         </aside>
       </div>
 

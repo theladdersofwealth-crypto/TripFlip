@@ -1,2 +1,14 @@
 # Cloudflare Pages: 저장된 여행 상세는 껍데기 페이지 하나로 처리
 /trip/* /trip/_ 200
+# 11/25 정리한 옛 시제품 화면 → 지금 화면으로
+/premium / 301
+/premium/ / 301
+/trips /my-trips 301
+/trips/ /my-trips 301
+/plan / 301
+/plan/ / 301
+/discover / 301
+/discover/ / 301
+/search / 301
+/search/ / 301
+/create/* / 301
