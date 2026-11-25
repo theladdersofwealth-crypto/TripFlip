@@ -59,7 +59,7 @@ test("6일·후보 3곳에서 확인된 입장 제한만 볼거리 집계를 바
   const places = ALL_PLACES.filter((p) => p.region === regionId);
   const fixture = (i: number): PlaceV1 => ({
     id: `gate-fixture-${i}`, region: regionId, name: `테스트 명소 ${i}`, en: `Fixture ${i}`,
-    concepts: [i < 3 ? "관광" : "쇼핑"], tags: [], travel: "미확인", penalty: 0, grade: "A",
+    concepts: [i < 3 ? "관광" : "쇼핑"], tags: i < 3 ? [] : ["로컬푸드"], travel: "미확인", penalty: 0, grade: "A",
   });
   const indices = places.map((p) => ALL_PLACES.indexOf(p));
   indices.forEach((index, i) => { ALL_PLACES[index] = fixture(i); });
@@ -120,4 +120,19 @@ test("6일·후보 3곳에서 확인된 입장 제한만 볼거리 집계를 바
   assert.equal(estimated.status, "ranked");
   assert.equal(estimated.admissionNeedsCheck, true);
   assert.ok(estimated.score < original.score);
+
+  const ungraded = ALL_PLACES[indices[3]];
+  ungraded.tags = [];
+  ungraded.grade = null;
+  ALL_PLACES[indices[4]].tags = [];
+  const withMoreSightseeing = result();
+  assert.equal(withMoreSightseeing.sightseeing.eligible, 5);
+  assert.deepEqual(withMoreSightseeing.top.map(({ place }) => place.id), estimated.top.map(({ place }) => place.id));
+  assert.equal(withMoreSightseeing.score, estimated.score);
+  assert.equal(withMoreSightseeing.readiness.ready, estimated.readiness.ready);
+
+  // 볼거리가 충분해도 기존 추천 주제의 점수 후보가 없으면 기존대로 순위에 넣지 않는다.
+  const noTheme = result({ ...q, main: "휴양" });
+  assert.equal(noTheme.sightseeing.eligible, 5);
+  assert.equal(noTheme.status, "조건 충족 장소 없음");
 });

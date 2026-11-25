@@ -316,16 +316,16 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     let admissionNeedsCheck = false;
 
     for (const p of places) {
-      if (p.grade == null) continue;
-      if (!openDuring(p, q.startDate, q.endDate)) continue; // 기간 한정 행사·시즌이 여행 날짜와 안 맞음
-      // 미식은 선택했을 때만 후보 (§1-3)
-      const weight = conceptWeight(p.concepts, q);
-      if (!weight) continue;
+      if (!openDuring(p, q.startDate, q.endDate)) continue;
+      // 방문 가능한 볼거리는 추천 취향·등급과 별개로 센다.
       const admission = admissionFor(p, members);
       if (admission !== "blocked") {
         eligible++;
         if (admission === "check" || (minors && (p.adultOnly || p.note?.includes("키 제한")))) admissionNeedsCheck = true;
       }
+      if (p.grade == null) continue;
+      const weight = conceptWeight(p.concepts, q);
+      if (!weight) continue;
       const fit = personalFit(p, q);
       fit.flags.forEach((f) => flags.add(f));
       if (minors && p.adultOnly) flags.add(`${p.name}: 미성년 동반 가능 여부 확인 필요`);
