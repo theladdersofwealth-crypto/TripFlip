@@ -68,7 +68,7 @@ p { margin: 0; }
 .header-nav a.active { color: var(--navy); background: var(--teal-50); }
 .back-btn { min-height: var(--tap); padding: 0 8px 0 0; border: 0; background: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--navy); }
 
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; background: #fff; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(2, 1fr); padding-bottom: env(safe-area-inset-bottom); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; background: #fff; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr); padding-bottom: env(safe-area-inset-bottom); }
 .bottom-nav a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 58px; font-size: 12px; font-weight: 600; color: var(--faint); }
 .bottom-nav a.active { color: var(--navy); }
 .bottom-nav svg { width: 22px; height: 22px; }
@@ -750,3 +750,23 @@ article.rank-card { cursor: pointer; }
 .home-faq details { border-bottom: 1px solid var(--line, #e5e7eb); }
 .home-faq summary { cursor: pointer; padding: 12px 0; font-size: 14px; font-weight: 700; min-height: 44px; }
 .home-faq details p { padding: 0 0 12px; line-height: 1.6; }
+
+/* 안내 탭(/guide, 11/25): 위쪽 탭 + 자주 묻는 질문·데이터 출처·약관·문의 */
+.seg-tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 4px; margin: 12px 0 16px; padding: 4px; border-radius: 12px; background: #ebe8e1; }
+.seg-tabs button { flex: 1; min-height: 40px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-size: 14px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.seg-tabs button[aria-selected="true"] { background: #fff; color: var(--navy); box-shadow: 0 1px 3px rgba(16, 47, 84, .15); }
+.seg-tabs button:focus-visible { outline: 2px solid var(--teal); outline-offset: 1px; }
+.guide-faq { margin-top: 0; }
+.guide-dl { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.guide-dl div { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.guide-dl div:last-child { border-bottom: 0; }
+.guide-dl dt { font-weight: 700; color: var(--navy); }
+.guide-dl dd { margin: 0; min-width: 0; color: var(--muted); }
+.guide-list { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.guide-list a { display: flex; justify-content: space-between; gap: 10px; align-items: center; min-height: var(--tap); padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 15px; font-weight: 600; }
+.guide-list a:last-child { border-bottom: 0; }
+.guide-list span { color: var(--faint); font-size: 13px; font-weight: 400; min-width: 0; overflow-wrap: anywhere; text-align: right; }
+.home-faq-link { display: inline-block; margin-top: 18px; color: var(--teal-dark); font-weight: 600; }
+.share-btn { border-color: var(--teal); color: var(--teal-dark); gap: 4px; }
+.share-manual { margin-top: 10px; }
+.share-manual input { width: 100%; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px; }

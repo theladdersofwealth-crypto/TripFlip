@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { STORAGE_FAIL_EVENT } from "@/lib/flow";
 import { trackPage } from "@/lib/analytics";
 import { AUTH_EVENT, loadAuth, refreshAuth } from "@/lib/account";
-import { AFFILIATE_SHORT, CONTACT_EMAIL } from "@/lib/legal";
+import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PLANS_CHANGED_EVENT } from "@/lib/flow";
 import { syncPlans } from "@/lib/planSync";
 import { Icon } from "./Icon";
@@ -14,6 +14,7 @@ import { useTripStore } from "@/store/TripStore";
 const NAV = [
   { href: "/", label: "여행지 추천", icon: "plane" },
   { href: "/my-trips", label: "내 여행", icon: "suitcase" },
+  { href: "/guide", label: "안내", icon: "info" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -51,7 +52,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("online", onPlans);
     return () => { window.removeEventListener(AUTH_EVENT, on); window.removeEventListener(PLANS_CHANGED_EVENT, onPlans); window.removeEventListener("online", onPlans); };
   }, []);
-  const isActive = (href: string) => (href === "/" ? !path.startsWith("/my-trips") : path.startsWith(href));
+  const isActive = (href: string) => (href === "/" ? !/^\/(my-trips|guide|legal|data-status)/.test(path) : href === "/guide" ? /^\/(guide|legal|data-status)/.test(path) : path.startsWith(href));
   return (
     <>
       <header className="header">
@@ -79,9 +80,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {hide ? <main className="container page"><p className="muted small">{ready ? "회원만 볼 수 있어요. 로그인 화면으로 이동해요…" : "불러오는 중…"}</p></main> : children}
       {!path.startsWith("/admin") && (
         <footer className="site-footer">
-          <div><Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link>·<a href={`mailto:${CONTACT_EMAIL}`}>문의하기</a></div>
-          <p>트립플립(TripFlip) · 문의 {CONTACT_EMAIL}</p>
-          <p>{AFFILIATE_SHORT}</p>
+          <div><Link href="/guide">안내</Link>·<Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link>·<Link href="/guide#legal">문의</Link></div>
+          <p>트립플립은 예약을 직접 판매하지 않아요. {AFFILIATE_NOTE}</p>
         </footer>
       )}
       <nav className="bottom-nav" aria-label="주요 메뉴">
