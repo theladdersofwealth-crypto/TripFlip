@@ -4,6 +4,7 @@ import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
+import { AGODA_CITY } from "@/data/agodaCities";
 import { agodaFlightsPrefilled, agodaFlightsUrl, aviasalesSearchUrl, CJ, cjLink, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
 import { liveHotelEntries } from "@/lib/livePrices";
 import { HOTEL_NAMES } from "@/data/hotelNames";
@@ -96,15 +97,31 @@ export function bookingComUrl(region: RegionV1, q: RegionQuery, name?: string) {
   return `https://www.booking.com/searchresults.ko.html?${params}`;
 }
 
+/**
+ * 아고다 숙소 검색(CJ 딥링크). 아고다는 도시 번호(city)가 있어야 목적지·날짜·인원이 채워진 결과를 연다.
+ * 주소 형식은 형님이 11/25 준 다카마쓰 검색 결과 주소에서 확인한 파라미터만 쓴다:
+ *   /ko-kr/search?city=88749&checkIn=2027-01-13&checkOut=2027-01-19&los=6&rooms=1&adults=2&children=1&childages=4&textToSearch=…
+ * 도시 번호를 모르는 권역은 textToSearch 만 보내는데, 이 경우 아고다가 홈으로 보낸다(번호 확보 전까지).
+ * 숙소 이름(name)은 도시 번호가 있으면 쓰지 않는다: 그 도시 검색 결과(날짜·인원 입력됨)로 연다.
+ */
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {
-  // 아고다 검색 페이지는 체크인(checkIn)과 숙박일수(los)로 날짜를 받는다. checkOut 만으로는 날짜가 빠지는 경우가 있어 둘 다 넣는다.
   const los = Math.max(1, Math.round((Date.parse(q.endDate) - Date.parse(q.startDate)) / 864e5) || 1);
-  const params = new URLSearchParams({ textToSearch: name ?? region.searchName, checkIn: q.startDate, checkOut: q.endDate, los: String(los), rooms: String(roomEstimate(q).rooms), adults: String(q.adults), children: String(q.children.length) });
+  const city = agodaCityId(region.id);
+  const params = new URLSearchParams();
+  if (city) params.set("city", String(city));
+  params.set("checkIn", q.startDate);
+  params.set("checkOut", q.endDate);
+  params.set("los", String(los));
+  params.set("rooms", String(roomEstimate(q).rooms));
+  params.set("adults", String(q.adults));
+  params.set("children", String(q.children.length));
   const ages = childAgesForBooking(q);
   if (ages?.length) params.set("childages", ages.join(","));
-  // CJ 아고다 설정이 채워지면 CJ 딥링크로 감싼다(비어 있으면 원래 주소).
+  params.set("textToSearch", city ? region.name : (name ?? region.searchName));
   return cjLink(`https://www.agoda.com/ko-kr/search?${params}`, CJ.agoda);
 }
+/** 아고다 도시 번호를 아는 권역인지(목적지·날짜·인원이 채워져 열리는지) */
+export const agodaCityId = (regionId: string): number | undefined => AGODA_CITY[regionId] ?? AGODA_CITY[PILOT_TWIN_OF[regionId] ?? ""];
 
 /** 클룩 호텔(제휴). 도시 번호를 아는 권역은 날짜·인원·객실이 채워져 열린다. */
 export function klookStayUrl(region: RegionV1, q: RegionQuery) {
