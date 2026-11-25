@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import type { PlaceV1 } from "@/data/regionsV1";
 import { PLACE_IMAGES } from "@/data/placeImages";
 import { REGIONS_V1 } from "@/data/regionsV1";
-import { cachedCommons, commonsPhoto } from "@/lib/commonsPhoto";
+import { cachedCommons, commonsPhoto, type CommonsPhoto } from "@/lib/commonsPhoto";
 
-export interface ThumbInfo { src: string; credit: string; link?: string }
+export interface ThumbInfo { src: string; credit: string; link?: string; licenseUrl?: string }
 
 const FALLBACK: Record<string, [string, string]> = {
   cafe: ["☕", "#f6ecdf"], food: ["🍽", "#fdeee6"], 휴양: ["🏖", "#e3f4f6"], 액티비티: ["🧗", "#e8f3ff"],
@@ -17,11 +17,15 @@ const fallbackOf = (p: PlaceV1): [string, string] => p.dining ? FALLBACK[p.dinin
 const autoTarget = (p: PlaceV1) => !p.dining && (p.grade === "S" || p.grade === "A") && !!p.en && /[a-z]/i.test(p.en);
 const areaOf = (p: PlaceV1) => REGIONS_V1.find((r) => r.id === p.region)?.searchName ?? "";
 
+const fromCommons = (c: CommonsPhoto): ThumbInfo => ({ src: c.src, credit: `사진: ${c.artist} · ${c.license} · 위키미디어 공용`, link: c.page, licenseUrl: c.licenseUrl });
+// 사진이 실제로 안 뜬(로드 실패) 경우 출처 줄도 숨기려고 기억해 둔다
+const brokenSrc = new Set<string>();
+
 function fixed(p: PlaceV1): ThumbInfo | null {
   const f = PLACE_IMAGES[p.id];
   if (f) return { src: f.src, credit: f.credit ?? "", link: f.link };
   const c = autoTarget(p) ? cachedCommons(p.id) : null;
-  return c ? { src: c.src, credit: `사진: ${c.artist} · ${c.license} · 위키미디어 공용`, link: c.page } : null;
+  return c ? fromCommons(c) : null;
 }
 
 export function usePlaceImage(p: PlaceV1, el: React.RefObject<HTMLElement | null>): ThumbInfo | null {
@@ -31,7 +35,7 @@ export function usePlaceImage(p: PlaceV1, el: React.RefObject<HTMLElement | null
     setImg(now);
     if (now || !autoTarget(p) || cachedCommons(p.id) === null) return;
     let alive = true;
-    const go = () => commonsPhoto(p.id, p.en, areaOf(p)).then((c) => { if (alive && c) setImg({ src: c.src, credit: `사진: ${c.artist} · ${c.license} · 위키미디어 공용`, link: c.page }); });
+    const go = () => commonsPhoto(p.id, p.en, areaOf(p)).then((c) => { if (alive && c) setImg(fromCommons(c)); });
     const node = el.current;
     if (!node || typeof IntersectionObserver === "undefined") { go(); return () => { alive = false; }; }
     const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: "200px" });
@@ -48,14 +52,15 @@ export function PlaceThumb({ p, img, size = 64 }: { p: PlaceV1; img: ThumbInfo |
   useEffect(() => setBroken(false), [img?.src]);
   const box = size === "wide" ? { background: bg } : { width: size, height: size, background: bg };
   return <span className={`place-thumb${size === "wide" ? " wide" : ""}`} style={box} aria-hidden>
-    {img && !broken ? <img src={img.src} alt="" loading="lazy" decoding="async" onError={() => setBroken(true)} /> : <span className="place-thumb-ico">{ico}</span>}
+    {img && !broken ? <img src={img.src} alt="" loading="lazy" decoding="async" onError={() => { brokenSrc.add(img.src); setBroken(true); }} /> : <span className="place-thumb-ico">{ico}</span>}
   </span>;
 }
 
 /** 사진 출처 한 줄(작가·라이선스). 사진 없으면 아무것도 안 그림. */
 export function ThumbCredit({ img }: { img: ThumbInfo | null }) {
-  if (!img?.credit) return null;
-  return <div className="faint">{img.link ? <a href={img.link} target="_blank" rel="noopener noreferrer">{img.credit}</a> : img.credit}</div>;
+  if (!img?.credit || brokenSrc.has(img.src)) return null;
+  const ext = { target: "_blank", rel: "noopener noreferrer" } as const;
+  return <div className="faint">{img.link ? <a href={img.link} {...ext}>{img.credit}</a> : img.credit}{img.licenseUrl && <> · <a href={img.licenseUrl} {...ext}>라이선스</a></>}</div>;
 }
 
 export function useThumbRef() { return useRef<HTMLDivElement>(null); }
