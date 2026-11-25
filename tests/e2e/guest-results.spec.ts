@@ -13,7 +13,7 @@ test("비회원은 1~3위만 보이고 4위부터 흐리며, 로그인하면 전
   }
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await page.getByRole("button", { name: /추천받기 · 정확도/ }).click();
+  await page.getByRole("button", { name: /추천받기 · 조건/ }).click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByRole("dialog", { name: "가입 안내" })).toBeVisible();
   await expect(page.getByText(/가입하면 4위부터 나머지 추천/)).toBeVisible();

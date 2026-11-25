@@ -12,6 +12,7 @@ import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
 import { HomePreview } from "@/components/HomePreview";
+import { HomeFaq } from "@/components/HomeFaq";
 import { useWide } from "@/lib/useWide";
 import type { IntensityV1, PriceLevel, RegionQuery, StayTier } from "@/services/regionScore";
 
@@ -25,10 +26,11 @@ const FLIGHTS: { v: number | null; label: string }[] = [{ v: 5, label: "5시간"
 
 type Q = "who" | "when" | "vibe" | "flight" | "intensity" | "budget" | "stay";
 // 형님 흐름(11/23): 1단계 → 2단계 → 3단계를 세로로 보여주고, 단계 안 질문은 하나씩 차례로
-const STEPS: { title: string; sub: string; pct: number; qs: Q[] }[] = [
-  { title: "기본", sub: "누구와 · 언제 · 여행 취향", pct: 60, qs: ["who", "when", "vibe"] },
-  { title: "일정 스타일", sub: "비행시간 · 하루 강도", pct: 20, qs: ["flight", "intensity"] },
-  { title: "예산·숙소", sub: "예산 · 숙소 · 물가 · 객실", pct: 20, qs: ["budget", "stay"] },
+// 11/25: "정확도 %"는 실제 정확도가 아니라 반영한 조건 단계 수라서 "여행 조건 반영 n/3"으로 표시
+const STEPS: { title: string; sub: string; qs: Q[] }[] = [
+  { title: "기본", sub: "누구와 · 언제 · 여행 취향", qs: ["who", "when", "vibe"] },
+  { title: "일정 스타일", sub: "비행시간 · 하루 강도", qs: ["flight", "intensity"] },
+  { title: "예산·숙소", sub: "예산 · 숙소 · 물가 · 객실", qs: ["budget", "stay"] },
 ];
 const Q_TITLE: Record<Q, string> = { who: "누구랑 가나요?", when: "언제 떠나요?", vibe: "어떤 여행인가요?", flight: "비행은 몇 시간까지 괜찮아요?", intensity: "하루에 몇 곳 둘러볼까요?", budget: "일행 전체 예산은요?", stay: "숙소·물가는요?" };
 const Q_SHORT: Record<Q, string> = { who: "누구와", when: "언제", vibe: "취향", flight: "비행시간", intensity: "하루 강도", budget: "예산", stay: "숙소" };
@@ -64,7 +66,8 @@ export default function Home() {
   const partyError = !hasAdult ? "성인 구성원을 한 명 이상 입력해 주세요." : members.some((m) => m.relationship === "child" && m.age === null) ? "자녀의 만 나이를 입력해 주세요." : null;
   const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "전체 예산은 0보다 큰 금액으로 입력해 주세요." : null;
   const error = dateError || partyError || budgetError;
-  const accuracy = STEPS.reduce((n, s, i) => n + (done[i] ? s.pct : 0), 0);
+  const doneCount = done.filter(Boolean).length;
+  const reflect = `여행 조건 반영 ${doneCount}/${STEPS.length}`;
   const patch = (next: Partial<RegionQuery>) => setQ({ ...q, ...next });
   const qError = (k: Q) => k === "who" ? partyError : k === "when" ? dateError : k === "budget" ? budgetError : null;
   const kids = members.filter((m) => m.relationship === "child").length;
@@ -102,9 +105,8 @@ export default function Home() {
     if (error || pending || flying || !done[0]) return;
     saveQuery(normalizeParty(q));
     track("search");
-    setFlying(true); // 비행기 회전 로딩(형님 흐름 ②)을 보여준 뒤 결과로 이동
-    router.prefetch("/results");
-    setTimeout(() => startTransition(() => router.push("/results")), 1800);
+    setFlying(true); // 비행기 로딩은 결과 화면으로 넘어갈 때까지만(고정 대기 없음, 11/25)
+    startTransition(() => router.push("/results"));
   };
   const openRegion = (id: string) => {
     if (error) return;
@@ -157,6 +159,7 @@ export default function Home() {
   const form = (
     <main className="container page discovery-form" style={{ maxWidth: 560 }}>
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
+      <p className="small muted home-intro">아이와 함께하는 가족여행처럼 누구와 가는지, 언제·어떤 여행인지, 예산을 고르면 갈 만한 여행지를 순위로 추천하고 날짜별 일정까지 짜 드려요.</p>
       <div className="bp-sticky"><BoardingPass compact q={q} members={members} days={days} interests={interests} active={activeSlot} onSlot={slotJump} /></div>
       <ol className="flow-steps">
         {STEPS.map((s, i) => {
@@ -168,34 +171,35 @@ export default function Home() {
               <button type="button" className="flow-step-head" disabled={locked} aria-expanded={isOpen} onClick={() => (isOpen ? setOpen(null) : openStep(i))}>
                 <b className="flow-dot">{done[i] ? "✓" : i + 1}</b>
                 <span className="flow-step-text"><strong>{i + 1}단계 · {s.title}</strong><small>{done[i] && !isOpen ? s.qs.map(answer).join(" · ") : s.sub}</small></span>
-                <em>{done[i] ? (isOpen ? "" : "수정") : i === 0 ? (isOpen ? `${qi + 1}/${s.qs.length}` : "") : locked ? "1단계 먼저" : isOpen ? `${qi + 1}/${s.qs.length}` : `+${s.pct}% 열기`}</em>
+                <em>{done[i] ? (isOpen ? "" : "수정") : i === 0 ? (isOpen ? `${qi + 1}/${s.qs.length}` : "") : locked ? "1단계 먼저" : isOpen ? `${qi + 1}/${s.qs.length}` : "열기"}</em>
               </button>
               {isOpen && <div className="flow-step-body">
                 {s.qs.slice(0, qi).map((pk, j) => <button key={pk} type="button" className="flow-answered" onClick={() => openStep(i, j)}><span>{Q_SHORT[pk]}</span><b>{answer(pk)}</b><em>변경</em></button>)}
                 <h2 className="flow-q">{Q_TITLE[k]}</h2>
                 <div className="pop-body">{question(k)}</div>
                 <button type="button" className="btn btn-primary btn-block flow-next" disabled={!!qError(k)} onClick={next}>
-                  {qi < s.qs.length - 1 ? `다음 · ${Q_SHORT[s.qs[qi + 1]]} →` : `${i + 1}단계 완료${done[i] ? "" : ` (+${s.pct}%)`}`}
+                  {qi < s.qs.length - 1 ? `다음 · ${Q_SHORT[s.qs[qi + 1]]} →` : `${i + 1}단계 완료`}
                 </button>
               </div>}
               {choice === i && (() => {
                 const nx = STEPS.findIndex((_, j) => j !== i && !done[j]);
                 return <div className="flow-choice" role="group" aria-label={`${i + 1}단계 완료 후 선택`}>
-                  <p><b>{i + 1}단계 완료!</b> 지금 정확도 {accuracy}%예요.</p>
-                  {nx >= 0 && <button type="button" className="btn btn-primary btn-block" onClick={() => openStep(nx)}>{nx + 1}단계로 더 정확하게 (+{STEPS[nx].pct}%) →</button>}
-                  <button type="button" className={`btn btn-block ${nx >= 0 ? "" : "btn-primary btn-lg"}`} disabled={!!error || pending} onClick={go}><Icon name="plane" /> 이대로 추천받기 · 정확도 {accuracy}%</button>
+                  <p><b>{i + 1}단계 완료!</b> 지금 {reflect}이에요.</p>
+                  {nx >= 0 && <button type="button" className="btn btn-primary btn-block" onClick={() => openStep(nx)}>{nx + 1}단계로 조건 더 넣기 →</button>}
+                  <button type="button" className={`btn btn-block ${nx >= 0 ? "" : "btn-primary btn-lg"}`} disabled={!!error || pending} onClick={go}><Icon name="plane" /> 이대로 추천받기 · 조건 {doneCount}/{STEPS.length}</button>
                 </div>;
               })()}
             </li>
           );
         })}
       </ol>
-      <div className="accuracy" aria-label={`추천 정확도 ${accuracy}%`}>
-        <div className="accuracy-head"><b>추천 정확도 {accuracy}%</b><span className="xs muted">{!done[0] ? "1단계를 마치면 추천받을 수 있어요" : accuracy < 100 ? "단계를 더할수록 더 정확해져요" : "모든 단계 반영 완료"}</span></div>
-        <div className="accuracy-bar"><span style={{ width: `${accuracy}%` }} /></div>
+      <div className="accuracy" aria-label={reflect}>
+        <div className="accuracy-head"><b>{reflect}</b><span className="xs muted">{!done[0] ? "1단계를 마치면 추천받을 수 있어요" : doneCount < STEPS.length ? "조건을 더 넣으면 순위에 더 반영돼요" : "모든 조건 반영 완료"}</span></div>
+        <div className="accuracy-bar"><span style={{ width: `${Math.round((doneCount / STEPS.length) * 100)}%` }} /></div>
       </div>
+      <HomeFaq />
       {done[0] && choice == null && open == null && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
-        <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 정확도 ${accuracy}%`}</button>
+        <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 조건 ${doneCount}/${STEPS.length}`}</button>
       </div>}
       {flying && (
         <div className="plane-overlay" role="status">
