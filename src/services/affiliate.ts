@@ -109,14 +109,31 @@ export const CJ = {
 };
 
 /**
- * 아고다 항공(한국어) 첫 화면. 출발지·날짜·인원을 넣는 주소 형식은 아직 확인 못 해 첫 화면으로 보낸다.
- * 링크는 숙소에서 이미 쓰는 아고다 CJ 딥링크(17095166)로 감싼다.
- * CJ 'Landing Page - Flights'(17374355)가 ?url= 딥링크를 받는지 확인되면 그 번호로 바꿀 수 있다.
+ * 아고다 항공(한국어). 링크는 숙소에서 이미 쓰는 아고다 CJ 딥링크(17095166)로 감싼다.
+ * 공항코드·출발일·귀국일이 맞으면 왕복 검색 결과 주소로, 아니면 첫 화면으로 보낸다.
+ * 주소 형식은 형님이 11/25 준 샘플(왕복·이코노미·성인)에서 확인한 값만 쓴다:
+ *   /ko-kr/flights/results?searchType=2&cabinType=Economy&adults=1&departureFrom=ICN&departureFromType=1
+ *     &departDate=2026-11-26&arrivalTo=CXR&arrivalToType=1&returnDate=2026-12-02&sort=8
+ * 편도·어린이·유아 인원 파라미터는 확인 못 해 넣지 않는다(어린이는 아고다 화면에서 직접 추가).
  * 주의: 아고다 CJ 수수료(6%)는 숙박 완료 건 기준이라 항공은 수수료가 없을 수 있다.
  */
 export const AGODA_FLIGHTS_KO = "https://www.agoda.com/ko-kr/flights";
-export function agodaFlightsUrl(prog: CjProgram = CJ.agoda): string {
-  return cjLink(AGODA_FLIGHTS_KO, prog);
+export type AgodaFlightQuery = { from: string; to: string; startDate: string; endDate: string; adults: number };
+
+/** 왕복 검색 결과로 바로 열 수 있는지(공항코드 3글자·날짜 형식·귀국일이 출발일 뒤) */
+export function agodaFlightsPrefilled(o?: AgodaFlightQuery): o is AgodaFlightQuery {
+  const ymd = /^\d{4}-\d{2}-\d{2}$/;
+  return !!o && /^[a-z]{3}$/i.test(o.from) && /^[a-z]{3}$/i.test(o.to) && ymd.test(o.startDate) && ymd.test(o.endDate) && o.endDate > o.startDate;
+}
+
+export function agodaFlightsUrl(o?: AgodaFlightQuery, prog: CjProgram = CJ.agoda): string {
+  if (!agodaFlightsPrefilled(o)) return cjLink(AGODA_FLIGHTS_KO, prog);
+  const params = new URLSearchParams({
+    searchType: "2", cabinType: "Economy", adults: String(Math.min(9, Math.max(1, Math.round(o.adults) || 1))),
+    departureFrom: o.from.toUpperCase(), departureFromType: "1", departDate: o.startDate,
+    arrivalTo: o.to.toUpperCase(), arrivalToType: "1", returnDate: o.endDate, sort: "8",
+  });
+  return cjLink(`${AGODA_FLIGHTS_KO}/results?${params}`, prog);
 }
 
 export function cjLink(url: string, prog: CjProgram, pid: string = CJ.pid): string {

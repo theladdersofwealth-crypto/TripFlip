@@ -4,7 +4,7 @@ import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
-import { agodaFlightsUrl, aviasalesSearchUrl, CJ, cjLink, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
+import { agodaFlightsPrefilled, agodaFlightsUrl, aviasalesSearchUrl, CJ, cjLink, klookHotelDetailUrl, klookHotelPrefilled, klookHotelUrl } from "@/services/affiliate";
 import { liveHotelEntries } from "@/lib/livePrices";
 import { HOTEL_NAMES } from "@/data/hotelNames";
 import { HOTEL_KO } from "@/data/hotelKo";
@@ -76,10 +76,13 @@ export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
   return `https://www.skyscanner.co.kr/transport/flights/icn/${region.airportCode.toLowerCase()}/${ymd(q.startDate)}/${ymd(q.endDate)}/?${params}`;
 }
 
-/** 항공권 주 버튼: 아고다 항공(한국어, CJ 제휴). 날짜·인원은 아직 못 넘겨 첫 화면으로 연다. */
-export function agodaFlightUrl() {
-  return agodaFlightsUrl();
+/** 항공권 주 버튼: 아고다 항공(한국어, CJ 제휴). 공항코드를 알면 인천 왕복·날짜·성인 수가 채워진 결과로, 모르면 첫 화면으로. */
+export function agodaFlightUrl(region: RegionV1, q: RegionQuery) {
+  return agodaFlightsUrl({ from: "ICN", to: region.airportCode, startDate: q.startDate, endDate: q.endDate, adults: q.adults });
 }
+/** 아고다 항공 링크에 아이 인원이 빠지는지(아고다 어린이 파라미터 미확인) */
+export const agodaFlightMissingKids = (region: RegionV1, q: RegionQuery) =>
+  q.children.length > 0 && agodaFlightsPrefilled({ from: "ICN", to: region.airportCode, startDate: q.startDate, endDate: q.endDate, adults: q.adults });
 
 /** 항공권 보조: Aviasales(Travelpayouts 제휴) 왕복 검색 */
 export function flightAffiliateUrl(region: RegionV1, q: RegionQuery) {

@@ -105,6 +105,20 @@ test("CJ 설정이 있으면 click-{pid}-{linkId}?url= 로 감싸고 날짜·인
   assert.equal(inner.searchParams.get("childages"), "4");
 });
 
-test("아고다 항공은 한국어 항공 첫 화면을 CJ 딥링크로 감싼다", () => {
-  assert.equal(agodaFlightsUrl(), "https://www.tkqlhce.com/click-101921886-17095166?url=https%3A%2F%2Fwww.agoda.com%2Fko-kr%2Fflights");
+test("아고다 항공: 조건이 없거나 공항코드·날짜가 안 맞으면 한국어 첫 화면을 CJ 딥링크로 감싼다", () => {
+  const home = "https://www.tkqlhce.com/click-101921886-17095166?url=https%3A%2F%2Fwww.agoda.com%2Fko-kr%2Fflights";
+  assert.equal(agodaFlightsUrl(), home);
+  assert.equal(agodaFlightsUrl({ from: "ICN", to: "", startDate: "2026-11-26", endDate: "2026-12-02", adults: 2 }), home);
+  assert.equal(agodaFlightsUrl({ from: "ICN", to: "미확인", startDate: "2026-11-26", endDate: "2026-12-02", adults: 2 }), home);
+  assert.equal(agodaFlightsUrl({ from: "ICN", to: "CXR", startDate: "2026-12-02", endDate: "2026-11-26", adults: 2 }), home);
+});
+
+test("아고다 항공: 형님 샘플과 같은 왕복 검색 결과 주소를 CJ 딥링크로 감싼다", () => {
+  const w = new URL(agodaFlightsUrl({ from: "icn", to: "cxr", startDate: "2026-11-26", endDate: "2026-12-02", adults: 1 }));
+  assert.equal(w.origin + w.pathname, "https://www.tkqlhce.com/click-101921886-17095166");
+  assert.equal(w.searchParams.get("url"), "https://www.agoda.com/ko-kr/flights/results?searchType=2&cabinType=Economy&adults=1&departureFrom=ICN&departureFromType=1&departDate=2026-11-26&arrivalTo=CXR&arrivalToType=1&returnDate=2026-12-02&sort=8");
+  const two = new URL(new URL(agodaFlightsUrl({ from: "ICN", to: "HKG", startDate: "2027-01-10", endDate: "2027-01-14", adults: 2 })).searchParams.get("url")!);
+  assert.equal(two.searchParams.get("adults"), "2");
+  assert.equal(two.searchParams.get("arrivalTo"), "HKG");
+  assert.equal([...two.searchParams.keys()].some((k) => /child|infant/i.test(k)), false);
 });
