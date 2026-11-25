@@ -13,7 +13,7 @@ import { boardKey, emptyBoard } from "@/services/planner";
 import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
 import type { StayTier } from "@/services/regionScore";
 import { hotelKo, pickPrice } from "@/components/PriceSheets";
-import { agodaFlightUrl, bookingComUrl, STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayPrefilled, klookStayUrl } from "@/services/booking";
+import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayPrefilled, klookStayUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
@@ -79,7 +79,8 @@ export default function BookPage() {
         <label className="field"><span className="label">항공 선호</span><select className="input" aria-label="항공 선호" value={flightPreference} onChange={(e) => setFlightPreference(e.target.value as typeof flightPreference)}><option value="any">상관없음</option><option value="lowcost">저가항공 우선</option><option value="fullservice">일반 항공사 우선</option></select></label>
         <p className="xs muted">선호는 계획에 저장돼요. 실제 항공사·수하물·도착시간은 예약처에서 비교해 주세요.</p>
         {unknownAges && <p className="xs muted">자녀 나이가 미확인이에요. 예약처에서 정확한 나이와 인원을 다시 입력해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={agodaFlightUrl()} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 <Icon name="link" /></a>
+        <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 <Icon name="link" /></a>
+        {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
         <div className="grid-2">
           <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">Aviasales <Icon name="link" /></a>
           <a className="btn btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너 <Icon name="link" /></a>
