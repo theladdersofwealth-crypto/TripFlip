@@ -5,9 +5,12 @@
  *       점검: 권역 id 모두 실제 권역, 같은 번호 중복 없음, 다카마쓰 값 일치. GPT가 "미확인"이라 한 27곳은 넣지 않았다.
  * 번호가 없는 권역은 아고다가 이름 검색(textToSearch)만으로는 결과를 못 열어 홈으로 간다.
  * 시범 권역(NT·OS·HK·DN·PQ)은 world id(vie-nhatrang 등)로 찾는다.
+ * 나트랑·다낭·오사카·홍콩·푸꾸옥 5곳은 2026-11-25 아고다 한국어 숙소 검색(도시 선택)을 직접 해서 결과 주소의 city=번호로 확인했다.
  */
 export const AGODA_CITY: Record<string, number> = {
+  "hon-hongkong": 16808,
   "jap-tokyo": 5085,
+  "jap-osaka": 9590,
   "jap-fukuoka": 16527,
   "jap-sapporo": 3435,
   "jap-naha": 18820,
@@ -18,6 +21,9 @@ export const AGODA_CITY: Record<string, number> = {
   "jap-matsuyama": 18809,
   "jap-takamatsu": 88749,
   "vie-hanoi": 2758,
+  "vie-nhatrang": 2679,
+  "vie-danang": 16440,
+  "vie-phuquoc": 17188,
   "vie-hochiminhcity": 13170,
   "vie-dalat": 15932,
   "vie-hoian": 16552,

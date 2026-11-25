@@ -122,3 +122,12 @@ test("아고다 항공: 형님 샘플과 같은 왕복 검색 결과 주소를 C
   assert.equal(two.searchParams.get("arrivalTo"), "HKG");
   assert.equal([...two.searchParams.keys()].some((k) => /child|infant/i.test(k)), false);
 });
+
+test("시범 5권역은 아고다 도시 번호를 찾는다(11/25 아고다 직접 검색 값)", async () => {
+  const { agodaCityId } = await import("../src/services/booking");
+  assert.equal(agodaCityId("NT"), 2679);
+  assert.equal(agodaCityId("DN"), 16440);
+  assert.equal(agodaCityId("OS"), 9590);
+  assert.equal(agodaCityId("HK"), 16808);
+  assert.equal(agodaCityId("PQ"), 17188);
+});
