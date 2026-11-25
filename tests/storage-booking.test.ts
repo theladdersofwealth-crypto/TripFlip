@@ -108,3 +108,13 @@ test("아고다 도시 번호를 아는 권역(다카마쓰)은 city·날짜·�
     assert.equal(a.searchParams.get("children"), "0");
   }
 });
+
+test("아고다 도시 번호 표: 모든 키가 실제 권역이고 같은 번호가 두 권역에 겹치지 않는다", async () => {
+  const { ALL_REGIONS } = await import("../src/services/regionScore");
+  const { AGODA_CITY } = await import("../src/data/agodaCities");
+  const ids = new Set(ALL_REGIONS.map((r) => r.id));
+  for (const k of Object.keys(AGODA_CITY)) assert.ok(ids.has(k), `없는 권역 ${k}`);
+  const nums = Object.values(AGODA_CITY);
+  assert.equal(new Set(nums).size, nums.length);
+  assert.equal(AGODA_CITY["jap-takamatsu"], 88749);
+});
