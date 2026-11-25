@@ -37,7 +37,7 @@ export default function ResultsPage() {
     const sq = decodeShare(s);
     setShared({ q: sq, bad: !sq });
   }, []);
-  const preview = !!shared?.q;
+  const previewOnly = !!shared?.q && !shared.applied;
   const applyShared = () => {
     if (!shared?.q) return;
     saveQuery(shared.q);
@@ -45,7 +45,6 @@ export default function ResultsPage() {
     router.replace("/results");
     showToast("공유받은 조건으로 바꿨어요.");
   };
-  const applied = !!shared?.applied;
   const q = shared === null ? null : shared.q ?? own;
   const priceVersion = useLivePrices();
   const results = useMemo(() => (q ? scoreRegions(q) : []), [q, priceVersion]);
@@ -62,10 +61,10 @@ export default function ResultsPage() {
     </main>
   );
   const ranked = results.filter((r) => r.status === "ranked").slice(0, 10);
-  const split = wide && member && ranked.length > 0 && !(preview && !applied);
+  const split = wide && member && ranked.length > 0 && !previewOnly;
   const picked = ranked.some((r) => r.region.id === sel) ? sel! : ranked[0]?.region.id ?? null;
   const open = (id: string) => {
-    if (preview && !applied) { showToast("자세히 보려면 먼저 '이 조건 사용'을 눌러 주세요."); return; }
+    if (previewOnly) { showToast("자세히 보려면 먼저 '이 조건 사용'을 눌러 주세요."); return; }
     router.push(`/r/${id}`);
   };
   const others = results.filter((r) => (r.status === "데이터 부족" || r.status === "조건 충족 장소 없음") && !r.region.tier);
@@ -79,11 +78,11 @@ export default function ResultsPage() {
       <div className="between">
         <h1 style={{ fontSize: 24, fontWeight: 900 }}>추천 여행지</h1>
         <div className="row-wrap" style={{ gap: 6 }}>
-          {ranked.length > 0 && !(preview && !applied) && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
+          {ranked.length > 0 && !previewOnly && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
           <Link href="/" className="btn btn-sm">조건 수정</Link>
         </div>
       </div>
-      {preview && !applied && <div className="card-soft stack" role="status" style={{ marginTop: 10, gap: 8 }}>
+      {previewOnly && <div className="card-soft stack" role="status" style={{ marginTop: 10, gap: 8 }}>
         <p className="small"><b>공유받은 추천 미리보기예요.</b> 내 조건은 그대로예요. 링크에는 이름·나이·키·보행 조건을 담지 않아서 보낸 사람 화면과 조금 다를 수 있어요.</p>
         <div className="row-wrap" style={{ gap: 6 }}>
           <button type="button" className="btn btn-sm btn-primary" onClick={applyShared}>이 조건 사용</button>
@@ -102,10 +101,10 @@ export default function ResultsPage() {
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}
       {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href="/" className="btn btn-sm">조건 다시 선택하기</Link></div>}
       {!member && ranked.length > 0 ? <div className="stack">
-        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={open} />
+        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={open} previewOnly={previewOnly} />
         {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} />}
       </div> : <div className="stack">
-        <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={open} />
+        <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={open} previewOnly={previewOnly} />
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>}
       </div>
