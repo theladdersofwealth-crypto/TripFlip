@@ -66,8 +66,10 @@ export function GuestPreview({ count, startRank = 1, beforeGo }: { count: number
 }
 
 /** 추천 순위 카드 목록. onSelect가 있으면(PC 2단) 페이지 이동 대신 오른쪽 상세를 바꾼다 */
-export function RankCards({ ranked, budget, selected, onSelect, onOpen }: { ranked: RegionResult[]; budget: number | null | undefined; selected?: string | null; onSelect?: (id: string) => void; onOpen: (id: string) => void }) {
-  const go = (id: string) => (onSelect ? onSelect(id) : onOpen(id));
+export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewOnly = false }: { ranked: RegionResult[]; budget: number | null | undefined; selected?: string | null; onSelect?: (id: string) => void; onOpen: (id: string) => void; previewOnly?: boolean }) {
+  const go = (id: string) => (!previewOnly && onSelect ? onSelect(id) : onOpen(id));
+  const detailStyle = { color: "var(--teal-dark)", fontWeight: 700 };
+  const detailLabel = <>자세히 보기 · 예약·일정·관광지·음식점 <Icon name="next" size={16} /></>;
   return <>
         {ranked.map((r, i) => (
           <article key={r.region.id} className={`rank-card reveal ${i === 0 ? "first" : ""} ${selected === r.region.id ? "picked" : ""}`} aria-current={selected === r.region.id || undefined} style={{ animationDelay: `${i * 0.08}s` }} onClick={() => go(r.region.id)}>
@@ -88,7 +90,11 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen }: { rank
               <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, budget)}</span>
             </div>
             {(r.flags.some((f) => f.includes("적합도를")) || r.overFlight || r.weather.judge === "스콜성 우기") && <span className="xs warn">⚠ {[r.flags.some((f) => f.includes("적합도를")) ? "일부 추정값" : "", r.overFlight ? "희망 비행시간 초과" : "", r.weather.judge === "스콜성 우기" ? "스콜성 우기" : ""].filter(Boolean).join(" · ")}</span>}
-            <Link href={`/r/${r.region.id}`} className="row small" style={{ color: "var(--teal-dark)", fontWeight: 700 }} onClick={(e) => { e.stopPropagation(); if (onSelect) { e.preventDefault(); onSelect(r.region.id); } }}>자세히 보기 · 예약·일정·관광지·음식점 <Icon name="next" size={16} /></Link>
+            {previewOnly ? (
+              <button type="button" className="row small" style={{ ...detailStyle, background: "none", border: 0, padding: 0, alignSelf: "flex-start", textAlign: "left" }} onClick={(e) => { e.stopPropagation(); go(r.region.id); }}>{detailLabel}</button>
+            ) : (
+              <Link href={`/r/${r.region.id}`} className="row small" style={detailStyle} onClick={(e) => { e.stopPropagation(); if (onSelect) { e.preventDefault(); onSelect(r.region.id); } }}>{detailLabel}</Link>
+            )}
           </article>
         ))}
   </>;
