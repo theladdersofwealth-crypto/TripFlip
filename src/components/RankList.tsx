@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { NEXT_KEY } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
+import { FlagBg } from "@/components/FlagBg";
 import type { RegionResult } from "@/services/regionScore";
 
 const HERO = ["#102f54,#00838c", "#1d497d,#00acb8", "#0b3a5b,#0ca678", "#3b2f63,#00838c", "#5a3a1a,#d9822b", "#102f54,#7a4fb5"];
@@ -70,7 +71,8 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen }: { rank
   return <>
         {ranked.map((r, i) => (
           <article key={r.region.id} className={`rank-card reveal ${i === 0 ? "first" : ""} ${selected === r.region.id ? "picked" : ""}`} aria-current={selected === r.region.id || undefined} style={{ animationDelay: `${i * 0.08}s` }} onClick={() => go(r.region.id)}>
-            <div className="rank-hero" style={{ background: heroBg(r.region.country) }}>
+            <div className="rank-hero">
+              <FlagBg country={r.region.country} en={r.region.searchName} fallback={heroBg(r.region.country)} />
               <div className="between" style={{ width: "100%" }}>
                 <span className="rank-pill">{i === 0 ? "🏆 " : ""}{r.rank}위 추천{r.weather.judge === "좋음" ? ` · ${r.weather.month}월 날씨 좋음` : ""}</span>
                 <span className="rank-match"><b className="rank-score">{Math.round(r.display)}</b>점 매칭</span>
