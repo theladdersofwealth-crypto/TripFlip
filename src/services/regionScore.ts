@@ -112,6 +112,7 @@ export interface RegionResult {
   filled: number;
   N: number;
   sightseeing: ReturnType<typeof sightseeingCoverage>;
+  admissionNeedsCheck: boolean;
   /** 일정 준비 상태: 등록된 식당·카페 수와, 관광·식사 모두 여행 기간을 채울 수 있는지 */
   readiness: { meals: number; mealsNeeded: number; ready: boolean };
   weather: { month: number; judge: WeatherJudge; adj: number; source: string; tmax?: number; rainDays?: number };
@@ -283,6 +284,20 @@ export function estimateFlightHours(regionId: string): number | null {
   return Math.round(h * 2) / 2;
 }
 
+/** 확인된 제한을 실제 인원 정보에 적용한다. 미입력은 입장 금지 근거로 쓰지 않는다. */
+function admissionFor(p: PlaceV1, members: TravelMember[]): "blocked" | "check" | "no-block" {
+  const evidence = p.admission;
+  let needsCheck = evidence?.needsCheck ?? false;
+  for (const member of members) {
+    for (const [value, minimum] of [[member.age, evidence?.minimumAge], [member.height, evidence?.minimumHeightCm]]) {
+      if (minimum == null) continue;
+      if (value == null || !Number.isFinite(value)) needsCheck = true;
+      else if (value < minimum) return "blocked";
+    }
+  }
+  return needsCheck ? "check" : "no-block";
+}
+
 export function scoreRegions(input: RegionQuery): RegionResult[] {
   const q = normalizeParty(input);
   const N = plannedVisitCount(q);
@@ -290,12 +305,15 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
   const month = weatherMonth(q.startDate, q.endDate);
   const interests = coreInterests(q);
   const minors = q.children.length > 0;
+  const members = membersOf(q);
 
   const results = ALL_REGIONS.map((region): RegionResult => {
     const places = ALL_PLACES.filter((p) => p.region === region.id && !isMealPlace(p));
     const excluded: RegionResult["excluded"] = [];
     const flags = new Set<string>(partyFlags(q));
     const scored: ScoredPlace[] = [];
+    let eligible = 0;
+    let admissionNeedsCheck = false;
 
     for (const p of places) {
       if (p.grade == null) continue;
@@ -303,10 +321,15 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       // 미식은 선택했을 때만 후보 (§1-3)
       const weight = conceptWeight(p.concepts, q);
       if (!weight) continue;
+      const admission = admissionFor(p, members);
+      if (admission !== "blocked") {
+        eligible++;
+        if (admission === "check" || (minors && (p.adultOnly || p.note?.includes("키 제한")))) admissionNeedsCheck = true;
+      }
       const fit = personalFit(p, q);
       fit.flags.forEach((f) => flags.add(f));
       if (minors && p.adultOnly) flags.add(`${p.name}: 미성년 동반 가능 여부 확인 필요`);
-      if (membersOf(q).some((m) => m.mobility === "limited") && p.steep === null) flags.add(`${p.name}: 급경사 여부 확인 필요`);
+      if (members.some((m) => m.mobility === "limited") && p.steep === null) flags.add(`${p.name}: 급경사 여부 확인 필요`);
       if (minors && p.note?.includes("키 제한") && q.children.some((c) => c.height === null)) flags.add("키 제한 확인 필요");
       if (q.pet) flags.add("반려동물 출입 미확인");
       // 동행 적합은 전체 중 일부에만 반영한다. AI의 0점으로 이용 불가를 만들지 않는다.
@@ -324,8 +347,8 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const mealsNeeded = days * 2; // 점심·저녁
     const readiness = { meals, mealsNeeded, ready: top.length >= N && meals >= Math.ceil(mealsNeeded / 2) };
     // 현재 추천 숙소 데이터는 이름·평점·후기·가격만 제공해 확인된 시설이 없다.
-    const sightseeing = sightseeingCoverage(days, scored.length);
-    const base = { region, rank: 0, N, weather, readiness, sightseeing, excluded, flags: [...flags], stay: estimateTripCost(region, q), flightHours, overFlight: false };
+    const sightseeing = sightseeingCoverage(days, eligible);
+    const base = { region, rank: 0, N, weather, readiness, sightseeing, admissionNeedsCheck, excluded, flags: [...flags], stay: estimateTripCost(region, q), flightHours, overFlight: false };
     if (!places.length) return { ...base, status: "데이터 부족", score: 0, display: 0, top: [], filled: 0, reasons: [] };
     if (!top.length) return { ...base, status: "조건 충족 장소 없음", score: 0, display: 0, top: [], filled: 0, reasons: [] };
 

@@ -1,3 +1,5 @@
+import type { AdmissionEvidence } from "./approvedCatalog";
+
 // 권역 추천 정의서 V1 시범 데이터 (나트랑·홍콩·다낭·푸꾸옥·오사카).
 // 나트랑·홍콩 원본: /mnt/project-files/tripflip-data/pilot-nhatrang-hongkong.xlsx
 // 등급(grade)은 한국어 후기 판정 전 임시값(TEMP_GRADE)이다. 실제 후기 등급으로 교체할 것.
@@ -37,6 +39,7 @@ export interface PlaceV1 {
   penalty: 0 | 0.5 | 1;
   grade: Grade | null; // 미평가 식당에는 등급을 만들지 않는다
   wikiBoost?: true; // 위키 조회수 상위 5%로 AI 등급을 한 단계 올린 장소 (정의서 V3 §2-3)
+  admission?: AdmissionEvidence; // 승인 카탈로그 어댑터가 연결한 장소 입장 조건
   adultOnly?: "check"; // 미성년 동반 시 확인 필요
   longWalk?: boolean;
   steep?: boolean | null; // null = 확인 필요
