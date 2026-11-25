@@ -15,6 +15,7 @@ import type { RegionQuery } from "@/services/regionScore";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
 import { useLivePrices } from "@/lib/livePrices";
+import { useTripStore } from "@/store/TripStore";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -27,15 +28,24 @@ export default function ResultsPage() {
     return () => window.removeEventListener(AUTH_EVENT, on);
   }, []);
   const own = useFlowQuery();
-  // 공유받은 링크(?s=): 링크에 담긴 조건으로 계산하고, 이후 일정·상세도 같은 조건으로 보이게 마지막 조건으로 저장한다
-  const [shared, setShared] = useState<{ q: RegionQuery | null; bad: boolean } | null>(null);
+  // 공유받은 링크(?s=): 미리보기로만 보여 주고, '이 조건 사용'을 눌러야 내 조건을 바꾼다(11/25 점검 후 수정)
+  const [shared, setShared] = useState<{ q: RegionQuery | null; bad: boolean; applied?: boolean } | null>(null);
+  const { showToast } = useTripStore();
   useEffect(() => {
     const s = new URLSearchParams(location.search).get("s");
     if (!s) { setShared({ q: null, bad: false }); return; }
     const sq = decodeShare(s);
-    if (sq) saveQuery(sq);
     setShared({ q: sq, bad: !sq });
   }, []);
+  const preview = !!shared?.q;
+  const applyShared = () => {
+    if (!shared?.q) return;
+    saveQuery(shared.q);
+    setShared({ q: shared.q, bad: false, applied: true });
+    router.replace("/results");
+    showToast("공유받은 조건으로 바꿨어요.");
+  };
+  const applied = !!shared?.applied;
   const q = shared === null ? null : shared.q ?? own;
   const priceVersion = useLivePrices();
   const results = useMemo(() => (q ? scoreRegions(q) : []), [q, priceVersion]);
@@ -52,8 +62,12 @@ export default function ResultsPage() {
     </main>
   );
   const ranked = results.filter((r) => r.status === "ranked").slice(0, 10);
-  const split = wide && member && ranked.length > 0;
+  const split = wide && member && ranked.length > 0 && !(preview && !applied);
   const picked = ranked.some((r) => r.region.id === sel) ? sel! : ranked[0]?.region.id ?? null;
+  const open = (id: string) => {
+    if (preview && !applied) { showToast("자세히 보려면 먼저 '이 조건 사용'을 눌러 주세요."); return; }
+    router.push(`/r/${id}`);
+  };
   const others = results.filter((r) => (r.status === "데이터 부족" || r.status === "조건 충족 장소 없음") && !r.region.tier);
   const days = tripDays(q.startDate, q.endDate);
   const members = membersOf(q);
@@ -65,11 +79,17 @@ export default function ResultsPage() {
       <div className="between">
         <h1 style={{ fontSize: 24, fontWeight: 900 }}>추천 여행지</h1>
         <div className="row-wrap" style={{ gap: 6 }}>
-          {ranked.length > 0 && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
+          {ranked.length > 0 && !(preview && !applied) && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
           <Link href="/" className="btn btn-sm">조건 수정</Link>
         </div>
       </div>
-      {shared?.q && <div className="card-soft small" role="status" style={{ marginTop: 10 }}>공유받은 추천이에요. <Link href="/" style={{ color: "var(--teal-dark)", fontWeight: 600 }}>내 조건으로 다시 추천받기 ›</Link></div>}
+      {preview && !applied && <div className="card-soft stack" role="status" style={{ marginTop: 10, gap: 8 }}>
+        <p className="small"><b>공유받은 추천 미리보기예요.</b> 내 조건은 그대로예요. 링크에는 이름·나이·키·보행 조건을 담지 않아서 보낸 사람 화면과 조금 다를 수 있어요.</p>
+        <div className="row-wrap" style={{ gap: 6 }}>
+          <button type="button" className="btn btn-sm btn-primary" onClick={applyShared}>이 조건 사용</button>
+          <Link href="/" className="btn btn-sm">내 조건으로 추천받기</Link>
+        </div>
+      </div>}
       {shared?.bad && <div className="card-soft small muted" role="status" style={{ marginTop: 10 }}>공유 링크를 열 수 없어서(날짜가 지났거나 주소가 잘림) 내 조건으로 보여 드려요.</div>}
       <p className="small muted" style={{ marginTop: 8 }}>이번 일행과 여행 조건에 대한 적합도예요. 조건을 바꾸면 순위도 달라져요.</p>
       <div className="row-wrap" style={{ margin: "10px 0 14px" }}>
@@ -82,10 +102,10 @@ export default function ResultsPage() {
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}
       {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href="/" className="btn btn-sm">조건 다시 선택하기</Link></div>}
       {!member && ranked.length > 0 ? <div className="stack">
-        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={(id) => router.push(`/r/${id}`)} />
+        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={open} />
         {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} />}
       </div> : <div className="stack">
-        <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={(id) => router.push(`/r/${id}`)} />
+        <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={open} />
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>}
       </div>
