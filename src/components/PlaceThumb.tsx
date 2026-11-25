@@ -46,14 +46,18 @@ export function usePlaceImage(p: PlaceV1, el: React.RefObject<HTMLElement | null
 }
 
 /** size=숫자면 정사각 썸네일, "wide"면 카드 폭 가득(이름 위 사진) */
-export function PlaceThumb({ p, img, size = 64 }: { p: PlaceV1; img: ThumbInfo | null; size?: number | "wide" }) {
+/** creditLine=true면 사진 바로 아래에 출처 한 줄(링크 없이 글자만, 버튼 안에서도 쓸 수 있게). 사진이 안 뜨면 같이 숨김. */
+export function PlaceThumb({ p, img, size = 64, creditLine = false }: { p: PlaceV1; img: ThumbInfo | null; size?: number | "wide"; creditLine?: boolean }) {
   const [broken, setBroken] = useState(false);
   const [ico, bg] = fallbackOf(p);
   useEffect(() => setBroken(false), [img?.src]);
   const box = size === "wide" ? { background: bg } : { width: size, height: size, background: bg };
-  return <span className={`place-thumb${size === "wide" ? " wide" : ""}`} style={box} aria-hidden>
+  const shown = !!img && !broken;
+  const thumb = <span className={`place-thumb${size === "wide" ? " wide" : ""}`} style={box} aria-hidden>
     {img && !broken ? <img src={img.src} alt="" loading="lazy" decoding="async" onError={() => { brokenSrc.add(img.src); setBroken(true); }} /> : <span className="place-thumb-ico">{ico}</span>}
   </span>;
+  if (!creditLine || !shown || !img?.credit) return thumb;
+  return <>{thumb}<span className="thumb-credit-line">{img.credit}</span></>;
 }
 
 /** 사진 출처 한 줄(작가·라이선스). 사진 없으면 아무것도 안 그림. */
