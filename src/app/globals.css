@@ -669,7 +669,7 @@ article.rank-card { cursor: pointer; }
 .admin-log span { display: inline-block; min-width: 82px; font-variant-numeric: tabular-nums; }
 
 /* 비회원 추천 결과: 가짜 카드를 흐리게 + 가입 안내 */
-.guest-wrap { position: relative; }
+.guest-wrap { position: relative; min-height: 370px; }
 .guest-blur { display: flex; flex-direction: column; gap: 12px; filter: blur(7px); opacity: .75; pointer-events: none; user-select: none; max-height: 900px; overflow: hidden; }
 .guest-gate { position: absolute; left: 12px; right: 12px; top: 90px; display: flex; flex-direction: column; gap: 10px; background: #fff; border: 2px solid var(--teal); border-radius: 20px; padding: 20px; box-shadow: 0 12px 36px rgba(16, 47, 84, 0.18); text-align: center; }
 

@@ -5,9 +5,9 @@ import { useLivePrices } from "@/lib/livePrices";
 import { normalizeParty } from "@/lib/travelParty";
 import { scoreRegions } from "@/services/regionScore";
 import type { RegionQuery } from "@/services/regionScore";
-import { GuestPreview, RankCards } from "@/components/RankList";
+import { GUEST_OPEN, GuestPreview, RankCards } from "@/components/RankList";
 
-/** PC 첫 화면 오른쪽: 고르는 조건으로 추천 순위를 바로 미리 보여 준다(비회원은 흐린 가짜 카드) */
+/** PC 첫 화면 오른쪽: 고르는 조건으로 추천 순위를 바로 미리 보여 준다(비회원은 1~3위만 실제, 4위부터 흐린 가짜 카드) */
 export function HomePreview({ q, ready, blocked, onOpen, save }: { q: RegionQuery; ready: boolean; blocked: string | null; onOpen: (id: string) => void; save: () => void }) {
   const [member, setMember] = useState<boolean | null>(null);
   useEffect(() => {
@@ -28,7 +28,8 @@ export function HomePreview({ q, ready, blocked, onOpen, save }: { q: RegionQuer
       : blocked ? <div className="card-soft small muted" role="status">{blocked}</div>
       : member === null ? null
       : !ranked.length ? <div className="card-soft small muted" role="status">현재 조건으로 보여드릴 추천이 없어요. 예산이나 취향을 조정해 보세요.</div>
-      : !member ? <GuestPreview count={ranked.length} beforeGo={save} />
+      : !member ? <div className="stack"><div className="rank-grid"><RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={onOpen} /></div>
+        {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} beforeGo={save} />}</div>
       : <div className="rank-grid"><RankCards ranked={ranked} budget={q.totalBudgetKrw} onOpen={onOpen} /></div>}
     {ready && !blocked && member && ranked.length > 0 && <p className="xs faint" style={{ marginTop: 12 }}>상위 {ranked.length}곳 미리보기예요. 카드를 누르면 예약·일정·관광지·음식점을 볼 수 있어요. 적합도·경비는 추정이에요.</p>}
   </>;

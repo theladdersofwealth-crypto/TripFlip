@@ -23,8 +23,12 @@ export function priceNote(s?: { flight: string; hotel: string; updatedAt: string
   return `예상 경비의 ${s.flight === "live" ? "항공" : ""}${s.flight === "live" && s.hotel === "live" ? "·" : ""}${s.hotel === "live" ? "숙소" : ""} 가격은 최근 2주 수집한 최저가의 평균이에요(${d.getMonth() + 1}/${d.getDate()} 갱신). 실제 예약가는 달라요.`;
 }
 
-/** 비회원용 흐린 결과: 실제 여행지 이름·점수·경비는 화면(DOM)에 넣지 않고 모양만 같은 가짜 카드를 흐리게 보여 준다 */
-export function GuestPreview({ count, beforeGo }: { count: number; beforeGo?: () => void }) {
+/** 비회원에게 실제로 공개하는 순위 수(형님 결정 11/25: 1~3위 공개, 4위부터 가입) */
+export const GUEST_OPEN = 3;
+
+/** 비회원용 흐린 결과: 공개분 이후(4위부터) 실제 여행지 이름·점수·경비는 화면(DOM)에 넣지 않고 모양만 같은 가짜 카드를 흐리게 보여 준다.
+ *  count = 가려진 곳 수, startRank = 가짜 카드의 첫 순위 번호 */
+export function GuestPreview({ count, startRank = 1, beforeGo }: { count: number; startRank?: number; beforeGo?: () => void }) {
   const goAccount = (hash: string) => {
     beforeGo?.();
     try { sessionStorage.setItem(NEXT_KEY, "/results"); } catch {}
@@ -33,10 +37,10 @@ export function GuestPreview({ count, beforeGo }: { count: number; beforeGo?: ()
   const n = Math.max(1, Math.min(count, 4));
   return <div className="guest-wrap">
     <div className="guest-blur" aria-hidden>
-      {Array.from({ length: n }, (_, i) => <article key={i} className={`rank-card ${i === 0 ? "first" : ""}`}>
+      {Array.from({ length: n }, (_, i) => <article key={i} className={`rank-card ${startRank + i === 1 ? "first" : ""}`}>
         <div className="rank-hero" style={{ background: `linear-gradient(135deg,${HERO[i % HERO.length]})` }}>
           <div className="between" style={{ width: "100%" }}>
-            <span className="rank-pill">{i === 0 ? "🏆 " : ""}{i + 1}위 추천</span>
+            <span className="rank-pill">{startRank + i === 1 ? "🏆 " : ""}{startRank + i}위 추천</span>
             <span className="rank-match"><b className="rank-score">??</b>점 매칭</span>
           </div>
           <div className="rank-hero-name">○○○○</div>
@@ -52,8 +56,8 @@ export function GuestPreview({ count, beforeGo }: { count: number; beforeGo?: ()
       </article>)}
     </div>
     <div className="guest-gate" role="dialog" aria-label="가입 안내">
-      <b style={{ fontSize: 18 }}>🔒 추천 여행지 {count}곳을 찾았어요</b>
-      <p className="small muted">가입하면 추천 여행지를 볼 수 있어요. 닉네임·생년월일·PIN 6자리, 30초면 끝나요. 가입·로그인하면 이 결과로 바로 돌아와요.</p>
+      <b style={{ fontSize: 18 }}>🔒 {startRank > 1 ? `${startRank}위부터 ${count}곳 더 있어요` : `추천 여행지 ${count}곳을 찾았어요`}</b>
+      <p className="small muted">{startRank > 1 ? `가입하면 ${startRank}위부터 나머지 추천과 각 여행지의 예약·일정·관광지·음식점을 볼 수 있어요.` : "가입하면 추천 여행지를 볼 수 있어요."} 닉네임·생년월일·성별, PIN 6자리(확인용 한 번 더)만 넣으면 돼요. 30초면 끝나요. 가입·로그인하면 이 결과로 바로 돌아와요.</p>
       <button type="button" className="btn btn-primary btn-block" onClick={() => goAccount("")}>30초 가입하고 보기</button>
       <button type="button" className="btn btn-block" onClick={() => goAccount("#login")}>이미 계정이 있어요</button>
     </div>
