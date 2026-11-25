@@ -251,7 +251,7 @@ function BoardCell({ k, p, cls, onClick, children }: { k: string; p?: PlaceV1; c
   if (!p) return <button type="button" className={cls} onClick={onClick}><span className="k">{k}</span>{children}</button>;
   return <button ref={ref as unknown as React.RefObject<HTMLButtonElement>} type="button" className={`${cls} rich`} onClick={onClick}>
     <span className="k">{k}</span>
-    <PlaceThumb p={p} img={img} size="wide" />
+    <PlaceThumb p={p} img={img} size="wide" creditLine />
     <span className="rich-row">{children}</span>
   </button>;
 }

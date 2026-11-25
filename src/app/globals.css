@@ -742,6 +742,7 @@ article.rank-card { cursor: pointer; }
 .board-cell.rich .k { display: inline-block; justify-self: start; }
 .board-cell.rich .rich-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .board-cell.rich .v { font-weight: 800; }
+.thumb-credit-line { display: block; font-size: 10px; line-height: 1.3; color: var(--faint); text-align: left; margin-top: -3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .day-card .board-cell + .board-cell { margin-top: 2px; }
 /* 첫 화면 한 줄 소개·자주 묻는 질문(11/25) */
 .home-intro { margin: 4px 0 12px; line-height: 1.55; }
