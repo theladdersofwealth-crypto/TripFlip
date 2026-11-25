@@ -8,7 +8,7 @@ import { DateEditor } from "@/components/DateEditor";
 import { BoardingPass } from "@/components/BoardingPass";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept } from "@/data/regionsV1";
-import { loadQuery, saveQuery } from "@/lib/flow";
+import { loadHomeDraft, saveHomeDraft, saveQuery } from "@/lib/flow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
@@ -48,9 +48,23 @@ export default function Home() {
   const moved = useRef(false);
   const wide = useWide(); // PC: 왼쪽 조건 + 오른쪽 추천 미리보기
   useEffect(() => {
-    const saved = loadQuery();
-    setQ(normalizeParty({ ...saved, dateWindow: undefined, interests: saved.interests?.length ? saved.interests : [saved.main, ...saved.subs] }));
+    const { q: saved, progress, hasSearch } = loadHomeDraft();
+    setQ(saved);
+    if (progress && Array.isArray(progress.done) && progress.done.length === STEPS.length && progress.done.every((d) => typeof d === "boolean")) {
+      const step = progress.open != null && Number.isInteger(progress.open) ? STEPS[progress.open] : undefined;
+      setOpen(step ? progress.open : null);
+      setQi(step && Number.isInteger(progress.question) && step.qs[progress.question] ? progress.question : 0);
+      setDone(progress.done);
+      setChoice(!step && Number.isInteger(progress.choice) && progress.choice != null && progress.done[progress.choice] ? progress.choice : null);
+    } else if (hasSearch) {
+      // 기존 사용자도 이미 추천받았다면 첫 질문부터 다시 완료할 필요가 없다.
+      setOpen(null);
+      setDone([true, false, false]);
+    }
   }, []);
+  useEffect(() => {
+    if (q) saveHomeDraft(q, { open, question: qi, done, choice });
+  }, [q, open, qi, done, choice]);
   useEffect(() => {
     // 처음 열 때는 그대로, 질문이 바뀔 때만 그 단계로 화면을 맞춤
     if (!moved.current || open == null) return;
@@ -101,16 +115,21 @@ export default function Home() {
     const subs = interests.slice(1);
     setInterests([interests[0], ...(subs.includes(c) ? subs.filter((s) => s !== c) : [...subs, c])]);
   };
+  const commit = () => {
+    const current = normalizeParty(q);
+    saveQuery(current);
+    saveHomeDraft(current, { open, question: qi, done, choice });
+  };
   const go = () => {
     if (error || pending || flying || !done[0]) return;
-    saveQuery(normalizeParty(q));
+    commit();
     track("search");
     setFlying(true); // 비행기 로딩은 결과 화면으로 넘어갈 때까지만(고정 대기 없음, 11/25)
     startTransition(() => router.push("/results"));
   };
   const openRegion = (id: string) => {
     if (error) return;
-    saveQuery(normalizeParty(q));
+    commit();
     track("search");
     router.push(`/results?r=${encodeURIComponent(id)}`);
   };
@@ -216,6 +235,6 @@ export default function Home() {
   if (!wide) return form;
   return <div className="container page pc-home">
     {form}
-    <aside className="pc-preview" aria-label="추천 미리보기"><HomePreview q={q} ready={done[0]} blocked={error} onOpen={openRegion} save={() => saveQuery(normalizeParty(q))} /></aside>
+    <aside className="pc-preview" aria-label="추천 미리보기"><HomePreview q={q} ready={done[0]} blocked={error} onOpen={openRegion} save={commit} /></aside>
   </div>;
 }
