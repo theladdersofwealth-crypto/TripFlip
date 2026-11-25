@@ -3,9 +3,9 @@
 // 상업 이용 가능한 라이선스(CC0·퍼블릭 도메인·CC BY·CC BY-SA)만 쓰고, 작가·라이선스를 화면에 표시한다.
 // 엉뚱한 사진을 막으려고 파일 제목에 장소 영문명 핵심 단어가 들어간 것만 채택한다.
 
-export interface CommonsPhoto { src: string; artist: string; license: string; page: string }
+export interface CommonsPhoto { src: string; artist: string; license: string; page: string; licenseUrl?: string }
 
-const KEY = "tripflip.commons.v1";
+const KEY = "tripflip.commons.v2"; // v2: 초상권·상표 표시 사진 제외 규칙 추가 → 예전 캐시 다시 판정
 const TTL = 7 * 24 * 3600 * 1000;
 const OK_LICENSE = /^(cc0|public domain|pd\b|pd-|cc by(-sa)? ?\d)/i;
 const GENERIC = new Set(["the", "and", "of", "de", "la", "le", "temple", "beach", "park", "market", "street", "museum", "island", "bay", "night", "old", "town", "city", "tower", "palace", "church", "pagoda", "bridge", "garden", "gardens", "mountain", "mount", "lake", "river", "falls", "waterfall", "national", "center", "centre", "square", "hill", "shrine", "station", "area", "village", "cave", "tour", "great", "new", "san", "santa", "saint", "st"]);
@@ -49,7 +49,13 @@ export function pickPhoto(pages: Page[], en: string): CommonsPhoto | null {
     if (!ii?.thumburl || !/^image\/(jpeg|png|webp)$/.test(ii.mime ?? "")) continue;
     if (!OK_LICENSE.test(lic)) continue;
     if (!titleMatches(p.title.replace(/^File:/, "").replace(/\.\w+$/, ""), en)) continue;
-    return { src: ii.thumburl, artist: strip(m.Artist?.value).slice(0, 60) || "미확인", license: lic, page: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(p.title)}` };
+    // 초상권(personality)·상표(trademarked) 등 사용 제한 표시가 붙은 사진은 쓰지 않는다
+    if (strip(m.Restrictions?.value)) continue;
+    // CC BY 계열은 작가 표시가 필수 → 작가를 모르면 쓰지 않는다(CC0·퍼블릭 도메인은 "미확인" 허용)
+    const artist = strip(m.Artist?.value).slice(0, 60);
+    if (!artist && /^cc by/i.test(lic)) continue;
+    const licUrl = strip(m.LicenseUrl?.value);
+    return { src: ii.thumburl, artist: artist || "미확인", license: lic, page: ii.descriptionurl ?? `https://commons.wikimedia.org/wiki/${encodeURIComponent(p.title)}`, ...(/^https?:\/\//.test(licUrl) ? { licenseUrl: licUrl } : {}) };
   }
   return null;
 }
@@ -62,7 +68,7 @@ export function commonsPhoto(id: string, en: string, area: string): Promise<Comm
   const q = new URLSearchParams({
     action: "query", format: "json", origin: "*", generator: "search", gsrnamespace: "6", gsrlimit: "8",
     gsrsearch: `"${en}" ${area} filetype:bitmap`, prop: "imageinfo", iiprop: "url|mime|extmetadata", iiurlwidth: "240",
-    iiextmetadatafilter: "LicenseShortName|Artist",
+    iiextmetadatafilter: "LicenseShortName|LicenseUrl|Artist|Restrictions",
   });
   const job = fetch(`https://commons.wikimedia.org/w/api.php?${q}`)
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
