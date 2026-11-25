@@ -91,3 +91,20 @@ test("숙소 팝업 맨 위 아고다 링크: 모든 권역·숙소에서 CJ로 
   }
   assert.ok(n > 1000, `숙소 ${n}곳`);
 });
+
+test("아고다 도시 번호를 아는 권역(다카마쓰)은 city·날짜·인원이 채워진 검색 결과로 연다", async () => {
+  const { ALL_REGIONS } = await import("../src/services/regionScore");
+  const region = ALL_REGIONS.find((r) => r.id === "jap-takamatsu")!;
+  assert.ok(region, "다카마쓰 권역");
+  const q = { ...DEFAULT_QUERY, startDate: "2027-01-13", endDate: "2027-01-19", adults: 2, children: [] };
+  for (const name of [undefined, "Dormy Inn Takamatsu Hot Spring"]) {
+    const a = new URL(new URL(hotelSearchUrl(region, q, name)).searchParams.get("url")!);
+    assert.equal(a.origin + a.pathname, "https://www.agoda.com/ko-kr/search");
+    assert.equal(a.searchParams.get("city"), "88749");
+    assert.equal(a.searchParams.get("checkIn"), "2027-01-13");
+    assert.equal(a.searchParams.get("checkOut"), "2027-01-19");
+    assert.equal(a.searchParams.get("los"), "6");
+    assert.equal(a.searchParams.get("adults"), "2");
+    assert.equal(a.searchParams.get("children"), "0");
+  }
+});
