@@ -47,9 +47,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 225);
+  assert.equal(imported.length, 344);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 35);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 71);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -83,14 +83,14 @@ test("기존 오사카 가이드 장소 ID와 출처를 유지하고 신규 다�
 
 test("확인 중 후보는 점심 목록에서 확인됨 뒤에 오고 지도 검색으로 찾을 수 있다", () => {
   const pending = ALL_PLACES.filter((p) => p.dining?.mapRecord?.status === "pending");
-  assert.equal(pending.length, 21);
-  assert.equal(pending.filter((p) => p.dining?.sourceUrl == null).length, 9);
+  assert.equal(pending.length, 26);
+  assert.equal(pending.filter((p) => p.dining?.sourceUrl == null).length, 10);
   for (const place of pending) {
     assert.equal(place.dining?.address, null);
     const map = new URL(diningMapUrl(place)!);
     assert.equal(map.searchParams.get("query"), `${place.dining!.mapRecord!.nameLocal} ${place.dining!.mapRecord!.area}`);
-    assert.equal(place.lat, undefined);
-    assert.equal(place.lon, undefined);
+    if (place.id.startsWith("pending-dining-")) assert.equal(place.lat, undefined);
+    if (place.id.startsWith("pending-dining-")) assert.equal(place.lon, undefined);
   }
   const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
   for (const region of ["gre-fira", "chi-harbin"]) {
@@ -111,4 +111,33 @@ test("미식 후보로도 표시한 니시키 시장은 기존 관광과 저장 
     const market = candidates("jap-kyoto", slot, DEFAULT_QUERY, day).find(({ p }) => p.id === "jap-kyoto-17");
     assert.equal(market?.p.dining?.mapRecord?.nameEn, "Nishiki Food Market");
   }
+});
+
+test("신규 미식 자료는 기존 시장 ID와 관광 역할을 보존하고 확인 상태별로 식사 후보를 정렬한다", () => {
+  const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
+  const hanoi = "vie-hanoi";
+  const hanoiBoard = emptyBoard(hanoi, q);
+  const day = hanoiBoard.days[1];
+  const lunch = candidates(hanoi, "점심", q, day);
+  const pendingMarket = ALL_PLACES.filter((p) => p.id === "vie-hanoi-684");
+  assert.equal(pendingMarket.length, 1);
+  assert.equal(pendingMarket[0].dining?.mapRecord?.status, "pending");
+  assert.ok(pendingMarket[0].tags.includes("시장"));
+  assert.ok(!isMealPlace(pendingMarket[0]));
+  assert.ok(candidates(hanoi, "오전", q, day).some(({ p }) => p.id === pendingMarket[0].id));
+  const firstPending = lunch.findIndex(({ p }) => p.dining?.mapRecord?.status === "pending");
+  assert.ok(firstPending > 0);
+  assert.ok(lunch.slice(0, firstPending).some(({ p }) => p.dining?.mapRecord?.status === "confirmed"));
+  assert.ok(lunch.slice(firstPending).some(({ p }) => p.id === pendingMarket[0].id));
+  assert.ok(lunch.slice(firstPending).every(({ p }) => p.dining?.mapRecord?.status === "pending"));
+
+  const borough = ALL_PLACES.filter((p) => p.id === "uni-london-1234");
+  assert.equal(borough.length, 1);
+  assert.equal(borough[0].dining?.mapRecord?.status, "confirmed");
+  assert.ok(!isMealPlace(borough[0]));
+  const maltby = ALL_PLACES.find((p) => p.dining?.mapRecord?.nameEn === "Maltby Street Market")!;
+  const restaurant = ALL_PLACES.find((p) => p.dining?.mapRecord?.nameEn === "Dishoom Covent Garden")!;
+  assert.ok(isMealPlace(maltby) && isMealPlace(restaurant));
+  assert.notEqual(maltby.id, borough[0].id);
+  assert.notEqual(restaurant.id, "uni-london-1233");
 });
