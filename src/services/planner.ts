@@ -154,7 +154,7 @@ export function candidates(regionId: string, slot: SlotKey, q: RegionQuery, day:
   return placesOf(regionId)
     .filter((p) => !day.date || openOn(p, day.date))
     .filter((p) => !meal || p.dining || !freshNames.has(normalize(p.name)) && !freshNames.has(normalize(p.en)))
-    .filter((p) => slot === "디저트" ? isDessert(p) : meal ? isFood(p) && !isDessert(p) && fitsCuisine(p, day.mealStyle ?? "any") : !isFood(p))
+    .filter((p) => slot === "디저트" ? isDessert(p) : meal ? (isFood(p) || p.dining) && !isDessert(p) && fitsCuisine(p, day.mealStyle ?? "any") : !isFood(p))
     .filter((p) => slot !== "야간" || PLACE_ATTRS[p.id]?.[0] === "저녁" || PLACE_ATTRS[p.id]?.[0] === "아무때나" || p.tags.includes("야경·야시장"))
     .map((p) => {
       const e = meal ? evaluateDining(p, q, day, slot) : evaluate(p, q, day);
