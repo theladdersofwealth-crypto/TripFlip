@@ -54,12 +54,12 @@ test("등록 명소 5곳인 모론다바는 10일 추천에 남고 11일 추천�
   assert.equal(sightseeingCoverage(10, 10).relaxed, false);
 });
 
-test("6일·후보 3곳에서 확인된 입장 제한만 볼거리 집계를 바꾼다", (t) => {
+test("6일·볼거리 3곳이면 테마 일치 1곳으로도 통과하고, 확인된 입장 제한은 집계에서 뺀다", (t) => {
   const regionId = "mad-morondava";
   const places = ALL_PLACES.filter((p) => p.region === regionId);
   const fixture = (i: number): PlaceV1 => ({
     id: `gate-fixture-${i}`, region: regionId, name: `테스트 명소 ${i}`, en: `Fixture ${i}`,
-    concepts: [i < 3 ? "관광" : "쇼핑"], tags: [], travel: "미확인", penalty: 0, grade: "A",
+    concepts: [i < 3 ? "관광" : "쇼핑"], tags: i < 3 ? [] : ["로컬푸드"], travel: "미확인", penalty: 0, grade: "A",
   });
   const indices = places.map((p) => ALL_PLACES.indexOf(p));
   indices.forEach((index, i) => { ALL_PLACES[index] = fixture(i); });
@@ -120,4 +120,32 @@ test("6일·후보 3곳에서 확인된 입장 제한만 볼거리 집계를 바
   assert.equal(estimated.status, "ranked");
   assert.equal(estimated.admissionNeedsCheck, true);
   assert.ok(estimated.score < original.score);
+
+  // 한 곳만 관광 테마에 맞는다. 다른 두 곳은 쇼핑 장소이고, 그중 하나는 등급도 없다.
+  const nonMatching = ALL_PLACES[indices[1]];
+  const ungraded = ALL_PLACES[indices[2]];
+  nonMatching.concepts = ["쇼핑"];
+  ungraded.concepts = ["쇼핑"];
+  ungraded.grade = null;
+  const enoughSightseeing = result();
+  assert.equal(enoughSightseeing.sightseeing.minimum, 3);
+  assert.equal(enoughSightseeing.sightseeing.eligible, 3);
+  assert.equal(enoughSightseeing.status, "ranked");
+  assert.deepEqual(enoughSightseeing.top.map(({ place }) => place.id), [place.id]);
+
+  nonMatching.tags = ["로컬푸드"];
+  ungraded.tags = ["로컬푸드"];
+  const notEnoughSightseeing = result();
+  assert.equal(notEnoughSightseeing.sightseeing.eligible, 1);
+  assert.equal(notEnoughSightseeing.status, "볼거리 부족");
+  assert.deepEqual(notEnoughSightseeing.top, enoughSightseeing.top);
+  assert.equal(notEnoughSightseeing.score, enoughSightseeing.score);
+  assert.equal(notEnoughSightseeing.readiness.ready, enoughSightseeing.readiness.ready);
+  nonMatching.tags = [];
+  ungraded.tags = [];
+
+  // 볼거리가 충분해도 기존 추천 주제의 점수 후보가 없으면 기존대로 순위에 넣지 않는다.
+  const noTheme = result({ ...q, main: "휴양" });
+  assert.equal(noTheme.sightseeing.eligible, 3);
+  assert.equal(noTheme.status, "조건 충족 장소 없음");
 });
