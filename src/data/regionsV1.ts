@@ -65,6 +65,7 @@ export interface PlaceV1 {
       signature: string[];
       priceLevel: string | null;
       confidence: string | null;
+      guideSource?: { name: string; url: string; license: string; checkedAt: string };
     };
   };
 }
