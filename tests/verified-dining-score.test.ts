@@ -162,3 +162,21 @@ test("복합 야경·핫플 태그는 실제 미식 장소에만 미식을 자�
   const hk = scoreRegions(query).find((r) => r.region.id === "HK")!;
   assert.ok(!hk.top.some(({ place }) => place.id === "hk-peak"));
 });
+
+
+test("복원된 미식 점수와 PR #78 희망 지역 필터가 함께 동작한다", () => {
+  const input: RegionQuery = { ...query, maxFlightHours: 8 };
+  const all = scoreRegions(input);
+  const selected = scoreRegions({ ...input, preferredAreas: ["western-europe"] });
+  const paris = selected.find((r) => r.region.id === "fra-paris")!;
+  assert.ok(paris);
+  assert.equal(paris.status, "ranked");
+  assert.equal(paris.diningFit?.share, 1);
+  assert.equal(paris.overFlight, true);
+  assert.match(paris.reasons[0], /선택 지역 안에서는 점수순/);
+  assert.ok(!selected.some((r) => r.region.id === "chi-shanghai"));
+  assert.equal(paris.score, all.find((r) => r.region.id === paris.region.id)!.score);
+  const ranked = selected.filter((r) => r.status === "ranked");
+  assert.ok(ranked.every((r, i) => i === 0 || ranked[i - 1].score >= r.score));
+  assert.deepEqual(scoreRegions({ ...input, preferredAreas: [] }), all);
+});
