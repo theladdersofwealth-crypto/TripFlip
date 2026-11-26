@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DINING_CATALOG, DINING_PLACES } from "../src/data/dining";
 import verifiedDining from "../src/data/verifiedDining.json";
+import pendingDining from "../src/data/pendingDining.json";
 import { diningMapUrl } from "../src/components/DiningMapDetails";
 import { ALL_PLACES, ALL_REGIONS, isMealPlace } from "../src/services/regionScore";
 import { candidates, diningDistance, emptyBoard, evaluate } from "../src/services/planner";
@@ -47,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 344);
+  assert.equal(imported.length, 576);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 71);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 145);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -83,12 +84,12 @@ test("기존 오사카 가이드 장소 ID와 출처를 유지하고 신규 다�
 
 test("확인 중 후보는 점심 목록에서 확인됨 뒤에 오고 지도 검색으로 찾을 수 있다", () => {
   const pending = ALL_PLACES.filter((p) => p.dining?.mapRecord?.status === "pending");
-  assert.equal(pending.length, 26);
-  assert.equal(pending.filter((p) => p.dining?.sourceUrl == null).length, 10);
+  assert.equal(pending.length, 42);
+  assert.equal(pending.filter((p) => p.dining?.sourceUrl == null).length, 22);
   for (const place of pending) {
     assert.equal(place.dining?.address, null);
     const map = new URL(diningMapUrl(place)!);
-    assert.equal(map.searchParams.get("query"), `${place.dining!.mapRecord!.nameLocal} ${place.dining!.mapRecord!.area}`);
+    assert.equal(map.searchParams.get("query"), [place.dining!.mapRecord!.nameLocal, place.dining!.mapRecord!.area].filter(Boolean).join(" "));
     if (place.id.startsWith("pending-dining-")) assert.equal(place.lat, undefined);
     if (place.id.startsWith("pending-dining-")) assert.equal(place.lon, undefined);
   }
@@ -140,4 +141,35 @@ test("신규 미식 자료는 기존 시장 ID와 관광 역할을 보존하고 
   assert.ok(isMealPlace(maltby) && isMealPlace(restaurant));
   assert.notEqual(maltby.id, borough[0].id);
   assert.notEqual(restaurant.id, "uni-london-1233");
+});
+
+test("4차 미식 데이터는 지정 필드만 넣고 기존 시장 ID와 확인 상태를 유지한다", () => {
+  const expected = ["id", "region", "nameLocal", "nameEn", "nameKo", "kind", "styles", "cuisine", "signature", "priceLevel", "sourceUrl", "checkedAt"].sort();
+  const rows = [...verifiedDining.slice(344), ...pendingDining.slice(26)];
+  assert.equal(rows.length, 248);
+  assert.equal(new Set(rows.map((r) => r.region)).size, 10);
+  const mapNames = new Set(rows.map((r) => r.nameLocal));
+  assert.ok(!mapNames.has("Tarihi Karaköy Balıkçısı") && !mapNames.has("Konyalı Lokantası Topkapı Sarayı"));
+  for (const row of rows) {
+    assert.deepEqual(Object.keys(row).sort(), expected);
+    const p = ALL_PLACES.find((p) => p.id === row.id)!;
+    assert.equal(p.dining?.mapRecord?.area, null);
+    assert.equal(p.dining?.mapRecord?.confidence, null);
+  }
+  for (const id of ["tur-istanbul-1000", "uni-losangeles-x10", "uni-losangeles-x7", "spa-madrid-940", "spa-madrid-x9"]) {
+    const p = ALL_PLACES.filter((p) => p.id === id);
+    assert.equal(p.length, 1);
+    assert.equal(p[0].dining?.mapRecord?.status, "confirmed");
+  }
+  const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
+  for (const [region, expectedPending] of [["chi-shanghai", 6], ["chi-beijing", 10]] as const) {
+    const board = emptyBoard(region, q);
+    const choices = ["점심", "디저트"].flatMap((slot) => {
+      const list = candidates(region, slot as "점심" | "디저트", q, board.days[1]);
+      const first = list.findIndex(({ p }) => p.dining?.mapRecord?.status === "pending");
+      if (first >= 0) assert.ok(list.slice(first).every(({ p }) => p.dining?.mapRecord?.status === "pending"));
+      return list;
+    });
+    assert.equal(choices.filter(({ p }) => p.dining?.mapRecord?.status === "pending").length, expectedPending);
+  }
 });
