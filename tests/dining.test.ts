@@ -48,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 576);
+  assert.equal(imported.length, 673);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 145);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 160);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -84,7 +84,7 @@ test("기존 오사카 가이드 장소 ID와 출처를 유지하고 신규 다�
 
 test("확인 중 후보는 점심 목록에서 확인됨 뒤에 오고 지도 검색으로 찾을 수 있다", () => {
   const pending = ALL_PLACES.filter((p) => p.dining?.mapRecord?.status === "pending");
-  assert.equal(pending.length, 42);
+  assert.equal(pending.length, 44);
   assert.equal(pending.filter((p) => p.dining?.sourceUrl == null).length, 22);
   for (const place of pending) {
     assert.equal(place.dining?.address, null);
@@ -145,7 +145,7 @@ test("신규 미식 자료는 기존 시장 ID와 관광 역할을 보존하고 
 
 test("4차 미식 데이터는 지정 필드만 넣고 기존 시장 ID와 확인 상태를 유지한다", () => {
   const expected = ["id", "region", "nameLocal", "nameEn", "nameKo", "kind", "styles", "cuisine", "signature", "priceLevel", "sourceUrl", "checkedAt"].sort();
-  const rows = [...verifiedDining.slice(344), ...pendingDining.slice(26)];
+  const rows = [...verifiedDining.slice(344, 576), ...pendingDining.slice(26, 42)];
   assert.equal(rows.length, 248);
   assert.equal(new Set(rows.map((r) => r.region)).size, 10);
   const mapNames = new Set(rows.map((r) => r.nameLocal));
@@ -171,5 +171,43 @@ test("4차 미식 데이터는 지정 필드만 넣고 기존 시장 ID와 확�
       return list;
     });
     assert.equal(choices.filter(({ p }) => p.dining?.mapRecord?.status === "pending").length, expectedPending);
+  }
+});
+
+test("5차 자료는 앱의 4권역에만 연결하고 동네 및 기존 장소 ID를 유지한다", () => {
+  const confirmed = verifiedDining.slice(576);
+  const pending = pendingDining.slice(42);
+  assert.equal(confirmed.length, 97);
+  assert.equal(pending.length, 2);
+  const rows = [...confirmed, ...pending];
+  assert.deepEqual([...new Set(rows.map((r) => r.region))].sort(), ["aus-vienna", "hun-budapest", "mac-macau", "phi-boracay"]);
+  const fields = ["id", "region", "nameLocal", "nameEn", "nameKo", "area", "kind", "styles", "cuisine", "signature", "priceLevel", "sourceUrl", "checkedAt"].sort();
+  assert.ok(rows.every((row) => row.nameLocal !== "Belvárosi Disznótoros – Király utca"));
+  for (const row of rows) {
+    assert.deepEqual(Object.keys(row).sort(), fields);
+    const p = ALL_PLACES.find((entry) => entry.id === row.id)!;
+    assert.equal(p.dining?.mapRecord?.area, "area" in row ? row.area : null);
+    assert.equal(p.dining?.mapRecord?.confidence, null);
+  }
+  for (const id of ["phi-boracay-x16", "hun-budapest-1318", "hun-budapest-x6", "aus-vienna-1011", "aus-vienna-1009"]) {
+    const p = ALL_PLACES.filter((entry) => entry.id === id);
+    assert.equal(p.length, 1);
+    assert.equal(p[0].dining?.mapRecord?.status, "confirmed");
+  }
+  const pendingMarket = ALL_PLACES.filter((p) => p.id === "phi-boracay-x13");
+  assert.equal(pendingMarket.length, 1);
+  assert.ok(pendingMarket[0].tags.includes("시장"));
+  assert.equal(pendingMarket[0].grade, "A");
+  assert.equal(pendingMarket[0].dining?.mapRecord?.status, "pending");
+  const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
+  for (const region of ["mac-macau", "phi-boracay"]) {
+    const b = emptyBoard(region, q);
+    const pendingIds = new Set(pending.map((r) => r.id));
+    assert.ok(b.days.every((d) => [d.cells.점심.v, d.cells.저녁.v].every((id) => id == null || !pendingIds.has(id))));
+    const lunch = candidates(region, "점심", q, b.days[1]);
+    const firstPending = lunch.findIndex(({ p }) => p.dining?.mapRecord?.status === "pending");
+    assert.ok(firstPending > 0);
+    assert.ok(lunch.slice(0, firstPending).some(({ p }) => p.dining?.mapRecord?.status === "confirmed"));
+    assert.ok(lunch.slice(firstPending).every(({ p }) => p.dining?.mapRecord?.status === "pending"));
   }
 });
