@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { stepForPath } from "../src/lib/analytics";
-// @ts-expect-error 순수 JS Worker 모듈
 import { parseEvent, kstDay } from "../workers/stats/src/lib.js";
 
 test("주소를 퍼널 단계로 바꾼다", () => {
@@ -43,21 +42,20 @@ test("화면 주소는 서버가 받는 모양으로만 보낸다", async () => 
 });
 
 test("간편 가입 입력 검사와 PIN 해시", async () => {
-  // @ts-expect-error 순수 JS Worker 모듈
   const { validateSignup, hashPin, nickKey, lockMs } = await import("../workers/stats/src/lib.js");
   const ok = { nick: " 준서아빠 ", birth: "1985-01-27", gender: "M", pin: "012345", agree: true };
   assert.deepEqual(validateSignup(ok, "2026-11-24"), { nick: "준서아빠", birth: "1985-01-27", gender: "M", pin: "012345" });
-  assert.match(validateSignup({ ...ok, pin: "12345" }).error, /6자리/);
-  assert.match(validateSignup({ ...ok, pin: "12345a" }).error, /6자리/);
-  assert.match(validateSignup({ ...ok, birth: "1985-02-30" }).error, /생년월일/);
-  assert.match(validateSignup({ ...ok, birth: "2030-01-01" }, "2026-11-24").error, /생년월일/);
-  assert.match(validateSignup({ ...ok, gender: "X" }).error, /성별/);
+  assert.match(validateSignup({ ...ok, pin: "12345" }).error ?? "", /6자리/);
+  assert.match(validateSignup({ ...ok, pin: "12345a" }).error ?? "", /6자리/);
+  assert.match(validateSignup({ ...ok, birth: "1985-02-30" }).error ?? "", /생년월일/);
+  assert.match(validateSignup({ ...ok, birth: "2030-01-01" }, "2026-11-24").error ?? "", /생년월일/);
+  assert.match(validateSignup({ ...ok, gender: "X" }).error ?? "", /성별/);
   // 만 14세 미만 가입 차단 (생일 전날까지는 13세)
-  assert.match(validateSignup({ ...ok, birth: "2012-11-25" }, "2026-11-24").error, /14세/);
+  assert.match(validateSignup({ ...ok, birth: "2012-11-25" }, "2026-11-24").error ?? "", /14세/);
   assert.equal(validateSignup({ ...ok, birth: "2012-11-24" }, "2026-11-24").error, undefined);
-  assert.match(validateSignup({ ...ok, nick: "a" }).error, /닉네임/);
-  assert.match(validateSignup({ ...ok, nick: "<b>" }).error, /닉네임/);
-  assert.match(validateSignup({ ...ok, agree: false }).error, /동의/);
+  assert.match(validateSignup({ ...ok, nick: "a" }).error ?? "", /닉네임/);
+  assert.match(validateSignup({ ...ok, nick: "<b>" }).error ?? "", /닉네임/);
+  assert.match(validateSignup({ ...ok, agree: false }).error ?? "", /동의/);
   assert.equal(nickKey(" AbC "), "abc");
   const h1 = await hashPin("123456", "00112233445566778899aabbccddeeff", 1000);
   assert.equal(h1.length, 64);
@@ -77,7 +75,6 @@ test("생년월일 8자리 입력", async () => {
 });
 
 test("계정에 올릴 여행 모양 검사", async () => {
-  // @ts-expect-error 순수 JS Worker 모듈
   const { planOk } = await import("../workers/stats/src/lib.js");
   const p = { id: "NT-2026-12-20-abc", regionId: "NT", regionName: "나트랑", query: {}, createdAt: "2026-11-24T00:00:00Z" };
   assert.equal(planOk(p), true);
