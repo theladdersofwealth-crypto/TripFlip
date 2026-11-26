@@ -103,6 +103,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
     if (url.hostname === "localhost" || url.hostname === "127.0.0.1") await route.continue();
     // 계정 확인·저장 요청은 beforeEach의 모의 서버로 넘긴다. 그 외 외부 요청은 차단한다.
     else if (url.origin === STATS_ORIGIN && ["/me", "/plans"].includes(url.pathname)) await route.fallback();
+    // 카드 썸네일용 위키미디어 공용 검색은 결과 없음으로 응답한다(사진 없이 색 블록으로 표시).
+    else if (url.origin === "https://commons.wikimedia.org" && url.pathname === "/w/api.php") await route.fulfill({ json: {}, headers: { "access-control-allow-origin": "*" } });
     // 수집 서버의 최근 평균가 (시험용 값으로 응답)
     else if (url.href === "https://tripflip-collector.ohysky0127.workers.dev/summary") {
       summaryRequests++;
@@ -305,7 +307,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
-  await page.getByRole("button", { name: /^1단계 · 기본/ }).click();
+  await page.getByRole("button", { name: /^✓ 1단계 · 기본/ }).click();
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
   await pickRange(page, "2027-06-01", "2027-06-04");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
