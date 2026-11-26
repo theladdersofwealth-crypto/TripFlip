@@ -1,0 +1,25 @@
+name = "tripflip-auth"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = false
+routes = [{ pattern = "tripflip.co.kr/auth/*", zone_name = "tripflip.co.kr" }]
+
+[vars]
+# Public Web application OAuth client ID; configure before deployment.
+GOOGLE_CLIENT_ID = ""
+
+[observability]
+enabled = false
+
+[[durable_objects.bindings]]
+name = "OAUTH_FLOW"
+class_name = "OAuthFlow"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["OAuthFlow"]
+
+[[durable_objects.bindings]]
+name = "STATS"
+class_name = "Stats"
+script_name = "tripflip-stats"

@@ -14,6 +14,7 @@ import { DurableObject } from "cloudflare:workers";
 
 import { PLANS_BODY_MAX, PLAN_MAX, PLANS_PER_USER, planOk } from "./lib.js";
 import { hiddenNickKeys } from "./lib.js";
+import { validIdentity, resolveIdentity } from "./oauth.js";
 import { STEPS, KEEP_DAYS, LOCK_AFTER, PIN_ITER, kstDay, parseEvent, validateSignup, validPin, nickKey, hashPin, sha256, randomHex, lockMs } from "./lib.js";
 
 const CORS = {
@@ -90,6 +91,10 @@ export class Stats extends DurableObject {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS search_areas (day TEXT NOT NULL, area TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 1, PRIMARY KEY (day, area))`);
     // 회원
     this.sql.exec(`CREATE TABLE IF NOT EXISTS users (uid TEXT PRIMARY KEY, nick TEXT NOT NULL, nick_key TEXT NOT NULL UNIQUE, birth TEXT NOT NULL, gender TEXT NOT NULL, salt TEXT NOT NULL, pin_hash TEXT NOT NULL, iter INTEGER NOT NULL, created INTEGER NOT NULL, fails INTEGER NOT NULL DEFAULT 0, locks INTEGER NOT NULL DEFAULT 0, lock_until INTEGER NOT NULL DEFAULT 0)`);
+    // Provider subject is a one-way hash; only verified email and name are stored as profile data.
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS oauth_identities (provider TEXT NOT NULL, subject TEXT NOT NULL, uid TEXT NOT NULL, email TEXT NOT NULL, name TEXT NOT NULL, PRIMARY KEY(provider, subject), UNIQUE(provider, uid))`);
+    this.sql.exec(`CREATE INDEX IF NOT EXISTS oauth_email ON oauth_identities(email)`);
+    this.storage = ctx.storage;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS sessions (tok TEXT PRIMARY KEY, uid TEXT NOT NULL, vid TEXT NOT NULL, created INTEGER NOT NULL)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (vid TEXT PRIMARY KEY, uid TEXT NOT NULL, since INTEGER NOT NULL)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '')`);
@@ -152,6 +157,56 @@ export class Stats extends DurableObject {
     }
   }
 
+  // Only accessible through the cross-Worker Durable Object binding, not the public HTTP route.
+  async oauthStart(intent, token, v, ip) {
+    if (!/^[a-z0-9]{8,32}$/.test(v) || this.throttled("oauth", ip, 30)) return { ok: false };
+    if (intent === "login" && token == null) return { ok: true };
+    if (!["link", "withdraw"].includes(intent)) return { ok: false };
+    const session = await this.sessionOf(token);
+    if (!session || session.vid !== v) return { ok: false };
+    return { ok: true, sessionHash: session.tok };
+  }
+
+  async oauthAccount(profile, intent, token, expectedHash, v) {
+    const fail = { ok: false, error: "구글 계정을 연결할 수 없어요. 기존 계정으로 로그인한 뒤 연결해 주세요." };
+    if (!validIdentity(profile) || !/^[a-z0-9]{8,32}$/.test(v)) return fail;
+    if (intent === "login" ? token != null || expectedHash != null : !["link", "withdraw"].includes(intent) || typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token) || !expectedHash) return fail;
+    const tokenHash = token ? await sha256(token) : null;
+    if (tokenHash !== expectedHash) return fail;
+    const subject = await sha256(profile.provider + ":" + profile.subject);
+    const freshToken = randomHex(24), freshHash = await sha256(freshToken);
+    // Same database transaction for identity resolution, user creation/link and session creation.
+    return this.storage.transactionSync(() => {
+      const session = tokenHash ? this.sql.exec(`SELECT s.uid FROM sessions s JOIN users u ON u.uid=s.uid WHERE s.tok=? AND s.vid=?`, tokenHash, v).toArray()[0] : null;
+      if (tokenHash && !session) return fail;
+      const bySubject = this.sql.exec(`SELECT uid FROM oauth_identities WHERE provider=? AND subject=?`, profile.provider, subject).toArray()[0];
+      const emailUids = this.sql.exec(`SELECT DISTINCT uid FROM oauth_identities WHERE email=?`, profile.email).toArray().map(x => x.uid);
+      const linked = session ? this.sql.exec(`SELECT subject FROM oauth_identities WHERE provider=? AND uid=?`, profile.provider, session.uid).toArray()[0] : null;
+      const decision = resolveIdentity({ intent, currentUid: session?.uid, subjectUid: bySubject?.uid, emailUids, linkedSubject: linked?.subject });
+      if (!decision) return fail;
+      if (intent === "withdraw") {
+        this.eraseUser(decision.uid);
+        return { ok: true, withdrawn: true };
+      }
+      const uid = decision.create ? randomHex(8) : decision.uid;
+      if (decision.create) {
+        // No invented birth/gender/PIN. Empty strings preserve legacy NOT NULL columns.
+        this.sql.exec(`INSERT INTO users (uid,nick,nick_key,birth,gender,salt,pin_hash,iter,created) VALUES (?,?,?,'','','','',0,?)`,
+          uid, profile.name, "oauth:" + uid, Date.now());
+      }
+      this.sql.exec(`INSERT INTO oauth_identities(provider,subject,uid,email,name) VALUES (?,?,?,?,?) ON CONFLICT(provider,subject) DO UPDATE SET email=excluded.email,name=excluded.name`,
+        profile.provider, subject, uid, profile.email, profile.name);
+      const user = this.sql.exec(`SELECT nick,pin_hash FROM users WHERE uid=?`, uid).toArray()[0];
+      if (!user) throw Error("missing account");
+      if (!user.pin_hash) this.sql.exec(`UPDATE users SET nick=? WHERE uid=?`, profile.name, uid);
+      const nick = user.pin_hash ? user.nick : profile.name;
+      if (intent === "link") return { ok: true, uid, nick, token, hasPin: !!user.pin_hash };
+      this.sql.exec(`INSERT INTO sessions(tok,uid,vid,created) VALUES(?,?,?,?)`, freshHash, uid, v, Date.now());
+      this.sql.exec(`INSERT INTO devices(vid,uid,since) VALUES(?,?,?) ON CONFLICT(vid) DO UPDATE SET uid=excluded.uid,since=excluded.since`, v, uid, Date.now());
+      return { ok: true, uid, nick, token: freshToken, hasPin: !!user.pin_hash };
+    });
+  }
+
   async newSession(uid, v) {
     const token = randomHex(24);
     this.sql.exec(`INSERT INTO sessions (tok, uid, vid, created) VALUES (?, ?, ?, ?)`, await sha256(token), uid, v, Date.now());
@@ -178,7 +233,7 @@ export class Stats extends DurableObject {
     if (!v || !pin || typeof b.nick !== "string") return { ok: false, error: "닉네임과 PIN 6자리를 넣어 주세요." };
     if (this.throttled("l", ip, 30)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
     const u = this.sql.exec(`SELECT * FROM users WHERE nick_key = ?`, nickKey(b.nick)).toArray()[0];
-    if (!u) return { ok: false, error: "닉네임 또는 PIN이 맞지 않아요.", status: 401 };
+    if (!u || !u.pin_hash) return { ok: false, error: "닉네임 또는 PIN이 맞지 않아요.", status: 401 };
     const now = Date.now();
     if (u.lock_until > now) return { ok: false, error: `PIN을 여러 번 틀려 잠겼어요. ${Math.ceil((u.lock_until - now) / 60000)}분 뒤 다시 해 주세요.`, status: 429 };
     if ((await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) {
@@ -205,7 +260,8 @@ export class Stats extends DurableObject {
     if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
     // 이 기기가 다른 계정에 묶였으면 다시 이 계정으로
     this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid`, s.vid, s.uid, Date.now());
-    return { ok: true, nick: s.nick, uid: s.uid };
+    const u = this.sql.exec(`SELECT pin_hash FROM users WHERE uid = ?`, s.uid).toArray()[0];
+    return { ok: true, nick: s.nick, uid: s.uid, hasPin: !!u?.pin_hash };
   }
 
   async logout(b) {
@@ -225,7 +281,7 @@ export class Stats extends DurableObject {
     if (!pin) return { ok: false, error: "PIN 6자리를 넣어 주세요." };
     if (this.throttled("w", ip, 10)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
     const u = this.sql.exec(`SELECT salt, pin_hash, iter FROM users WHERE uid = ?`, s.uid).toArray()[0];
-    if (!u || (await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) return { ok: false, error: "PIN이 맞지 않아요.", status: 401 };
+    if (!u || !u.pin_hash || (await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) return { ok: false, error: "PIN이 맞지 않아요.", status: 401 };
     return this.deleteUser(s.uid);
   }
 
@@ -299,8 +355,11 @@ export class Stats extends DurableObject {
     return { ok: true, user: u, devices, regions, daily, recent, saved };
   }
 
+  eraseUser(uid) {
+    for (const t of ["oauth_identities", "log", "plans", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+  }
   async deleteUser(uid) {
-    for (const t of ["log", "plans", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+    this.storage.transactionSync(() => this.eraseUser(uid));
     return { ok: true };
   }
 
