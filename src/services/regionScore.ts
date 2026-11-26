@@ -115,6 +115,8 @@ export interface RegionResult {
   admissionNeedsCheck: boolean;
   /** 일정 준비 상태: 등록된 식당·카페 수와, 관광·식사 모두 여행 기간을 채울 수 있는지 */
   readiness: { meals: number; mealsNeeded: number; ready: boolean };
+  /** 미식 선택 시에만 제공. null은 검증 자료가 없어서 업체 수를 알 수 없는 경우다. */
+  diningFit?: { verifiedCount: number | null; bonus: number };
   weather: { month: number; judge: WeatherJudge; adj: number; source: string; tmax?: number; rainDays?: number };
   excluded: { place: PlaceV1; reason: string }[];
   flags: string[];
@@ -141,6 +143,7 @@ export interface RegionResult {
 }
 
 const MAX_SCORE = 5.5;
+const VERIFIED_DINING_SCORE = { pointsPerPlace: 0.025, maxPlaces: 15 };
 
 // 나라 물가: 10/31 자료 + 새 권역 나라(세계은행 PLI, 11/24 추가)
 const COUNTRY_PRICE_LEVEL: Record<string, number> = { ...WB_PRICE_LEVEL, ...EXTRA_PRICE_LEVEL };
@@ -304,6 +307,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
   const days = tripDays(q.startDate, q.endDate);
   const month = weatherMonth(q.startDate, q.endDate);
   const interests = coreInterests(q);
+  const diningWeight = interests.includes("미식") ? conceptWeight(["미식"], q) : 0;
   const minors = q.children.length > 0;
   const members = membersOf(q);
 
@@ -343,7 +347,8 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const flightHours = estimateFlightHours(region.id);
     const top = balancedTop(scored, N, interests);
 
-    const meals = ALL_PLACES.filter((p) => p.region === region.id && (isMealPlace(p) || !!p.dining)).length;
+    const mealPlaces = ALL_PLACES.filter((p) => p.region === region.id && (isMealPlace(p) || !!p.dining));
+    const meals = mealPlaces.length;
     const mealsNeeded = days * 2; // 점심·저녁
     const readiness = { meals, mealsNeeded, ready: top.length >= N && meals >= Math.ceil(mealsNeeded / 2) };
     // 현재 추천 숙소 데이터는 이름·평점·후기·가격만 제공해 확인된 시설이 없다.
@@ -376,8 +381,20 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       score *= 1 - 0.1 * unknown.length;
       base.flags.push(`${unknown.join("·")} 자료가 없어 추정값이라 적합도를 ${unknown.length * 10}% 낮췄어요`);
     }
+    const reasons = buildReasons(q, region, top, scored, weather, N, flightHours);
+    const verifiedCount = diningWeight ? mealPlaces.filter((p) => p.dining?.verified).length : 0;
+    const diningFit = diningWeight ? {
+      verifiedCount: verifiedCount || null,
+      bonus: Math.min(verifiedCount, VERIFIED_DINING_SCORE.maxPlaces) * VERIFIED_DINING_SCORE.pointsPerPlace * diningWeight,
+    } : undefined;
+    if (diningFit) {
+      score += diningFit.bonus;
+      reasons.unshift(diningFit.verifiedCount == null
+        ? "검증 식당 자료가 아직 없어요"
+        : `검증 식당·카페 등 ${diningFit.verifiedCount}곳 · 미식 가산점 반영`);
+    }
     const display = Math.min(100, Math.max(0, (score / MAX_SCORE) * 100));
-    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons: buildReasons(q, region, top, scored, weather, N, flightHours), themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
+    return { ...base, ...(diningFit && { diningFit }), status: "ranked", score, display, top, filled: top.length, reasons, themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
   });
 
   // 현지 물가 선택과 일행 전체 예산 상한을 서로 독립적으로 적용한다.
