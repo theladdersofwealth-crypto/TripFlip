@@ -1,6 +1,8 @@
 // 순수 함수(테스트용으로 분리). Worker 전용 모듈을 쓰지 않는다.
 export const STEPS = ["visit", "search", "results", "region", "day", "book", "flight", "hotel", "save"];
 export const KEEP_DAYS = 400;
+// 고정 허용 목록. 앱 TRAVEL_AREAS와 일치하는지 회귀 테스트로 확인한다.
+export const SEARCH_AREAS = ["east-asia", "southeast-asia", "south-asia", "central-asia", "middle-east", "western-europe", "southern-europe", "central-eastern-europe", "northern-europe", "north-america", "central-america", "south-america", "oceania", "africa"];
 
 /** KST 날짜 YYYY-MM-DD */
 export function kstDay(ms = Date.now()) {
@@ -17,7 +19,10 @@ export function parseEvent(raw) {
   const r = e.r == null || e.r === "" ? "" : typeof e.r === "string" && /^[A-Za-z0-9-]{2,40}$/.test(e.r) ? e.r : null;
   const p = e.p == null || e.p === "" ? "" : typeof e.p === "string" && /^\/[A-Za-z0-9/_-]{0,80}$/.test(e.p) ? e.p : null;
   if (!v || !s || r === null || p === null) return null;
-  return p ? { v, s, r, p } : { v, s, r };
+  const base = p ? { v, s, r, p } : { v, s, r };
+  if (e.g === undefined) return base; // 구버전 이벤트에는 지역 기록 없음
+  if (s !== "search" || !Array.isArray(e.g) || e.g.length > SEARCH_AREAS.length || !e.g.every((a) => SEARCH_AREAS.includes(a))) return null;
+  return { ...base, g: SEARCH_AREAS.filter((a) => e.g.includes(a)) };
 }
 
 // ── 간편 회원 ──────────────────────────────────────────────

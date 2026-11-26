@@ -89,3 +89,17 @@ test("관리자 통계에서 뺄 닉네임 목록", async () => {
   assert.deepEqual(hiddenNickKeys(undefined), []);
   assert.equal(hiddenNickKeys("너만은잡는다")[0], nickKey("너만은잡는다"));
 });
+
+
+test("희망 지역 통계는 검색 시 허용된 고정 지역 ID만 받고 구버전 이벤트를 유지한다", async () => {
+  const { SEARCH_AREAS } = await import("../workers/stats/src/lib.js");
+  const { TRAVEL_AREAS } = await import("../src/data/travelAreas");
+  assert.deepEqual(SEARCH_AREAS, TRAVEL_AREAS.map((a) => a.id));
+  const base = { v: "abc12345", s: "search" };
+  assert.deepEqual(parseEvent({ ...base, g: ["northern-europe", "southeast-asia", "northern-europe"] }), { ...base, r: "", g: ["southeast-asia", "northern-europe"] });
+  assert.deepEqual(parseEvent({ ...base, g: [] }), { ...base, r: "", g: [] });
+  assert.deepEqual(parseEvent(base), { ...base, r: "" });
+  assert.equal(parseEvent({ ...base, g: ["개인 이름"] }), null);
+  assert.equal(parseEvent({ ...base, g: "east-asia" }), null);
+  assert.equal(parseEvent({ ...base, s: "visit", g: ["east-asia"] }), null);
+});

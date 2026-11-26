@@ -3,6 +3,7 @@ import type { ChildBand, RegionQuery } from "@/services/regionScore";
 import { DEFAULT_QUERY } from "@/lib/flow";
 import { travelDateError } from "@/lib/travelDates";
 import { coreInterests, normalizeParty } from "@/lib/travelParty";
+import { normalizeTravelAreas } from "@/data/travelAreas";
 
 // 추천 결과 공유 링크(11/25 형님): 서버 없이 링크 주소(?s=)에 검색 조건을 담는다.
 // 링크는 누구나 읽을 수 있으므로 순위 계산에 꼭 필요한 값만 담는다(11/25 점검 후 수정).
@@ -31,7 +32,9 @@ export function shareableQuery(input: RegionQuery): RegionQuery {
   // 구성원별 취향은 누구의 취향인지 빼고 공통 취향 뒤에 붙인다
   const interests: Concept[] | undefined = q.interests?.length || q.members?.some((m) => m.preferences.length)
     ? coreInterests(q) : undefined;
+  const preferredAreas = normalizeTravelAreas(q.preferredAreas);
   return {
+    ...(preferredAreas.length ? { preferredAreas } : {}),
     startDate: q.startDate,
     endDate: q.endDate,
     adults: q.adults,

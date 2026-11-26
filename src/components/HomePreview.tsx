@@ -24,7 +24,7 @@ export function HomePreview({ q, ready, blocked, onOpen, save }: { q: RegionQuer
       <h2 style={{ fontSize: 20, fontWeight: 900 }}>미리 보는 추천</h2>
       <span className="chip">조건을 바꾸면 바로 갱신</span>
     </div>
-    {!ready ? <div className="card-soft small muted">1단계(누구와 · 언제 · 취향)를 마치면 여기에 추천 순위가 바로 떠요.</div>
+    {!ready ? <div className="card-soft small muted">1단계(누구와 · 언제 · 지역 · 취향)를 마치면 여기에 추천 순위가 바로 떠요.</div>
       : blocked ? <div className="card-soft small muted" role="status">{blocked}</div>
       : member === null ? null
       : !ranked.length ? <div className="card-soft small muted" role="status">현재 조건으로 보여드릴 추천이 없어요. 예산이나 취향을 조정해 보세요.</div>

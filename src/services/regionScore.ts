@@ -13,6 +13,7 @@ import { applyApprovedFacts } from "@/data/approvedCatalog";
 import { DINING_PLACES, isPendingDining, withMapDining } from "@/data/dining";
 import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, personalFit, plannedVisitCount, roomEstimate } from "@/lib/travelParty";
 import type { TravelMember } from "@/lib/travelParty";
+import { normalizeTravelAreas, travelAreaOf, type TravelArea } from "@/data/travelAreas";
 
 // 시범 5개 권역은 날씨·도보 정보가 있는 regionsV1을 쓰고, 나머지는 전 세계 데이터(worldV1)를 붙인다.
 export const PILOT_TWIN_OF: Record<string, string> = { OS: "jap-osaka", NT: "vie-nhatrang", HK: "hon-hongkong", DN: "vie-danang", PQ: "vie-phuquoc" };
@@ -75,7 +76,9 @@ export type Companion = "부부" | "연인" | "친구" | "부모님" | "영유�
 export const COMPANIONS: Companion[] = ["부부", "연인", "친구", "부모님", "영유아", "아이", "10대", "혼자"];
 
 export interface RegionQuery {
-  /** 희망 편도 비행시간 상한(시간). null·없음 = 상관없음. 넘는 권역은 순위 맨 뒤로 */
+  /** 희망 지역 복수 선택. 미입력/빈 배열은 전체. */
+  preferredAreas?: TravelArea[];
+  /** 희망 편도 비행시간(시간). null·없음 = 상관없음. 지역 미선택에서만 초과 권역을 뒤로 배치. */
   maxFlightHours?: number | null;
   members?: TravelMember[];
   interests?: Concept[]; // 동등한 핵심 취향. 없으면 기존 메인/서브 방식 유지
@@ -106,7 +109,7 @@ export interface ScoredPlace {
 export interface RegionResult {
   region: RegionV1;
   status: "ranked" | "데이터 부족" | "조건 충족 장소 없음" | "볼거리 부족" | "예산 밖" | "물가 미확인";
-  /** 희망 비행시간 초과: 순위 맨 뒤로 */
+  /** 희망 비행시간 초과. 명시 지역 선택 시 경고만 표시. */
   overFlight: boolean;
   /** 인천→거점 편도 비행시간(추정, 시간). 좌표가 없으면 null */
   flightHours: number | null;
@@ -306,7 +309,7 @@ function admissionFor(p: PlaceV1, members: TravelMember[]): "blocked" | "check" 
   return needsCheck ? "check" : "no-block";
 }
 
-export function scoreRegions(input: RegionQuery): RegionResult[] {
+export function scoreRegions(input: RegionQuery, options: { includeOutsideAreas?: boolean } = {}): RegionResult[] {
   const q = normalizeParty(input);
   const N = plannedVisitCount(q);
   const days = tripDays(q.startDate, q.endDate);
@@ -418,18 +421,29 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     if (r.status === "ranked" && !r.sightseeing.passes) r.status = "볼거리 부족";
   }
 
-  // 희망 비행시간을 넘는 곳은 빼지 않고 순위 맨 뒤로 보낸다 (형님 결정 2026-11-05)
+  // 전체 물가 구간·예산·볼거리 판정은 기존대로 모든 권역에서 먼저 계산한다.
+  // 선택 지역은 후보만 제한하고 기존 비행 감점은 그대로 둔다.
+  const selected = normalizeTravelAreas(q.preferredAreas);
+  const explicit = selected.length > 0;
+  const candidates = explicit ? results.filter((r) => {
+    const area = travelAreaOf(r.region.country);
+    return area != null && selected.includes(area);
+  }) : results;
   const maxH = q.maxFlightHours ?? null;
-  for (const r of results) {
+  for (const r of candidates) {
     if (r.status !== "ranked" || maxH == null || r.flightHours == null || r.flightHours <= maxH) continue;
     r.overFlight = true;
-    r.reasons.unshift(`희망 비행시간 초과: 편도 약 ${r.flightHours}시간(추정)으로 희망 ${maxH}시간을 넘어 순위를 뒤로 내렸어요`);
+    r.reasons.unshift(explicit
+      ? `희망 비행시간 초과: 편도 약 ${r.flightHours}시간(추정) · 선택 지역 안에서는 점수순으로 비교해요`
+      : `희망 비행시간 초과: 편도 약 ${r.flightHours}시간(추정)으로 희망 ${maxH}시간을 넘어 순위를 뒤로 내렸어요`);
   }
 
-  // 희망 비행시간 안쪽 먼저, 그 안에서 높은 점수 순, 동점은 공동 순위
-  const ranked = results.filter((r) => r.status === "ranked").sort((a, b) => Number(a.overFlight) - Number(b.overFlight) || b.score - a.score);
-  ranked.forEach((r, i) => (r.rank = i > 0 && r.score === ranked[i - 1].score && r.overFlight === ranked[i - 1].overFlight ? ranked[i - 1].rank : i + 1));
-  return [...ranked, ...results.filter((r) => r.status !== "ranked")];
+  // 명시 지역 안에서는 점수순. 전체는 기존 비행시간 우선순위·공동순위 그대로.
+  const ranked = candidates.filter((r) => r.status === "ranked").sort((a, b) => (explicit ? 0 : Number(a.overFlight) - Number(b.overFlight)) || b.score - a.score);
+  ranked.forEach((r, i) => (r.rank = i > 0 && r.score === ranked[i - 1].score && (explicit || r.overFlight === ranked[i - 1].overFlight) ? ranked[i - 1].rank : i + 1));
+  // 예약/일정의 직접 링크는 현재 검색 지역 밖이어도 열 수 있도록 허용.
+  const outside = explicit && options.includeOutsideAreas ? results.filter((r) => !candidates.includes(r)) : [];
+  return [...ranked, ...candidates.filter((r) => r.status !== "ranked"), ...outside];
 }
 
 /** 카드에 보여줄 사유: 점수에 실제로 들어간 요소만, 사람이 읽는 말로 쓴다 */

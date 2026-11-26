@@ -14,6 +14,8 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
     for (let i = 0; i < 24 && !(await day.isVisible()); i++) await page.getByRole("button", { name: "다음 달", exact: true }).click();
     await day.click();
   }
+  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: "메인 휴양", exact: true }).click();
   // 추천 전의 진행 중 질문과 값도 홈을 다시 열었을 때 남는다.

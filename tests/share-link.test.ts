@@ -46,3 +46,11 @@ test("깨진 링크·잘못된 날짜는 null", () => {
   assert.equal(decodeShare(""), null);
   assert.equal(decodeShare(encodeShare({ ...q, startDate: "2027-05-11", endDate: "2027-05-11" })), null);
 });
+
+
+test("선택 지역을 공유하고 중복/미지 ID는 제거한다. 예전 링크는 전체", () => {
+  const selected = { ...q, preferredAreas: ["northern-europe", "southeast-asia", "northern-europe", "invalid"] } as RegionQuery;
+  assert.deepEqual(decodeShare(encodeShare(selected))?.preferredAreas, ["southeast-asia", "northern-europe"]);
+  assert.equal(decodeShare(encodeShare({ ...q, preferredAreas: [] }))?.preferredAreas, undefined);
+  assert.equal(decodeShare(encodeShare(q))?.preferredAreas, undefined);
+});

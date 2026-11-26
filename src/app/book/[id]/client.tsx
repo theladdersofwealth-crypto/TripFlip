@@ -25,7 +25,7 @@ export default function BookPage() {
   const router = useRouter();
   const q = useFlowQuery();
   const priceVersion = useLivePrices();
-  const r = useMemo(() => q ? scoreRegions(q).find((x) => x.region.id === id) : undefined, [q, id, priceVersion]);
+  const r = useMemo(() => q ? scoreRegions(q, { includeOutsideAreas: true }).find((x) => x.region.id === id) : undefined, [q, id, priceVersion]);
   const [booked, setBooked] = useState({ flight: false, hotel: false });
   const [tier, setTier] = useState<StayTier | null>(null);
   const [rooms, setRooms] = useState<number | null | undefined>(undefined);
@@ -45,7 +45,7 @@ export default function BookPage() {
 
   const makePlan = (): SavedPlan => {
     const board = loadBoard(id, boardKey(id, q)) ?? emptyBoard(id, q);
-    const updatedScore = scoreRegions(nextQuery).find((x) => x.region.id === id)?.display ?? r.display;
+    const updatedScore = scoreRegions(nextQuery, { includeOutsideAreas: true }).find((x) => x.region.id === id)?.display ?? r.display;
     return { id: `${id}-${q.startDate}-${Date.now().toString(36)}`, schemaVersion: 2, regionId: id, regionName: r.region.name, query: nextQuery, display: updatedScore, booked, flightPreference, createdAt: new Date().toISOString(), board: { ...board, key: boardKey(id, nextQuery) }, prefs: loadPrefs(id) };
   };
   const save = async () => {

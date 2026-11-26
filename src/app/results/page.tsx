@@ -14,6 +14,7 @@ import { ShareButton } from "@/components/ShareButton";
 import type { RegionQuery } from "@/services/regionScore";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
+import { normalizeTravelAreas, TRAVEL_AREAS } from "@/data/travelAreas";
 import { useLivePrices } from "@/lib/livePrices";
 import { useTripStore } from "@/store/TripStore";
 
@@ -96,6 +97,7 @@ export default function ResultsPage() {
         <span className="chip"><Icon name="users" />{who}</span>
         <span className="chip">{coreInterests(q).join(" + ")}</span>
         <span className="chip">{q.stay}</span>
+        {normalizeTravelAreas(q.preferredAreas).map((id) => <span key={id} className="chip">{TRAVEL_AREAS.find((a) => a.id === id)!.label}</span>)}
         {q.totalBudgetKrw != null && <span className="chip">전체 {Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원 {q.budgetMode === "cap" ? "상한" : "목표"}</span>}
       </div>
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}

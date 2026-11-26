@@ -7,6 +7,7 @@ import { CompanionChooser } from "@/components/CompanionChooser";
 import { DateEditor } from "@/components/DateEditor";
 import { BoardingPass } from "@/components/BoardingPass";
 import { CONCEPTS } from "@/data/regionsV1";
+import { TRAVEL_AREAS, normalizeTravelAreas, travelAreaSummary, type TravelArea } from "@/data/travelAreas";
 import type { Concept } from "@/data/regionsV1";
 import { loadHomeDraft, saveHomeDraft, saveQuery } from "@/lib/flow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
@@ -24,16 +25,16 @@ const STAYS: StayTier[] = ["가성비", "가심비", "프리미엄", "하이엔�
 
 const FLIGHTS: { v: number | null; label: string }[] = [{ v: 5, label: "5시간" }, { v: 8, label: "8시간" }, { v: 12, label: "12시간" }, { v: null, label: "상관없음" }];
 
-type Q = "who" | "when" | "vibe" | "flight" | "intensity" | "budget" | "stay";
+type Q = "who" | "when" | "area" | "vibe" | "flight" | "intensity" | "budget" | "stay";
 // 형님 흐름(11/23): 1단계 → 2단계 → 3단계를 세로로 보여주고, 단계 안 질문은 하나씩 차례로
 // 11/25: "정확도 %"는 실제 정확도가 아니라 반영한 조건 단계 수라서 "여행 조건 반영 n/3"으로 표시
 const STEPS: { title: string; sub: string; qs: Q[] }[] = [
-  { title: "기본", sub: "누구와 · 언제 · 여행 취향", qs: ["who", "when", "vibe"] },
+  { title: "기본", sub: "누구와 · 언제 · 지역 · 여행 취향", qs: ["who", "when", "area", "vibe"] },
   { title: "일정 스타일", sub: "비행시간 · 하루 강도", qs: ["flight", "intensity"] },
   { title: "예산·숙소", sub: "예산 · 숙소 · 물가 · 객실", qs: ["budget", "stay"] },
 ];
-const Q_TITLE: Record<Q, string> = { who: "누구랑 가나요?", when: "언제 떠나요?", vibe: "어떤 여행인가요?", flight: "비행은 몇 시간까지 괜찮아요?", intensity: "하루에 몇 곳 둘러볼까요?", budget: "일행 전체 예산은요?", stay: "숙소·물가는요?" };
-const Q_SHORT: Record<Q, string> = { who: "누구와", when: "언제", vibe: "취향", flight: "비행시간", intensity: "하루 강도", budget: "예산", stay: "숙소" };
+const Q_TITLE: Record<Q, string> = { who: "누구랑 가나요?", when: "언제 떠나요?", area: "가고 싶은 지역", vibe: "어떤 여행인가요?", flight: "비행은 몇 시간까지 괜찮아요?", intensity: "하루에 몇 곳 둘러볼까요?", budget: "일행 전체 예산은요?", stay: "숙소·물가는요?" };
+const Q_SHORT: Record<Q, string> = { who: "누구와", when: "언제", area: "지역", vibe: "취향", flight: "비행시간", intensity: "하루 강도", budget: "예산", stay: "숙소" };
 
 export default function Home() {
   const router = useRouter();
@@ -76,6 +77,7 @@ export default function Home() {
   const members = membersOf(q);
   const interests = q.interests?.length ? q.interests : [q.main, ...q.subs];
   const rooms = roomEstimate(q);
+  const selectedAreas = normalizeTravelAreas(q.preferredAreas);
   const hasAdult = members.some((m) => m.age === null ? m.relationship !== "child" : m.age >= 18);
   const partyError = !hasAdult ? "성인 구성원을 한 명 이상 입력해 주세요." : members.some((m) => m.relationship === "child" && m.age === null) ? "자녀의 만 나이를 입력해 주세요." : null;
   const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "전체 예산은 0보다 큰 금액으로 입력해 주세요." : null;
@@ -89,6 +91,7 @@ export default function Home() {
     switch (k) {
       case "who": return `${members.length}명 · 성인 ${members.length - kids}${kids ? ` · 자녀 ${kids}` : ""}`;
       case "when": return Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택";
+      case "area": return travelAreaSummary(selectedAreas);
       case "vibe": return interests.join("·");
       case "flight": return FLIGHTS.find((f) => f.v === (q.maxFlightHours ?? null))?.label ?? "상관없음";
       case "intensity": return INTENSITY.find((it) => it.v === q.perDay)?.label ?? "-";
@@ -108,6 +111,10 @@ export default function Home() {
   };
   // 하나만 고르면 되는 질문은 누르면 바로 다음으로
   const pickAndNext = (next2: Partial<RegionQuery>) => { patch(next2); next(); };
+  const toggleArea = (area: TravelArea) => {
+    const next = normalizeTravelAreas(selectedAreas.includes(area) ? selectedAreas.filter((a) => a !== area) : [...selectedAreas, area]);
+    patch({ preferredAreas: next.length ? next : undefined });
+  };
   const setInterests = (next: Concept[]) => setQ({ ...q, interests: next, main: next[0], subs: next.slice(1) });
   // 메인은 한 번 눌러 바꾸고, 서브는 누른 순서대로 1·2·3… (다시 누르면 빠지고 뒤 번호가 당겨짐)
   const pickMain = (c: Concept) => setInterests([c, ...interests.slice(1).filter((s) => s !== c)]);
@@ -123,14 +130,14 @@ export default function Home() {
   const go = () => {
     if (error || pending || flying || !done[0]) return;
     commit();
-    track("search");
+    track("search", undefined, undefined, selectedAreas);
     setFlying(true); // 비행기 로딩은 결과 화면으로 넘어갈 때까지만(고정 대기 없음, 11/25)
     startTransition(() => router.push("/results"));
   };
   const openRegion = (id: string) => {
     if (error) return;
     commit();
-    track("search");
+    track("search", undefined, undefined, selectedAreas);
     router.push(`/results?r=${encodeURIComponent(id)}`);
   };
   const curQ = open == null ? null : STEPS[open].qs[qi];
@@ -143,6 +150,14 @@ export default function Home() {
         <DateEditor query={q} onChange={setQ} />
         {dateError ? <p className="small form-error" role="alert">{dateError}</p> : <p className="small muted">기준 일정 {days - 1}박 {days}일</p>}
       </>;
+      case "area": return <>
+        <p className="small muted">선택 사항 · 여러 지역을 고를 수 있어요. 선택하지 않으면 전 세계를 추천해요.</p>
+        <div className="chips" role="group" aria-label="가고 싶은 지역 선택">
+          <button type="button" className={`toggle-chip ${selectedAreas.length === 0 ? "on" : ""}`} aria-pressed={selectedAreas.length === 0} onClick={() => patch({ preferredAreas: undefined })}>상관없음</button>
+          {TRAVEL_AREAS.map((a) => <button key={a.id} type="button" className={`toggle-chip ${selectedAreas.includes(a.id) ? "on" : ""}`} aria-pressed={selectedAreas.includes(a.id)} onClick={() => toggleArea(a.id)}>{a.label}</button>)}
+        </div>
+        {selectedAreas.length > 0 && <p className="xs muted">선택한 {selectedAreas.length}개 지역 안에서 점수순으로 추천해요.</p>}
+      </>;
       case "vibe": return <>
         <span className="label">메인 테마 · 1개</span>
         <p className="xs muted">여행지를 고를 때 가장 크게 반영해요. 누르면 바로 바뀌어요.</p>
@@ -154,7 +169,7 @@ export default function Home() {
       </>;
       case "flight": return <>
         <div className="seg sm">{FLIGHTS.map((f) => <button key={f.label} type="button" className={(q.maxFlightHours ?? null) === f.v ? "on" : ""} aria-pressed={(q.maxFlightHours ?? null) === f.v} onClick={() => pickAndNext({ maxFlightHours: f.v })}>{f.label}</button>)}</div>
-        <p className="xs muted">인천 출발 편도 기준이에요. 넘는 곳은 빼지 않고 순위 맨 뒤로 보내요.</p>
+        <p className="xs muted">{selectedAreas.length ? "인천 출발 편도 기준이에요. 선택 지역 안에서는 점수순으로 추천하고 비행 부담은 점수에 반영해요." : "인천 출발 편도 기준이에요. 넘는 곳은 빼지 않고 순위 맨 뒤로 보내요."}</p>
       </>;
       case "intensity": return <div className="seg sm">{INTENSITY.map((it) => <button key={it.v} type="button" className={q.perDay === it.v ? "on" : ""} aria-pressed={q.perDay === it.v} onClick={() => pickAndNext({ perDay: it.v })}>{it.label}</button>)}</div>;
       case "budget": return <>
@@ -180,6 +195,9 @@ export default function Home() {
       <h1 style={{ fontSize: 24, fontWeight: 900 }}>어디로 떠나볼까요?</h1>
       <p className="small muted home-intro">아이와 함께하는 가족여행처럼 누구와 가는지, 언제·어떤 여행인지, 예산을 고르면 갈 만한 여행지를 순위로 추천하고 날짜별 일정까지 짜 드려요.</p>
       <div className="bp-sticky"><BoardingPass compact q={q} members={members} days={days} interests={interests} active={activeSlot} onSlot={slotJump} /></div>
+      <button type="button" className="flow-answered" style={{ marginBottom: 10 }} onClick={() => openStep(0, STEPS[0].qs.indexOf("area"))}>
+        <span>가고 싶은 지역</span><b>{travelAreaSummary(selectedAreas)}</b><em>선택</em>
+      </button>
       <ol className="flow-steps">
         {STEPS.map((s, i) => {
           const isOpen = open === i;
@@ -217,7 +235,7 @@ export default function Home() {
         <div className="accuracy-bar"><span style={{ width: `${Math.round((doneCount / STEPS.length) * 100)}%` }} /></div>
       </div>
       <Link href="/guide" className="home-faq-link small">자주 묻는 질문 ›</Link>
-      {done[0] && choice == null && open == null && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}</p>
+      {done[0] && choice == null && open == null && <div className="sticky-cta"><p className="xs muted form-total">{Number.isFinite(days) ? `${days - 1}박 ${days}일` : "날짜 선택"} · {members.length}명 · {interests.join("·")}{selectedAreas.length ? ` · ${travelAreaSummary(selectedAreas)}` : ""}</p>
         <button className="btn btn-primary btn-lg btn-block" disabled={!!error || pending} onClick={go}><Icon name="plane" /> {pending ? "여행지를 찾는 중…" : `여행지 추천받기 · 조건 ${doneCount}/${STEPS.length}`}</button>
       </div>}
       {flying && (

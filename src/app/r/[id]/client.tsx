@@ -38,7 +38,7 @@ function BoardInner({ regionId }: { regionId?: string }) {
   const router = useRouter();
   const q = useFlowQuery(plan);
   const priceVersion = useLivePrices();
-  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
+  const r = useMemo(() => (q ? scoreRegions(q, { includeOutsideAreas: true }).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
   const [board, setBoard] = useState<Board | null>(null);
   const [pick, setPick] = useState<{ di: number; slot: SlotKey } | null>(null);
   const [toast, setToast] = useState("");

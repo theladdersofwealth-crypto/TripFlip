@@ -59,7 +59,7 @@ test.beforeEach(async ({ page }) => {
 test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
-  // 1단계 질문이 하나씩: 누구와 → 언제 → 취향. 1단계를 끝내기 전엔 추천 버튼이 없다.
+  // 1단계 질문이 하나씩: 누구와 → 언제 → 지역 → 취향. 1단계를 끝내기 전엔 추천 버튼이 없다.
   const submit = page.getByRole("button", { name: /추천받기 · 조건/ });
   await expect(submit).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
@@ -75,6 +75,8 @@ test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) =
   await pickRange(page, "2027-05-10", "2027-05-20");
   await expect(page.getByText("기준 일정 10박 11일", { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
+  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
   await expect(page.getByText("여행 조건 반영 1/3", { exact: true })).toBeVisible();
@@ -137,6 +139,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
   await pickRange(page, "2027-05-07", "2027-05-17");
+  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   const travelStyle = page.locator(".flow-step.open");
   // 메인은 한 번 눌러 바꾸고(기본 메인 관광 → 휴양), 서브는 누른 순서대로 번호가 붙는다.
@@ -310,6 +314,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: /^✓ 1단계 · 기본/ }).click();
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
   await pickRange(page, "2027-06-01", "2027-06-04");
+  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
   await page.getByRole("button", { name: /^2단계로 조건 더 넣기/ }).click();
