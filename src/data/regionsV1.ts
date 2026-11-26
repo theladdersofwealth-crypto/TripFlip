@@ -52,10 +52,19 @@ export interface PlaceV1 {
     cuisine: string | null;
     address: string | null;
     source: string;
-    sourceUrl: string;
+    sourceUrl: string | null;
     checkedAt: string;
-    license: string;
+    license: string | null;
     website: string | null;
+    verified?: {
+      nameLocal: string;
+      nameEn: string;
+      nameKo: string | null;
+      area: string | null;
+      signature: string[];
+      priceLevel: string | null;
+      confidence: string | null;
+    };
   };
 }
 

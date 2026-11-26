@@ -1,4 +1,5 @@
 import catalog from "../../public/dining/catalog.json";
+import verifiedDining from "./verifiedDining.json";
 import type { PlaceV1 } from "./regionsV1";
 
 export const DINING_CATALOG = catalog;
@@ -11,3 +12,35 @@ export const DINING_PLACES: PlaceV1[] = catalog.places.map((row) => ({
   dining: { kind: row.kind as "restaurant" | "cafe", styles: row.styles, cuisine: row.cuisine, address: row.address,
     source: row.source, sourceUrl: row.sourceUrl, checkedAt: row.checkedAt, license: row.license, website: row.website },
 }));
+
+export function withVerifiedDining(places: PlaceV1[]): PlaceV1[] {
+  const merged = [...places];
+  const indexById = new Map(places.map((place, index) => [place.id, index]));
+  for (const row of verifiedDining) {
+    const index = indexById.get(row.id);
+    const existing = index == null ? undefined : merged[index];
+    const kind = row.kind === "cafe" ? "cafe" : "restaurant";
+    const name = row.nameKo ?? row.nameLocal;
+    const place: PlaceV1 = existing ?? {
+      id: row.id, region: row.region, name, en: row.nameEn,
+      concepts: ["미식"], tags: [kind === "cafe" ? "카페·디저트" : "로컬푸드"],
+      travel: "위치 확인 필요", penalty: 0, grade: null,
+    };
+    // 기존 시장의 관광 분류와 저장된 장소 ID, 좌표 및 등급은 유지한다.
+    const updated: PlaceV1 = {
+      ...place,
+      dining: {
+        kind, styles: row.styles, cuisine: row.cuisine, address: null,
+        source: "구글 지도 존재·영업 확인 자료", sourceUrl: row.sourceUrl,
+        checkedAt: row.checkedAt, license: null, website: null,
+        verified: {
+          nameLocal: row.nameLocal, nameEn: row.nameEn, nameKo: row.nameKo, area: row.area,
+          signature: row.signature, priceLevel: row.priceLevel, confidence: row.confidence,
+        },
+      },
+    };
+    if (index == null) merged.push(updated);
+    else merged[index] = updated;
+  }
+  return merged;
+}

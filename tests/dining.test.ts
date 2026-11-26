@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { DINING_CATALOG, DINING_PLACES } from "../src/data/dining";
+import verifiedDining from "../src/data/verifiedDining.json";
+import { diningMapUrl } from "../src/components/VerifiedDiningDetails";
+import { ALL_PLACES, ALL_REGIONS, isMealPlace } from "../src/services/regionScore";
 import { candidates, diningDistance, emptyBoard, evaluate } from "../src/services/planner";
 import { DEFAULT_QUERY } from "../src/lib/flow";
 
@@ -8,7 +11,7 @@ test("식당 후보에는 출처·이용 조건을 남기고 미확인 품질·�
   assert.ok(DINING_PLACES.length >= 100);
   for (const place of DINING_PLACES) {
     assert.equal(place.grade, null);
-    assert.ok(place.dining?.sourceUrl.startsWith("https://en.wikivoyage.org/w/index.php?"));
+    assert.ok(place.dining?.sourceUrl?.startsWith("https://en.wikivoyage.org/w/index.php?"));
     assert.equal(place.dining?.license, "CC-BY-SA-4.0");
   }
   assert.ok(DINING_CATALOG.places.every((p) => p.kidsChair === null && p.kidsMenu === null && p.openingHours === null));
@@ -40,4 +43,36 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
   const distance = diningDistance(place, {});
   assert.equal(distance.from, "거점");
   assert.ok(distance.km != null && distance.km < 3, "나트랑 시내 식당을 10km 이상 떨어졌다고 표시하지 않는다");
+});
+
+test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
+  const imported = ALL_PLACES.filter((place) => place.dining?.verified);
+  assert.equal(imported.length, 116);
+  assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 15);
+  const regions = new Set(ALL_REGIONS.map((region) => region.id));
+  for (const row of verifiedDining) {
+    const place = imported.find((p) => p.id === row.id)!;
+    assert.ok(regions.has(place.region));
+    assert.equal(place.region, row.region);
+    assert.equal(place.dining?.address, null);
+    assert.equal(place.dining?.sourceUrl, row.sourceUrl);
+    assert.ok(!("phone" in row || "address" in row || "opening_hours" in row));
+    const mapUrl = new URL(diningMapUrl(place)!);
+    assert.equal(mapUrl.searchParams.get("query"), [row.nameLocal, row.area].filter(Boolean).join(" "));
+    if (row.id.startsWith("verified-dining-")) {
+      assert.equal(place.grade, null);
+      assert.equal(place.lat, undefined);
+      assert.equal(place.lon, undefined);
+      assert.ok(isMealPlace(place));
+    }
+  }
+});
+
+test("미식 후보로도 표시한 니시키 시장은 기존 관광과 저장 장소 ID를 유지한다", () => {
+  const day = emptyBoard("jap-kyoto", DEFAULT_QUERY).days[0];
+  for (const slot of ["점심", "오전"] as const) {
+    const market = candidates("jap-kyoto", slot, DEFAULT_QUERY, day).find(({ p }) => p.id === "jap-kyoto-17");
+    assert.equal(market?.p.dining?.verified?.nameEn, "Nishiki Food Market");
+  }
 });

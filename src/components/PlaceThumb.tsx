@@ -22,6 +22,7 @@ const fromCommons = (c: CommonsPhoto): ThumbInfo => ({ src: c.src, credit: `ì‚¬ì
 const brokenSrc = new Set<string>();
 
 function fixed(p: PlaceV1): ThumbInfo | null {
+  if (p.dining?.verified) return null;
   const f = PLACE_IMAGES[p.id];
   if (f) return { src: f.src, credit: f.credit ?? "", link: f.link };
   const c = autoTarget(p) ? cachedCommons(p.id) : null;

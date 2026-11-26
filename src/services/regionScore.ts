@@ -10,7 +10,7 @@ import { HOTELS } from "@/data/worldHotels";
 import { EXTRA_PRICE_LEVEL, HOTEL_ESTIMATE_USD } from "@/data/hotelEstimates";
 import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
-import { DINING_PLACES } from "@/data/dining";
+import { DINING_PLACES, withVerifiedDining } from "@/data/dining";
 import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, personalFit, plannedVisitCount, roomEstimate } from "@/lib/travelParty";
 import type { TravelMember } from "@/lib/travelParty";
 
@@ -48,7 +48,7 @@ const withConcepts = (p: PlaceV1): PlaceV1 => {
   const add = p.tags.flatMap((t) => TAG_CONCEPT[t] ?? []).filter((c) => !p.concepts.includes(c));
   return add.length ? { ...p, concepts: [...p.concepts, ...new Set(add)] } : p;
 };
-export const ALL_PLACES: PlaceV1[] = [
+export const ALL_PLACES: PlaceV1[] = withVerifiedDining([
   ...PLACES_V1,
   ...WORLD_PLACES.flatMap((p) => {
     const pilot = PILOT_OF[p.region];
@@ -58,7 +58,7 @@ export const ALL_PLACES: PlaceV1[] = [
     return [{ ...p, region: pilot }];
   }),
   ...DINING_PLACES,
-].map(withConcepts).map(applyApprovedFacts).map(applyWikiBoost);
+]).map(withConcepts).map(applyApprovedFacts).map(applyWikiBoost);
 
 export type ChildBand = "영아" | "유아" | "초등" | "중고등";
 export type IntensityV1 = 1 | 2 | 3;
