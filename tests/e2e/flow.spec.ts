@@ -15,9 +15,45 @@ async function pickRange(page: import("@playwright/test").Page, start: string, e
   }
 }
 
-// 추천 결과는 회원 전용(PR #32) → 테스트는 가짜 로그인 상태로 시작
+// 실제 계정에는 연결하지 않는다. 테스트마다 독립된 가짜 서버의 계정 저장소를 사용한다.
+const E2E_AUTH = { uid: "0123456789abcdef", token: "e2e", nick: "e2e" };
+const STATS_ORIGIN = "https://tripflip-stats.ohysky0127.workers.dev";
+const accountPlansKey = `tripflip.acct.${E2E_AUTH.uid}.plans`;
+const accountPendingKey = `tripflip.acct.${E2E_AUTH.uid}.pending`;
+
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem("tripflip:auth", JSON.stringify({ token: "e2e", nick: "e2e" })));
+  const serverPlans = new Map<string, SavedPlan>();
+  const tombstones = new Set<string>();
+  await page.addInitScript((auth) => localStorage.setItem("tripflip:auth", JSON.stringify(auth)), E2E_AUTH);
+  await page.route(`${STATS_ORIGIN}/**`, async (route) => {
+    const req = route.request();
+    const path = new URL(req.url()).pathname;
+    const headers = {
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "POST, OPTIONS",
+      "access-control-allow-headers": "content-type",
+    };
+    if (path !== "/me" && path !== "/plans") { await route.abort(); return; }
+    if (req.method() === "OPTIONS") { await route.fulfill({ status: 204, headers }); return; }
+    if (req.method() !== "POST") { await route.fulfill({ status: 405, headers }); return; }
+    const body = req.postDataJSON() as { token?: string; put?: SavedPlan[]; del?: string[] };
+    if (body.token !== E2E_AUTH.token) {
+      await route.fulfill({ status: 401, headers, json: { ok: false, error: "로그인이 풀렸어요." } });
+      return;
+    }
+    if (path === "/me") {
+      await route.fulfill({ headers, json: { ok: true, uid: E2E_AUTH.uid, nick: E2E_AUTH.nick } });
+      return;
+    }
+    const saved: string[] = [], deleted: string[] = [], gone: string[] = [];
+    for (const id of body.del ?? []) { serverPlans.delete(id); tombstones.add(id); deleted.push(id); }
+    for (const plan of body.put ?? []) {
+      if (tombstones.has(plan.id)) { gone.push(plan.id); continue; }
+      serverPlans.set(plan.id, plan);
+      saved.push(plan.id);
+    }
+    await route.fulfill({ headers, json: { ok: true, uid: E2E_AUTH.uid, plans: [...serverPlans.values()], saved, deleted, gone, rejected: [] } });
+  });
 });
 
 test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
@@ -65,7 +101,11 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.route("**/*", async (route) => {
     const url = new URL(route.request().url());
     if (url.hostname === "localhost" || url.hostname === "127.0.0.1") await route.continue();
-    // 앱이 읽는 유일한 외부 주소: 수집 서버의 최근 평균가 (시험용 값으로 응답)
+    // 계정 확인·저장 요청은 beforeEach의 모의 서버로 넘긴다. 그 외 외부 요청은 차단한다.
+    else if (url.origin === STATS_ORIGIN && ["/me", "/plans"].includes(url.pathname)) await route.fallback();
+    // 카드 썸네일용 위키미디어 공용 검색은 결과 없음으로 응답한다(사진 없이 색 블록으로 표시).
+    else if (url.origin === "https://commons.wikimedia.org" && url.pathname === "/w/api.php") await route.fulfill({ json: {}, headers: { "access-control-allow-origin": "*" } });
+    // 수집 서버의 최근 평균가 (시험용 값으로 응답)
     else if (url.href === "https://tripflip-collector.ohysky0127.workers.dev/summary") {
       summaryRequests++;
       await route.fulfill({ json: { updatedAt: "2026-11-10T02:15:00Z", windowDays: 14, days: { flight: 3, hotel: 3 }, counts: { flightSnapshots: 9, hotelBatches: 66 }, flights: { NHA: { "2027-05": [298000, 3] } }, hotels: {} }, headers: { "access-control-allow-origin": "*" } });
@@ -226,11 +266,29 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(hotel.searchParams.get("childages")).toBe("1,8");
   await expect(page.getByLabel("항공권 예약 완료 (직접 확인)", { exact: true })).not.toBeChecked();
   await expect(page.getByLabel("숙소 예약 완료 (직접 확인)", { exact: true })).not.toBeChecked();
+  const saveResponse = page.waitForResponse((response) => {
+    const request = response.request();
+    if (response.url() !== `${STATS_ORIGIN}/plans` || request.method() !== "POST") return false;
+    const body = request.postDataJSON() as { put?: SavedPlan[] };
+    return !!body.put?.length;
+  });
   await page.getByRole("button", { name: "일정과 함께 내 여행에 저장", exact: true }).click();
+  const response = await saveResponse;
+  expect(response.ok()).toBe(true);
+  const ack = await response.json() as { ok: boolean; uid: string; saved: string[]; plans: SavedPlan[] };
+  expect(ack.ok).toBe(true);
+  expect(ack.uid).toBe(E2E_AUTH.uid);
+  expect(ack.saved).toHaveLength(1);
   await expect(page).toHaveURL(/\/my-trips$/);
+  await expect(page.getByText("✓ 계정에 저장됨", { exact: true })).toBeVisible();
   await expect(page.getByText("항공 미예약", { exact: true })).toBeVisible();
   await expect(page.getByText("숙소 미예약", { exact: true })).toBeVisible();
-  const originalPlans = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.plans") ?? "[]")) as SavedPlan[];
+  const readAccountPlans = () => page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]"), accountPlansKey) as Promise<SavedPlan[]>;
+  const originalPlans = await readAccountPlans();
+  expect(originalPlans).toEqual(ack.plans);
+  expect(ack.saved).toEqual(originalPlans.map((p) => p.id));
+  expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "{}").puts, accountPendingKey)).toEqual({});
+  expect(await page.evaluate(() => localStorage.getItem("tripflip.flow.plans"))).toBeNull();
   expect(originalPlans).toHaveLength(1);
   const original = originalPlans[0];
   expect(original.query.stay).toBe("프리미엄");
@@ -238,14 +296,18 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(original.flightPreference).toBe("lowcost");
   expect(original.board?.days[1].cells["오전"]).toEqual({ v: "rest", lock: true });
   expect(original.prefs?.breakfastEnabled).toBe(false);
+  // 계정 캐시를 없애도 서버에서 원래 일정을 다시 받아 복원해야 한다.
+  await page.evaluate((key) => localStorage.removeItem(key), accountPlansKey);
   await page.reload();
   await expect(page.getByRole("link", { name: /^나트랑/ })).toBeVisible();
+  await expect(page.getByText("✓ 계정에 저장됨", { exact: true })).toBeVisible();
+  expect(await readAccountPlans()).toEqual(originalPlans);
 
   await expect(page.getByRole("button", { name: "계획 파일 내려받기" })).toHaveCount(0);
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
-  await page.getByRole("button", { name: /^1단계 · 기본/ }).click();
+  await page.getByRole("button", { name: /^✓ 1단계 · 기본/ }).click();
   await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
   await pickRange(page, "2027-06-01", "2027-06-04");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
@@ -270,7 +332,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(page.getByLabel("조식을 먹어요", { exact: true })).not.toBeChecked();
   await expect(page.getByLabel("기상 시간", { exact: true })).toHaveValue("08:30");
   await noHorizontalOverflow(page);
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.plans") ?? "[]"))).toEqual(originalPlans);
+  expect(await readAccountPlans()).toEqual(originalPlans);
+  expect(await page.evaluate(() => localStorage.getItem("tripflip.flow.plans"))).toBeNull();
   await page.goto("/data-status");
   await expect(page.getByRole("heading", { name: "데이터 출처와 확인 상태", exact: true })).toBeVisible();
   await expect(page.getByText("출처 검토 자료 · 권역 5곳, 장소 10곳", { exact: true })).toBeVisible();
