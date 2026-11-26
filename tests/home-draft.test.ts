@@ -30,3 +30,19 @@ test("다른 화면에서 명시적으로 적용한 새 조건에 과거 홈 초
   saveQuery(applied);
   assert.deepEqual(loadHomeDraft(), { q: applied, progress: null, hasSearch: true });
 });
+
+
+test("지역 선택은 검색 조건·홈 초안에 보존되고 이전 조건은 전체를 의미한다", () => {
+  const legacy = { ...DEFAULT_QUERY };
+  assert.equal(loadQuery().preferredAreas, undefined);
+  saveQuery(legacy);
+  assert.equal(loadQuery().preferredAreas, undefined);
+  const next = { ...legacy, preferredAreas: ["central-eastern-europe", "southeast-asia"] as const };
+  const selected = { ...next, preferredAreas: [...next.preferredAreas] };
+  const progress = { open: 0, question: 2, done: [false, false, false], choice: null };
+  saveHomeDraft(selected, progress);
+  assert.deepEqual(loadHomeDraft().q.preferredAreas, selected.preferredAreas);
+  assert.equal(loadQuery().preferredAreas, undefined);
+  saveQuery(selected);
+  assert.deepEqual(loadQuery().preferredAreas, selected.preferredAreas);
+});

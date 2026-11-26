@@ -11,6 +11,8 @@ test("비회원은 1~3위만 보이고 4위부터 흐리며, 로그인하면 전
     for (let i = 0; i < 24 && !(await day.isVisible()); i++) await page.getByRole("button", { name: "다음 달", exact: true }).click();
     await day.click();
   }
+  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
   await page.getByRole("button", { name: /^1단계 완료/ }).click();
   await page.getByRole("button", { name: /추천받기 · 조건/ }).click();
