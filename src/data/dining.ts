@@ -1,8 +1,11 @@
 import catalog from "../../public/dining/catalog.json";
 import verifiedDining from "./verifiedDining.json";
+import pendingDining from "./pendingDining.json";
 import type { PlaceV1 } from "./regionsV1";
 
 export const DINING_CATALOG = catalog;
+export const isPendingDining = (place: PlaceV1) => place.dining?.mapRecord?.status === "pending";
+export const pendingDiningLast = (a: PlaceV1, b: PlaceV1) => Number(isPendingDining(a)) - Number(isPendingDining(b));
 /** 공개 가이드의 상호·위치만 사용한다. 영업·품질·가족 편의시설을 추정해 채우지 않는다. */
 export const DINING_PLACES: PlaceV1[] = catalog.places.map((row) => ({
   id: row.id, region: row.region, name: row.name, en: row.name,
@@ -13,10 +16,14 @@ export const DINING_PLACES: PlaceV1[] = catalog.places.map((row) => ({
     source: row.source, sourceUrl: row.sourceUrl, checkedAt: row.checkedAt, license: row.license, website: row.website },
 }));
 
-export function withVerifiedDining(places: PlaceV1[]): PlaceV1[] {
+export function withMapDining(places: PlaceV1[]): PlaceV1[] {
   const merged = [...places];
   const indexById = new Map(places.map((place, index) => [place.id, index]));
-  for (const row of verifiedDining) {
+  const rows = [
+    ...verifiedDining.map((row) => ({ ...row, status: "confirmed" as const })),
+    ...pendingDining.map((row) => ({ ...row, status: "pending" as const })),
+  ];
+  for (const row of rows) {
     const index = indexById.get(row.id);
     const existing = index == null ? undefined : merged[index];
     const kind = row.kind === "cafe" ? "cafe" : "restaurant";
@@ -31,9 +38,11 @@ export function withVerifiedDining(places: PlaceV1[]): PlaceV1[] {
       ...place,
       dining: {
         kind, styles: row.styles, cuisine: row.cuisine, address: null,
-        source: "구글 지도 존재·영업 확인 자료", sourceUrl: row.sourceUrl,
+        source: row.status === "confirmed" ? "구글 지도 존재·영업 확인 자료" : "구글 지도 확인 중 자료",
+        sourceUrl: row.sourceUrl,
         checkedAt: row.checkedAt, license: null, website: null,
-        verified: {
+        mapRecord: {
+          status: row.status,
           nameLocal: row.nameLocal, nameEn: row.nameEn, nameKo: row.nameKo, area: row.area,
           signature: row.signature, priceLevel: row.priceLevel, confidence: row.confidence,
         },

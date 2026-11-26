@@ -10,7 +10,7 @@ import { HOTELS } from "@/data/worldHotels";
 import { EXTRA_PRICE_LEVEL, HOTEL_ESTIMATE_USD } from "@/data/hotelEstimates";
 import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
-import { DINING_PLACES, withVerifiedDining } from "@/data/dining";
+import { DINING_PLACES, isPendingDining, withMapDining } from "@/data/dining";
 import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, personalFit, plannedVisitCount, roomEstimate } from "@/lib/travelParty";
 import type { TravelMember } from "@/lib/travelParty";
 
@@ -48,7 +48,7 @@ const withConcepts = (p: PlaceV1): PlaceV1 => {
   const add = p.tags.flatMap((t) => TAG_CONCEPT[t] ?? []).filter((c) => !p.concepts.includes(c));
   return add.length ? { ...p, concepts: [...p.concepts, ...new Set(add)] } : p;
 };
-export const ALL_PLACES: PlaceV1[] = withVerifiedDining([
+export const ALL_PLACES: PlaceV1[] = withMapDining([
   ...PLACES_V1,
   ...WORLD_PLACES.flatMap((p) => {
     const pilot = PILOT_OF[p.region];
@@ -348,7 +348,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const top = balancedTop(scored, N, interests);
 
     const mealPlaces = ALL_PLACES.filter((p) => p.region === region.id && (isMealPlace(p) || !!p.dining));
-    const meals = mealPlaces.length;
+    const meals = mealPlaces.filter((p) => !isPendingDining(p)).length;
     const mealsNeeded = days * 2; // 점심·저녁
     const readiness = { meals, mealsNeeded, ready: top.length >= N && meals >= Math.ceil(mealsNeeded / 2) };
     // 현재 추천 숙소 데이터는 이름·평점·후기·가격만 제공해 확인된 시설이 없다.
@@ -382,7 +382,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       base.flags.push(`${unknown.join("·")} 자료가 없어 추정값이라 적합도를 ${unknown.length * 10}% 낮췄어요`);
     }
     const reasons = buildReasons(q, region, top, scored, weather, N, flightHours);
-    const verifiedCount = diningWeight ? mealPlaces.filter((p) => p.dining?.verified).length : 0;
+    const verifiedCount = diningWeight ? mealPlaces.filter((p) => p.dining?.mapRecord?.status === "confirmed").length : 0;
     const diningFit = diningWeight ? {
       verifiedCount: verifiedCount || null,
       bonus: Math.min(verifiedCount, VERIFIED_DINING_SCORE.maxPlaces) * VERIFIED_DINING_SCORE.pointsPerPlace * diningWeight,

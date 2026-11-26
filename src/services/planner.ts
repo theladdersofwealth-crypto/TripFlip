@@ -2,6 +2,7 @@
 // 일자별 오전·점심·오후·저녁 칸, 칸마다 후보 점수순, 고정·재최적화.
 // 점수는 실측이 아니라 등급·동행 적합·이동·날씨·컨디션으로 낸 추정값이다.
 import { GRADE_SCORE } from "@/data/regionsV1";
+import { isPendingDining, pendingDiningLast } from "@/data/dining";
 import type { PlaceV1 } from "@/data/regionsV1";
 import { PLACE_ATTRS } from "@/data/placeAttrs";
 import { PLACE_FIT } from "@/data/placeFit";
@@ -162,7 +163,7 @@ export function candidates(regionId: string, slot: SlotKey, q: RegionQuery, day:
       if (slot === "야간") e.parts.push("야간 운영시간 확인 필요");
       return { p, e, allDay: isAllDay(p), distance: meal ? diningDistance(p, day, slot) : undefined };
     })
-    .sort((a, b) => (meal ? Number(a.distance?.km == null) - Number(b.distance?.km == null) : 0) || b.e.total - a.e.total);
+    .sort((a, b) => (meal ? pendingDiningLast(a.p, b.p) || Number(a.distance?.km == null) - Number(b.distance?.km == null) : 0) || b.e.total - a.e.total);
 }
 
 // ---------- 일정판 만들기·재최적화 (나트랑앱 smartOptimize 이식) ----------
@@ -229,7 +230,7 @@ export function optimize(board: Board, regionId: string, q: RegionQuery): Board 
   };
   const mealPick = (di: number, slot: SlotKey, anchors: PlaceV1[]) =>
     candidates(regionId, slot, q, days[di])
-      .filter((x) => !x.e.blockedBy)
+      .filter((x) => !x.e.blockedBy && !isPendingDining(x.p))
       .filter((x) => x.distance?.km != null && x.distance.km <= 8)
       .map((x) => {
         let adj = x.e.total;

@@ -14,14 +14,14 @@ const parisResult = (input: RegionQuery) => scoreRegions(input).find((row) => ro
 test("검증 식당의 미식 가산점은 업체 수만큼 늘다가 상한에 도달한다", (t) => {
   const region = "chi-harbin";
   const locations = ALL_PLACES.map((place, index) => ({ place, index }))
-    .filter(({ place }) => place.region === region && place.dining?.verified);
+    .filter(({ place }) => place.region === region && place.dining?.mapRecord?.status === "confirmed");
   t.after(() => locations.forEach(({ place, index }) => { ALL_PLACES[index] = place; }));
   const result = () => scoreRegions(query).find((row) => row.region.id === region)!;
   const full = result();
 
   const leaveVerified = (count: number) => {
     locations.forEach(({ place, index }, i) => {
-      ALL_PLACES[index] = i < count ? place : { ...place, dining: { ...place.dining!, verified: undefined } };
+      ALL_PLACES[index] = i < count ? place : { ...place, dining: { ...place.dining!, mapRecord: undefined } };
     });
     return result();
   };
@@ -49,10 +49,10 @@ test("미식을 선택하지 않으면 검증 정보 유무가 전체 추천 결
   const input: RegionQuery = { ...query, main: "관광", interests: ["관광"] };
   const before = scoreRegions(input);
   const locations = ALL_PLACES.map((place, index) => ({ place, index }))
-    .filter(({ place }) => place.dining?.verified);
+    .filter(({ place }) => place.dining?.mapRecord?.status === "confirmed");
   t.after(() => locations.forEach(({ place, index }) => { ALL_PLACES[index] = place; }));
   locations.forEach(({ place, index }) => {
-    ALL_PLACES[index] = { ...place, dining: { ...place.dining!, verified: undefined } };
+    ALL_PLACES[index] = { ...place, dining: { ...place.dining!, mapRecord: undefined } };
   });
   assert.ok(before.every((row) => !("diningFit" in row)));
   const summary = (rows: ReturnType<typeof scoreRegions>) => rows.map(({ top, ...rest }) => ({

@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { BackButton } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
-import { VerifiedDiningDetails } from "@/components/VerifiedDiningDetails";
+import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
 import type { PlaceV1 } from "@/data/regionsV1";
 import { loadBoard, saveBoard, useFlowQuery } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
@@ -234,9 +234,9 @@ function PickSheet({ regionId, board, di, slot, q, onClose, onPick, onToggleLock
           const selected = cur.v === p.id;
           const location = meal ? distance?.km == null ? "위치 확인 필요" : `${distance.from} 기준 직선 약 ${distance.km < 1 ? Math.round(distance.km * 1000) + "m" : distance.km.toFixed(1) + "km"}` : `이동 약 ${travelMin(p)}분 · ${allDay ? "종일" : p.tags.slice(0, 2).join("·")}`;
           return <ChoiceItem key={p.id} p={p} className={`choice-card ${selected ? "selected" : ""}`}>{(img) => <>
-            <button type="button" className="choice-main" disabled={!!e.blockedBy} onClick={() => onPick(p.id, true)}><PlaceThumb p={p} img={img} size={60} /><span className="choice-copy"><b>{p.name}</b>{p.wikiBoost && <span className="xs" style={{ color: "var(--teal, #0f8b8d)", fontWeight: 700 }}>🔥 위키 조회수 상위</span>}<span className="small muted">{meal ? p.dining?.cuisine ?? (slot === "디저트" ? "카페·디저트" : "식당") : e.label}</span><span className="xs muted">{location}</span></span><span className="choice-select">{selected ? "선택됨" : "선택"}</span></button>
+            <button type="button" className="choice-main" disabled={!!e.blockedBy} onClick={() => onPick(p.id, true)}><PlaceThumb p={p} img={img} size={60} /><span className="choice-copy"><b>{p.name}</b>{meal && p.dining?.mapRecord && <span><DiningStatusBadge place={p} /></span>}{p.wikiBoost && <span className="xs" style={{ color: "var(--teal, #0f8b8d)", fontWeight: 700 }}>🔥 위키 조회수 상위</span>}<span className="small muted">{meal ? p.dining?.cuisine ?? (slot === "디저트" ? "카페·디저트" : "식당") : e.label}</span><span className="xs muted">{location}</span></span><span className="choice-select">{selected ? "선택됨" : "선택"}</span></button>
             <details className="choice-detail"><summary>정보·출처</summary><div className="xs muted">
-              {meal && p.dining?.verified ? <VerifiedDiningDetails place={p} /> : <>
+              {meal && p.dining?.mapRecord ? <DiningMapDetails place={p} /> : <>
                 {p.dining?.address && <p>{p.dining.address}</p>}
                 <p>{meal ? "영업시간·가격·아기의자·키즈메뉴는 방문 전에 확인해 주세요." : e.parts.join(" · ") || "이동·체류시간과 적합도는 추정이에요."}</p>
                 {p.dining?.sourceUrl ? <><p>가이드 등록 자료 · 조회 {p.dining.checkedAt}. 음식 종류는 설명에 따른 분류예요.</p><a href={p.dining.sourceUrl} target="_blank" rel="noopener noreferrer">{p.dining.source} 원문</a><span> · CC BY-SA 4.0</span></> : <p>기존 후보 자료 · 현장 정보 확인 필요</p>}

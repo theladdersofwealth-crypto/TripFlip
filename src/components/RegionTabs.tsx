@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
-import { VerifiedDiningDetails } from "@/components/VerifiedDiningDetails";
+import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
+import { pendingDiningLast } from "@/data/dining";
 import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept, PlaceV1 } from "@/data/regionsV1";
@@ -94,18 +95,18 @@ const GRADE_CLS: Record<string, string> = { S: "gS", A: "gA", B: "gB", C: "gC", 
 function PlaceRow({ p, food }: { p: PlaceV1; food?: boolean }) {
   const [open, setOpen] = useState(false);
   const attr = PLACE_ATTRS[p.id];
-  const verified = food ? p.dining?.verified : undefined;
-  const sub = food ? [p.dining?.kind === "cafe" ? "☕ 카페" : "🍽 식당", p.dining?.cuisine, verified ? verified.area : p.dining?.address].filter(Boolean).join(" · ") : [p.tags.slice(0, 2).join("·"), p.travel].filter(Boolean).join(" · ");
+  const mapRecord = food ? p.dining?.mapRecord : undefined;
+  const sub = food ? [p.dining?.kind === "cafe" ? "☕ 카페" : "🍽 식당", p.dining?.cuisine, mapRecord ? mapRecord.area : p.dining?.address].filter(Boolean).join(" · ") : [p.tags.slice(0, 2).join("·"), p.travel].filter(Boolean).join(" · ");
   const ref = useThumbRef();
   const img = usePlaceImage(p, ref);
   return <div className="place-row" ref={ref}>
     <PlaceThumb p={p} img={img} size="wide" />
     <div className="place-head"><div className="place-head-copy">
-      <div className="between"><b>{p.name}</b>{!verified && p.grade && <span className={`grade-pill ${GRADE_CLS[p.grade] ?? "gC"}`}>{p.grade}</span>}</div>
+      <div className="between"><b>{p.name}</b>{mapRecord ? <DiningStatusBadge place={p} /> : p.grade && <span className={`grade-pill ${GRADE_CLS[p.grade] ?? "gC"}`}>{p.grade}</span>}</div>
       <span className="xs muted">{sub || "정보 미확인"}</span>
       <button type="button" className="xs link-btn" onClick={() => setOpen(!open)} aria-expanded={open}>{open ? "상세 닫기 ▴" : "상세 보기 ▾"}</button>
     </div></div>
-    {open && <div className="place-more xs">{verified ? <VerifiedDiningDetails place={p} /> : <>
+    {open && <div className="place-more xs">{mapRecord ? <DiningMapDetails place={p} /> : <>
       {!food && <div>컨셉: {p.concepts.join(" · ")}</div>}
       {!food && <div>권장 시간: {attr ? `${attr[0]} · 약 ${attr[1] >= 60 ? `${Math.round(attr[1] / 6) / 10}시간` : `${attr[1]}분`}` : "미확인"}</div>}
       {p.note && <div>{p.note}</div>}
@@ -145,7 +146,7 @@ export function SightsTab({ r }: { r: RegionResult }) {
 /** 음식점 탭: 등록된 식당만. 없으면 한 줄 안내 */
 export function FoodTab({ r }: { r: RegionResult }) {
   const [shown, setShown] = useState(15);
-  const list = placesOf(r.region.id).filter((p) => p.dining || isFood(p));
+  const list = placesOf(r.region.id).filter((p) => p.dining || isFood(p)).sort(pendingDiningLast);
   if (!list.length) return <p className="empty-tab">🍽<br />이 지역 음식점은 준비 중이에요<br /><span className="xs muted">관광지 탭에서 먼저 둘러보세요</span></p>;
   return <div style={{ marginTop: 14 }}>
     <p className="note-box xs">가격대는 참고용이에요. 실제 가격과 영업시간은 방문 전에 확인해 주세요.</p>
