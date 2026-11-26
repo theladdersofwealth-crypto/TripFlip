@@ -1,0 +1,9 @@
+# 소셜 전용 인증 — 수동 배포 절차 (이번 작업에서는 미실행)
+1. Google Cloud Console: Web OAuth client, 승인 URI `https://tripflip.co.kr/auth/google/callback`, 공개 ID는 auth Worker vars의 GOOGLE_CLIENT_ID.
+2. Kakao Developers: 카카오 로그인 활성화, REST API 키를 KAKAO_CLIENT_ID로, 클라이언트 시크릿 활성화, 웹 도메인 https://tripflip.co.kr 및 URI `https://tripflip.co.kr/auth/kakao/callback`, 이름 또는 프로필 별명 제공 허용, 이메일 선택 동의, PKCE S256 사용. 공식 REST 문서 https://developers.kakao.com/docs/ko/kakaologin/rest-api
+3. NAVER Developers: 웹 서비스 URL https://tripflip.co.kr, Callback URL `https://tripflip.co.kr/auth/naver/callback`, Client ID를 NAVER_CLIENT_ID로, 이름/별명 허용 및 이메일 선택 동의, OIDC(openid) 및 PKCE S256 지원 설정/검수. 공식 가이드 https://developers.naver.com/docs/login/devguide/devguide.md (3.5), 프로필 https://developers.naver.com/docs/login/api/api.md. 이메일 검증 필드가 문서에 없으므로 네이버 이메일은 자동 연결 금지.
+4. 비밀값은 로컬 명령의 프롬프트로 입력. 코드, toml, 앱 환경변수, 로그에 기록하지 않는다. `workers/auth/wrangler.toml` 공개 ID 3개만 설정한다.
+5. 기존 Stats Durable Object의 회원 테이블·세션·여행 수를 백업하고 확인. 신규 social_users/social_identities는 별도 테이블이라 기존 users/oauth_identities를 자동 삭제/변경하지 않음. 기존 가입자가 없다면 새 테이블 사용 가능. 이전 구글 회원이 존재하면 UID와 해시 식별자를 그대로 이관해야 함. scripts/manual/retire-legacy-members.sql은 백업 SQLite 검토용(자동 실행 금지, 기존 테이블이 존재하고 PIN 회원 0명이며 새 테이블 비어 있을 때만 허용). 실제 Durable Object 저장소에 실행하는 절차는 별도 승인 및 검증 필요. 기존 계정이 있으면 운영 전 이관 완료 필수.
+6. 승인 후 `cd workers/stats && wrangler deploy` (기존 STATS DO 바인딩/ADMIN_KEY 보존).
+7. `cd workers/auth`에서 `wrangler secret put GOOGLE_CLIENT_SECRET`, `wrangler secret put KAKAO_CLIENT_SECRET`, `wrangler secret put NAVER_CLIENT_SECRET`, `wrangler deploy`. 새 Worker 초기 생성이 요구되는 경우 Cloudflare의 create/secret 등록 절차를 먼저 검토. tripflip.co.kr/auth/* 라우팅 확인, workers.dev 비활성 및 로그 비활성 유지. 이후 Pages 앱 배포는 별도 승인. 테스트 계정으로 신규 가입, 동일 검증 이메일 연결, 이메일 거부, 탈퇴, state/PKCE 재사용·타 공급자 콜백 거부를 실제 검증.
+8. 탈퇴는 TripFlip의 계정·연결·세션·여행·이용 기록 삭제. 공급자 자체 계정이나 제공 동의 철회는 해당 공급자 관리 화면에서 별도 수행.
