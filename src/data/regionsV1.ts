@@ -56,7 +56,8 @@ export interface PlaceV1 {
     checkedAt: string;
     license: string | null;
     website: string | null;
-    verified?: {
+    mapRecord?: {
+      status: "confirmed" | "pending";
       nameLocal: string;
       nameEn: string;
       nameKo: string | null;
