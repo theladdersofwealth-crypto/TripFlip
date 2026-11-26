@@ -7,6 +7,8 @@ routes = [{ pattern = "tripflip.co.kr/auth/*", zone_name = "tripflip.co.kr" }]
 [vars]
 # Public Web application OAuth client ID; configure before deployment.
 GOOGLE_CLIENT_ID = ""
+KAKAO_CLIENT_ID = ""
+NAVER_CLIENT_ID = ""
 
 [observability]
 enabled = false

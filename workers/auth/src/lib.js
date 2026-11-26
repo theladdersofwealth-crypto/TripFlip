@@ -25,7 +25,7 @@ export function browserProof(header) {
 export const cookie = (value, maxAge) => COOKIE + "=" + value + "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=" + maxAge;
 export const validIntent = b => b && validDevice(b.v) && (
   (b.intent === "login" && b.agree === true && b.token == null) ||
-  (["link", "withdraw"].includes(b.intent) && typeof b.token === "string" && /^[a-f0-9]{48}$/.test(b.token) && b.agree === true)
+  (b.intent === "withdraw" && typeof b.token === "string" && /^[a-f0-9]{48}$/.test(b.token) && b.agree === true)
 );
 export function googleProfile(raw) {
   if (!raw || raw.email_verified !== true || typeof raw.sub !== "string" || !raw.sub || raw.sub.length > 255 ||

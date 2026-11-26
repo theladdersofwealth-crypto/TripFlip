@@ -1,21 +1,17 @@
 // tripflip-stats: 사용 흐름 집계 + 간편 회원.
 //  POST /e      {v, s, r?, p?, g?}  ← 앱(sendBeacon, text/plain). v=기기 무작위 번호, s=단계, r=권역 id, p=화면 주소
 //  GET  /stats?days=30          ← 관리자 페이지 (Authorization: Bearer ADMIN_KEY)
-//  POST /signup {nick, birth, gender, pin, agree, v} → {token, nick}
-//  POST /login  {nick, pin, v}  → {token, nick}   (PIN 5번 틀리면 15분 잠금, 반복 시 두 배)
 //  POST /logout {token}
 //  POST /me     {token}         → {nick}
-//  POST /withdraw {token, pin} → 본인 탈퇴: 계정·내 여행·이용 기록·로그인 기기 모두 삭제
 //  POST /plans  {token, put?, del?} → {plans}  로그인 회원의 '내 여행'(저장 계획) 합치기·내려받기
 //  GET  /users, GET /user?id=, DELETE /user?id=   ← 관리자
 // HIDE_NICKS(wrangler.toml)에 적은 회원과 그 회원이 로그인했던 기기는 /stats·/users 집계와 목록에서 빠진다(기록은 지우지 않음).
-// 회원은 닉네임·생년월일·성별만. PIN은 PBKDF2 해시+솔트로만 저장. 로그인 기기의 화면 이동만 계정에 묶어 기록한다.
 import { DurableObject } from "cloudflare:workers";
 
 import { PLANS_BODY_MAX, PLAN_MAX, PLANS_PER_USER, planOk } from "./lib.js";
 import { hiddenNickKeys } from "./lib.js";
 import { validIdentity, resolveIdentity } from "./oauth.js";
-import { STEPS, KEEP_DAYS, LOCK_AFTER, PIN_ITER, kstDay, parseEvent, validateSignup, validPin, nickKey, hashPin, sha256, randomHex, lockMs } from "./lib.js";
+import { KEEP_DAYS, kstDay, parseEvent, sha256, randomHex } from "./lib.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
@@ -51,7 +47,7 @@ export default {
 
     // 회원: 앱에서 JSON 본문으로. IP는 잠깐 횟수 제한에만 쓰고 저장하지 않는다.
     const ip = req.headers.get("cf-connecting-ip") || "";
-    if (req.method === "POST" && ["/signup", "/login", "/logout", "/me", "/plans", "/withdraw"].includes(url.pathname)) {
+    if (req.method === "POST" && ["/logout", "/me", "/plans"].includes(url.pathname)) {
       const text = await req.text();
       const max = url.pathname === "/plans" ? PLANS_BODY_MAX : 2000;
       if (text.length > max) return json({ ok: false, error: "저장할 내용이 너무 커요." }, 413);
@@ -90,10 +86,10 @@ export class Stats extends DurableObject {
     // 개인·기기별 지역 선택은 저장하지 않음. 일별·지역별 검색 횟수 합계만.
     this.sql.exec(`CREATE TABLE IF NOT EXISTS search_areas (day TEXT NOT NULL, area TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 1, PRIMARY KEY (day, area))`);
     // 회원
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS users (uid TEXT PRIMARY KEY, nick TEXT NOT NULL, nick_key TEXT NOT NULL UNIQUE, birth TEXT NOT NULL, gender TEXT NOT NULL, salt TEXT NOT NULL, pin_hash TEXT NOT NULL, iter INTEGER NOT NULL, created INTEGER NOT NULL, fails INTEGER NOT NULL DEFAULT 0, locks INTEGER NOT NULL DEFAULT 0, lock_until INTEGER NOT NULL DEFAULT 0)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS social_users (uid TEXT PRIMARY KEY, nick TEXT NOT NULL, created INTEGER NOT NULL)`);
     // Provider subject is a one-way hash; only verified email and name are stored as profile data.
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS oauth_identities (provider TEXT NOT NULL, subject TEXT NOT NULL, uid TEXT NOT NULL, email TEXT NOT NULL, name TEXT NOT NULL, PRIMARY KEY(provider, subject), UNIQUE(provider, uid))`);
-    this.sql.exec(`CREATE INDEX IF NOT EXISTS oauth_email ON oauth_identities(email)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS social_identities (provider TEXT NOT NULL, subject TEXT NOT NULL, uid TEXT NOT NULL, email TEXT, email_verified INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, PRIMARY KEY(provider,subject), UNIQUE(provider,uid))`);
+    this.sql.exec(`CREATE INDEX IF NOT EXISTS social_email ON social_identities(email,email_verified)`);
     this.storage = ctx.storage;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS sessions (tok TEXT PRIMARY KEY, uid TEXT NOT NULL, vid TEXT NOT NULL, created INTEGER NOT NULL)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (vid TEXT PRIMARY KEY, uid TEXT NOT NULL, since INTEGER NOT NULL)`);
@@ -110,7 +106,7 @@ export class Stats extends DurableObject {
   /** 숨긴 회원 uid 목록 (닉네임 기준) */
   hiddenUids() {
     if (!this.hiddenKeys.length) return [];
-    return this.sql.exec(`SELECT uid FROM users WHERE nick_key IN (${this.hiddenKeys.map(() => "?").join(",")})`, ...this.hiddenKeys).toArray().map((r) => r.uid);
+    return this.sql.exec(`SELECT uid FROM social_users WHERE lower(trim(nick)) IN (${this.hiddenKeys.map(() => "?").join(",")})`, ...this.hiddenKeys).toArray().map((r) => r.uid);
   }
 
   /** 숨긴 회원이 쓴 기기를 hidden_vids에 모은다(지난 기록 포함). 집계 전에 부른다 */
@@ -161,98 +157,46 @@ export class Stats extends DurableObject {
   async oauthStart(intent, token, v, ip) {
     if (!/^[a-z0-9]{8,32}$/.test(v) || this.throttled("oauth", ip, 30)) return { ok: false };
     if (intent === "login" && token == null) return { ok: true };
-    if (!["link", "withdraw"].includes(intent)) return { ok: false };
+    if (intent !== "withdraw") return { ok: false };
     const session = await this.sessionOf(token);
     if (!session || session.vid !== v) return { ok: false };
     return { ok: true, sessionHash: session.tok };
   }
 
   async oauthAccount(profile, intent, token, expectedHash, v) {
-    const fail = { ok: false, error: "구글 계정을 연결할 수 없어요. 기존 계정으로 로그인한 뒤 연결해 주세요." };
+    const fail = { ok: false, error: "소셜 계정을 확인할 수 없어요. 다른 계정 또는 연결된 소셜 공급자로 다시 시도해 주세요." };
     if (!validIdentity(profile) || !/^[a-z0-9]{8,32}$/.test(v)) return fail;
-    if (intent === "login" ? token != null || expectedHash != null : !["link", "withdraw"].includes(intent) || typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token) || !expectedHash) return fail;
+    if (intent === "login" ? token != null || expectedHash != null : intent !== "withdraw" || typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token) || !expectedHash) return fail;
     const tokenHash = token ? await sha256(token) : null;
     if (tokenHash !== expectedHash) return fail;
     const subject = await sha256(profile.provider + ":" + profile.subject);
     const freshToken = randomHex(24), freshHash = await sha256(freshToken);
     // Same database transaction for identity resolution, user creation/link and session creation.
     return this.storage.transactionSync(() => {
-      const session = tokenHash ? this.sql.exec(`SELECT s.uid FROM sessions s JOIN users u ON u.uid=s.uid WHERE s.tok=? AND s.vid=?`, tokenHash, v).toArray()[0] : null;
+      const session = tokenHash ? this.sql.exec(`SELECT s.uid FROM sessions s JOIN social_users u ON u.uid=s.uid WHERE s.tok=? AND s.vid=?`, tokenHash, v).toArray()[0] : null;
       if (tokenHash && !session) return fail;
-      const bySubject = this.sql.exec(`SELECT uid FROM oauth_identities WHERE provider=? AND subject=?`, profile.provider, subject).toArray()[0];
-      const emailUids = this.sql.exec(`SELECT DISTINCT uid FROM oauth_identities WHERE email=?`, profile.email).toArray().map(x => x.uid);
-      const linked = session ? this.sql.exec(`SELECT subject FROM oauth_identities WHERE provider=? AND uid=?`, profile.provider, session.uid).toArray()[0] : null;
-      const decision = resolveIdentity({ intent, currentUid: session?.uid, subjectUid: bySubject?.uid, emailUids, linkedSubject: linked?.subject });
-      if (!decision) return fail;
-      if (intent === "withdraw") {
-        this.eraseUser(decision.uid);
-        return { ok: true, withdrawn: true };
-      }
-      const uid = decision.create ? randomHex(8) : decision.uid;
-      if (decision.create) {
-        // No invented birth/gender/PIN. Empty strings preserve legacy NOT NULL columns.
-        this.sql.exec(`INSERT INTO users (uid,nick,nick_key,birth,gender,salt,pin_hash,iter,created) VALUES (?,?,?,'','','','',0,?)`,
-          uid, profile.name, "oauth:" + uid, Date.now());
-      }
-      this.sql.exec(`INSERT INTO oauth_identities(provider,subject,uid,email,name) VALUES (?,?,?,?,?) ON CONFLICT(provider,subject) DO UPDATE SET email=excluded.email,name=excluded.name`,
-        profile.provider, subject, uid, profile.email, profile.name);
-      const user = this.sql.exec(`SELECT nick,pin_hash FROM users WHERE uid=?`, uid).toArray()[0];
-      if (!user) throw Error("missing account");
-      if (!user.pin_hash) this.sql.exec(`UPDATE users SET nick=? WHERE uid=?`, profile.name, uid);
-      const nick = user.pin_hash ? user.nick : profile.name;
-      if (intent === "link") return { ok: true, uid, nick, token, hasPin: !!user.pin_hash };
+      const bySubject = this.sql.exec(`SELECT uid FROM social_identities WHERE provider=? AND subject=?`, profile.provider, subject).toArray()[0];
+      const emailUids = profile.emailVerified && profile.email ? this.sql.exec(`SELECT DISTINCT uid FROM social_identities WHERE email=? AND email_verified=1`, profile.email).toArray().map(x=>x.uid) : [];
+      const existingProvider = emailUids.length===1 && !!this.sql.exec(`SELECT 1 FROM social_identities WHERE provider=? AND uid=?`,profile.provider,emailUids[0]).toArray().length;
+      const decision = resolveIdentity({intent,currentUid:session?.uid,subjectUid:bySubject?.uid,emailUids,existingProvider});
+      if(!decision) return fail;
+      if(intent==="withdraw"){this.eraseUser(decision.uid);return {ok:true,withdrawn:true};}
+      const uid=decision.create?randomHex(8):decision.uid;
+      if(decision.create) this.sql.exec(`INSERT INTO social_users(uid,nick,created) VALUES(?,?,?)`,uid,profile.name,Date.now());
+      if(!this.sql.exec(`SELECT uid FROM social_users WHERE uid=?`,uid).toArray().length) throw Error("missing account");
+      const verified=profile.emailVerified && !emailUids.some(x=>x!==uid);
+      this.sql.exec(`INSERT INTO social_identities(provider,subject,uid,email,email_verified,name) VALUES(?,?,?,?,?,?) ON CONFLICT(provider,subject) DO UPDATE SET email=excluded.email,email_verified=excluded.email_verified,name=excluded.name`,profile.provider,subject,uid,profile.email,Number(verified),profile.name);
+      const nick=profile.name;
+      this.sql.exec(`UPDATE social_users SET nick=? WHERE uid=?`,nick,uid);
       this.sql.exec(`INSERT INTO sessions(tok,uid,vid,created) VALUES(?,?,?,?)`, freshHash, uid, v, Date.now());
       this.sql.exec(`INSERT INTO devices(vid,uid,since) VALUES(?,?,?) ON CONFLICT(vid) DO UPDATE SET uid=excluded.uid,since=excluded.since`, v, uid, Date.now());
-      return { ok: true, uid, nick, token: freshToken, hasPin: !!user.pin_hash };
+      return { ok: true, uid, nick, token: freshToken };
     });
-  }
-
-  async newSession(uid, v) {
-    const token = randomHex(24);
-    this.sql.exec(`INSERT INTO sessions (tok, uid, vid, created) VALUES (?, ?, ?, ?)`, await sha256(token), uid, v, Date.now());
-    this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid, since = excluded.since`, v, uid, Date.now());
-    return token;
-  }
-
-  async signup(b, ip) {
-    const v = typeof b.v === "string" && /^[a-z0-9]{8,32}$/.test(b.v) ? b.v : null;
-    if (!v) return { ok: false, error: "이 브라우저에서는 가입할 수 없어요. (저장 공간 차단)" };
-    const x = validateSignup(b);
-    if (x.error) return { ok: false, error: x.error };
-    if (this.throttled("s", ip, 10)) return { ok: false, error: "가입 요청이 너무 많아요. 잠시 뒤 다시 해 주세요.", status: 429 };
-    if (this.sql.exec(`SELECT 1 FROM users WHERE nick_key = ?`, nickKey(x.nick)).toArray().length) return { ok: false, error: "이미 쓰는 닉네임이에요. 다른 닉네임을 정해 주세요.", status: 409 };
-    const uid = randomHex(8), salt = randomHex(16);
-    this.sql.exec(`INSERT INTO users (uid, nick, nick_key, birth, gender, salt, pin_hash, iter, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      uid, x.nick, nickKey(x.nick), x.birth, x.gender, salt, await hashPin(x.pin, salt), PIN_ITER, Date.now());
-    return { ok: true, nick: x.nick, uid, token: await this.newSession(uid, v) };
-  }
-
-  async login(b, ip) {
-    const v = typeof b.v === "string" && /^[a-z0-9]{8,32}$/.test(b.v) ? b.v : null;
-    const pin = validPin(b.pin);
-    if (!v || !pin || typeof b.nick !== "string") return { ok: false, error: "닉네임과 PIN 6자리를 넣어 주세요." };
-    if (this.throttled("l", ip, 30)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
-    const u = this.sql.exec(`SELECT * FROM users WHERE nick_key = ?`, nickKey(b.nick)).toArray()[0];
-    if (!u || !u.pin_hash) return { ok: false, error: "닉네임 또는 PIN이 맞지 않아요.", status: 401 };
-    const now = Date.now();
-    if (u.lock_until > now) return { ok: false, error: `PIN을 여러 번 틀려 잠겼어요. ${Math.ceil((u.lock_until - now) / 60000)}분 뒤 다시 해 주세요.`, status: 429 };
-    if ((await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) {
-      const fails = u.fails + 1;
-      if (fails >= LOCK_AFTER) {
-        const locks = u.locks + 1;
-        this.sql.exec(`UPDATE users SET fails = 0, locks = ?, lock_until = ? WHERE uid = ?`, locks, now + lockMs(locks), u.uid);
-        return { ok: false, error: `PIN을 ${LOCK_AFTER}번 틀려 ${lockMs(locks) / 60000}분 동안 잠겼어요.`, status: 429 };
-      }
-      this.sql.exec(`UPDATE users SET fails = ? WHERE uid = ?`, fails, u.uid);
-      return { ok: false, error: `닉네임 또는 PIN이 맞지 않아요. (${LOCK_AFTER - fails}번 더 틀리면 잠겨요)`, status: 401 };
-    }
-    this.sql.exec(`UPDATE users SET fails = 0, locks = 0, lock_until = 0 WHERE uid = ?`, u.uid);
-    return { ok: true, nick: u.nick, uid: u.uid, token: await this.newSession(u.uid, v) };
   }
 
   async sessionOf(token) {
     if (typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token)) return null;
-    return this.sql.exec(`SELECT s.tok, s.uid, s.vid, u.nick FROM sessions s JOIN users u ON u.uid = s.uid WHERE s.tok = ?`, await sha256(token)).toArray()[0] ?? null;
+    return this.sql.exec(`SELECT s.tok, s.uid, s.vid, u.nick FROM sessions s JOIN social_users u ON u.uid = s.uid WHERE s.tok = ?`, await sha256(token)).toArray()[0] ?? null;
   }
 
   async me(b) {
@@ -260,8 +204,7 @@ export class Stats extends DurableObject {
     if (!s) return { ok: false, error: "로그인이 풀렸어요.", status: 401 };
     // 이 기기가 다른 계정에 묶였으면 다시 이 계정으로
     this.sql.exec(`INSERT INTO devices (vid, uid, since) VALUES (?, ?, ?) ON CONFLICT (vid) DO UPDATE SET uid = excluded.uid`, s.vid, s.uid, Date.now());
-    const u = this.sql.exec(`SELECT pin_hash FROM users WHERE uid = ?`, s.uid).toArray()[0];
-    return { ok: true, nick: s.nick, uid: s.uid, hasPin: !!u?.pin_hash };
+    return { ok: true, nick: s.nick, uid: s.uid };
   }
 
   async logout(b) {
@@ -271,18 +214,6 @@ export class Stats extends DurableObject {
       this.sql.exec(`DELETE FROM devices WHERE vid = ? AND uid = ?`, s.vid, s.uid);
     }
     return { ok: true };
-  }
-
-  /** 본인 탈퇴. 실수 방지로 PIN 한 번 더 확인 */
-  async withdraw(b, ip) {
-    const s = await this.sessionOf(b.token);
-    if (!s) return { ok: false, error: "로그인이 풀렸어요. 다시 로그인해 주세요.", status: 401 };
-    const pin = validPin(b.pin);
-    if (!pin) return { ok: false, error: "PIN 6자리를 넣어 주세요." };
-    if (this.throttled("w", ip, 10)) return { ok: false, error: "시도가 너무 많아요. 1시간 뒤 다시 해 주세요.", status: 429 };
-    const u = this.sql.exec(`SELECT salt, pin_hash, iter FROM users WHERE uid = ?`, s.uid).toArray()[0];
-    if (!u || !u.pin_hash || (await hashPin(pin, u.salt, u.iter)) !== u.pin_hash) return { ok: false, error: "PIN이 맞지 않아요.", status: 401 };
-    return this.deleteUser(s.uid);
   }
 
   // 항목별 결과를 돌려준다: saved(저장 확인) · deleted(삭제 확인) · gone(다른 기기에서 이미 지움) · rejected(거절, 사유)
@@ -317,10 +248,10 @@ export class Stats extends DurableObject {
     const hidden = new Set(this.syncHidden());
     const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
-    const all = rows(`SELECT u.uid, u.nick, u.birth, u.gender, u.created, MAX(l.ts) AS last,
+    const all = rows(`SELECT u.uid, u.nick, u.created, MAX(l.ts) AS last,
         COUNT(CASE WHEN l.step = 'visit' THEN 1 END) AS visitsAll,
         COUNT(DISTINCT l.day) AS daysAll
-      FROM users u LEFT JOIN log l ON l.uid = u.uid GROUP BY u.uid`);
+      FROM social_users u LEFT JOIN log l ON l.uid = u.uid GROUP BY u.uid`);
     const period = new Map(rows(`SELECT uid,
         COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits,
         COUNT(DISTINCT day) AS days,
@@ -338,7 +269,7 @@ export class Stats extends DurableObject {
 
   async user(uid) {
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
-    const u = rows(`SELECT uid, nick, birth, gender, created, locks, lock_until FROM users WHERE uid = ?`, uid)[0];
+    const u = rows(`SELECT uid, nick, created FROM social_users WHERE uid = ?`, uid)[0];
     if (!u) return { ok: false, error: "없는 계정", status: 404 };
     const regions = rows(`SELECT region,
         COUNT(CASE WHEN step IN ('region','day') THEN 1 END) AS views,
@@ -356,7 +287,7 @@ export class Stats extends DurableObject {
   }
 
   eraseUser(uid) {
-    for (const t of ["oauth_identities", "log", "plans", "sessions", "devices", "users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+    for (const t of ["social_identities", "log", "plans", "sessions", "devices", "social_users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
   }
   async deleteUser(uid) {
     this.storage.transactionSync(() => this.eraseUser(uid));
@@ -402,8 +333,8 @@ export class Stats extends DurableObject {
     const kstStart = Date.parse(today + "T00:00:00+09:00");
     const notHidden = (col) => (hidden.length ? ` AND ${col} NOT IN (${hidden.map(() => "?").join(",")})` : "");
     const members = {
-      total: rows(`SELECT COUNT(*) AS c FROM users WHERE 1${notHidden("uid")}`, ...hidden)[0]?.c ?? 0,
-      today: rows(`SELECT COUNT(*) AS c FROM users WHERE created >= ?${notHidden("uid")}`, kstStart, ...hidden)[0]?.c ?? 0,
+      total: rows(`SELECT COUNT(*) AS c FROM social_users WHERE 1${notHidden("uid")}`, ...hidden)[0]?.c ?? 0,
+      today: rows(`SELECT COUNT(*) AS c FROM social_users WHERE created >= ?${notHidden("uid")}`, kstStart, ...hidden)[0]?.c ?? 0,
       activeToday: rows(`SELECT COUNT(DISTINCT uid) AS c FROM log WHERE day = ?${notHidden("uid")}`, today, ...hidden)[0]?.c ?? 0,
     };
     return {
