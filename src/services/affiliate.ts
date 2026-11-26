@@ -6,6 +6,7 @@
  */
 import { KLOOK_CITY } from "@/data/klookCities";
 import { KLOOK_HOTEL } from "@/data/klookHotels";
+import { bookingDates, calendarDays } from "@/lib/travelDates";
 
 export type TpProgram = { p: string; campaignId: string };
 
@@ -43,11 +44,11 @@ export type KlookStay = { startDate: string; endDate: string; adults: number; ch
 /** 클룩 호텔(한국어). 도시 번호를 알면 날짜·인원·객실이 채워진 검색 결과로, 모르면 호텔 첫 화면으로. */
 export function klookHotelUrl(regionId?: string, stay?: KlookStay, tp?: { marker: string; trs: string }, prog: TpProgram = TP.klook): string {
   const city = regionId ? KLOOK_CITY[regionId] : undefined;
-  const ok = stay && /^\d{4}-\d{2}-\d{2}$/.test(stay.startDate) && /^\d{4}-\d{2}-\d{2}$/.test(stay.endDate) && stay.endDate > stay.startDate;
-  if (!city || !ok) return tpLink("https://www.klook.com/ko/hotels/", prog, tp);
+  const dates = stay && bookingDates(stay.startDate, stay.endDate);
+  if (!city || !stay || !dates) return tpLink("https://www.klook.com/ko/hotels/", prog, tp);
   const params = new URLSearchParams({
     city_id: String(city), stype: "city", svalue: String(city),
-    check_in: stay.startDate, check_out: stay.endDate,
+    check_in: dates.startDate, check_out: dates.endDate,
     adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)), room_num: String(Math.max(1, stay.rooms)),
   });
   return tpLink(`https://www.klook.com/ko/hotels/searchresult/?${params}`, prog, tp);
@@ -60,9 +61,9 @@ export function klookHotelDetailUrl(hotelName: string, stay?: KlookStay, tp?: { 
   const id = KLOOK_HOTEL[hotelName];
   if (!id) return null;
   const base = `https://www.klook.com/ko/hotels/detail/${id}-${slug(hotelName)}/`;
-  const ok = stay && /^\d{4}-\d{2}-\d{2}$/.test(stay.startDate) && /^\d{4}-\d{2}-\d{2}$/.test(stay.endDate) && stay.endDate > stay.startDate;
-  if (!ok) return tpLink(base, prog, tp);
-  const params = new URLSearchParams({ check_in: stay.startDate, check_out: stay.endDate, room_num: String(Math.max(1, stay.rooms)), adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)) });
+  const dates = stay && bookingDates(stay.startDate, stay.endDate);
+  if (!stay || !dates) return tpLink(base, prog, tp);
+  const params = new URLSearchParams({ check_in: dates.startDate, check_out: dates.endDate, room_num: String(Math.max(1, stay.rooms)), adult_num: String(Math.max(1, stay.adults)), child_num: String(Math.max(0, stay.children)) });
   return tpLink(`${base}?${params}`, prog, tp);
 }
 
@@ -79,13 +80,14 @@ export function aviasalesSearchUrl(
   prog: TpProgram = TP.aviasales,
 ): string {
   const base = "https://www.aviasales.com/";
-  if (!/^[a-z]{3}$/i.test(o.to) || !/^\d{4}-\d{2}-\d{2}$/.test(o.startDate) || !/^\d{4}-\d{2}-\d{2}$/.test(o.endDate)) return tpLink(base, prog, tp);
+  const dates = bookingDates(o.startDate, o.endDate);
+  if (!/^[a-z]{3}$/i.test(o.from) || !/^[a-z]{3}$/i.test(o.to) || !dates) return tpLink(base, prog, tp);
   const ddmm = (d: string) => d.slice(8, 10) + d.slice(5, 7);
   const infants = o.childAges ? o.childAges.filter((a) => a < 2).length : 0;
   const kids = o.childCount - infants;
   const n = (x: number) => String(Math.min(9, Math.max(0, x)));
   const tail = n(Math.max(1, o.adults)) + (kids || infants ? n(kids) : "") + (infants ? n(infants) : "");
-  const url = `${base}search/${o.from.toUpperCase()}${ddmm(o.startDate)}${o.to.toUpperCase()}${ddmm(o.endDate)}${tail}?currency=krw`;
+  const url = `${base}search/${o.from.toUpperCase()}${ddmm(dates.startDate)}${o.to.toUpperCase()}${ddmm(dates.endDate)}${tail}?currency=krw`;
   return tpLink(url, prog, tp);
 }
 
@@ -122,16 +124,17 @@ export type AgodaFlightQuery = { from: string; to: string; startDate: string; en
 
 /** 왕복 검색 결과로 바로 열 수 있는지(공항코드 3글자·날짜 형식·귀국일이 출발일 뒤) */
 export function agodaFlightsPrefilled(o?: AgodaFlightQuery): o is AgodaFlightQuery {
-  const ymd = /^\d{4}-\d{2}-\d{2}$/;
-  return !!o && /^[a-z]{3}$/i.test(o.from) && /^[a-z]{3}$/i.test(o.to) && ymd.test(o.startDate) && ymd.test(o.endDate) && o.endDate > o.startDate;
+  return !!o && /^[a-z]{3}$/i.test(o.from) && /^[a-z]{3}$/i.test(o.to) && calendarDays(o.startDate, o.endDate) >= 2;
 }
 
 export function agodaFlightsUrl(o?: AgodaFlightQuery, prog: CjProgram = CJ.agoda): string {
   if (!agodaFlightsPrefilled(o)) return cjLink(AGODA_FLIGHTS_KO, prog);
+  const dates = bookingDates(o.startDate, o.endDate);
+  if (!dates) return cjLink(AGODA_FLIGHTS_KO, prog);
   const params = new URLSearchParams({
     searchType: "2", cabinType: "Economy", adults: String(Math.min(9, Math.max(1, Math.round(o.adults) || 1))),
-    departureFrom: o.from.toUpperCase(), departureFromType: "1", departDate: o.startDate,
-    arrivalTo: o.to.toUpperCase(), arrivalToType: "1", returnDate: o.endDate, sort: "8",
+    departureFrom: o.from.toUpperCase(), departureFromType: "1", departDate: dates.startDate,
+    arrivalTo: o.to.toUpperCase(), arrivalToType: "1", returnDate: dates.endDate, sort: "8",
   });
   return cjLink(`${AGODA_FLIGHTS_KO}/results?${params}`, prog);
 }

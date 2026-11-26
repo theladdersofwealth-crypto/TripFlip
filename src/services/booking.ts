@@ -1,6 +1,7 @@
 import type { RegionV1 } from "@/data/regionsV1";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
+import { bookingDates, calendarDays } from "@/lib/travelDates";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
@@ -70,11 +71,13 @@ export function childAgesForBooking(q: RegionQuery): number[] | null {
 
 export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
   if (!/^[a-z]{3}$/i.test(region.airportCode)) return "https://www.skyscanner.co.kr/transport/flights/";
+  const dates = bookingDates(q.startDate, q.endDate);
+  if (!dates) return "https://www.skyscanner.co.kr/transport/flights/";
   const ymd = (date: string) => date.slice(2).replaceAll("-", "");
   const ages = childAgesForBooking(q);
   const params = new URLSearchParams({ adultsv2: String(q.adults) });
   if (ages?.length) params.set("childrenv2", ages.join("|"));
-  return `https://www.skyscanner.co.kr/transport/flights/icn/${region.airportCode.toLowerCase()}/${ymd(q.startDate)}/${ymd(q.endDate)}/?${params}`;
+  return `https://www.skyscanner.co.kr/transport/flights/icn/${region.airportCode.toLowerCase()}/${ymd(dates.startDate)}/${ymd(dates.endDate)}/?${params}`;
 }
 
 /** 항공권 주 버튼: 아고다 항공(한국어, CJ 제휴). 공항코드를 알면 인천 왕복·날짜·성인 수가 채워진 결과로, 모르면 첫 화면으로. */
@@ -92,7 +95,9 @@ export function flightAffiliateUrl(region: RegionV1, q: RegionQuery) {
 
 /** 부킹닷컴 한국어 검색: 숙소 이름·날짜·인원·객실이 입력된 채로 열린다 */
 export function bookingComUrl(region: RegionV1, q: RegionQuery, name?: string) {
-  const params = new URLSearchParams({ ss: name ?? region.searchName, checkin: q.startDate, checkout: q.endDate, group_adults: String(Math.max(1, q.adults)), group_children: String(q.children.length), no_rooms: String(roomEstimate(q).rooms), lang: "ko" });
+  const dates = bookingDates(q.startDate, q.endDate);
+  const params = new URLSearchParams({ ss: name ?? region.searchName, group_adults: String(Math.max(1, q.adults)), group_children: String(q.children.length), no_rooms: String(roomEstimate(q).rooms), lang: "ko" });
+  if (dates) { params.set("checkin", dates.startDate); params.set("checkout", dates.endDate); }
   for (const a of childAgesForBooking(q) ?? []) params.append("age", String(a));
   return `https://www.booking.com/searchresults.ko.html?${params}`;
 }
@@ -105,13 +110,15 @@ export function bookingComUrl(region: RegionV1, q: RegionQuery, name?: string) {
  * 숙소 이름(name)은 도시 번호가 있으면 쓰지 않는다: 그 도시 검색 결과(날짜·인원 입력됨)로 연다.
  */
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {
-  const los = Math.max(1, Math.round((Date.parse(q.endDate) - Date.parse(q.startDate)) / 864e5) || 1);
+  const dates = bookingDates(q.startDate, q.endDate);
   const city = agodaCityId(region.id);
   const params = new URLSearchParams();
   if (city) params.set("city", String(city));
-  params.set("checkIn", q.startDate);
-  params.set("checkOut", q.endDate);
-  params.set("los", String(los));
+  if (dates) {
+    params.set("checkIn", dates.startDate);
+    params.set("checkOut", dates.endDate);
+    params.set("los", String(calendarDays(dates.startDate, dates.endDate) - 1));
+  }
   params.set("rooms", String(roomEstimate(q).rooms));
   params.set("adults", String(q.adults));
   params.set("children", String(q.children.length));
