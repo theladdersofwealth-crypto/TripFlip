@@ -44,8 +44,10 @@ export function withMapDining(places: PlaceV1[]): PlaceV1[] {
         checkedAt: row.checkedAt, license: null, website: null,
         mapRecord: {
           status: row.status,
-          nameLocal: row.nameLocal, nameEn: row.nameEn, nameKo: row.nameKo, area: row.area,
-          signature: row.signature, priceLevel: row.priceLevel, confidence: row.confidence,
+          nameLocal: row.nameLocal, nameEn: row.nameEn, nameKo: row.nameKo,
+          area: row.area ?? null,
+          signature: row.signature, priceLevel: row.priceLevel,
+          confidence: row.confidence ?? null,
           ...(guide?.sourceUrl && guide.license ? {
             guideSource: { name: guide.source, url: guide.sourceUrl, license: guide.license, checkedAt: guide.checkedAt },
           } : {}),
