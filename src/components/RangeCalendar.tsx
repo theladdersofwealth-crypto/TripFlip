@@ -1,15 +1,11 @@
 "use client";
 // 달력 하나에서 출발일 → 귀국일 순서로 두 번 눌러 기간을 고른다.
 import { useState } from "react";
-import { calendarDays } from "@/lib/travelDates";
+import { calendarDays, todayInSeoul } from "@/lib/travelDates";
 
 const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 const pad = (n: number) => String(n).padStart(2, "0");
 const iso = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;
-function today() {
-  const t = new Date();
-  return iso(t.getFullYear(), t.getMonth(), t.getDate());
-}
 function short(d: string) {
   const [y, m, day] = d.split("-").map(Number);
   return `${m}/${day}(${WEEK[new Date(Date.UTC(y, m - 1, day)).getUTCDay()]})`;
@@ -18,7 +14,7 @@ function short(d: string) {
 export function RangeCalendar({ start, end, onChange, startLabel = "출발", endLabel = "귀국", minDate }: {
   start: string; end: string; onChange: (start: string, end: string) => void; startLabel?: string; endLabel?: string; minDate?: string;
 }) {
-  const min = minDate ?? today();
+  const min = minDate ?? todayInSeoul();
   const base = /^\d{4}-\d{2}/.test(start) && start >= min ? start : min;
   const [view, setView] = useState({ y: Number(base.slice(0, 4)), m: Number(base.slice(5, 7)) - 1 });
   // 첫 번째로 누른 날짜(출발). 두 번째 누르면 기간이 확정된다.

@@ -5,6 +5,8 @@ import { normalizeParty } from "../src/lib/travelParty";
 import { REGIONS_V1 } from "../src/data/regionsV1";
 import { boardKey, emptyBoard } from "../src/services/planner";
 import { childAgesForBooking, flightSearchUrl, hotelSearchUrl } from "../src/services/booking";
+// 고정된 예제 날짜가 지나도 링크 회귀 테스트는 동일한 기준으로 실행한다.
+beforeEach((t) => { t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-26T03:00:00Z") }); });
 const values = new Map<string, string>();
 beforeEach(() => {
   values.clear();

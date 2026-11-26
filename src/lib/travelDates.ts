@@ -38,3 +38,25 @@ export function travelDateError(query: TravelDates): string | null {
   }
   return null;
 }
+
+/** 한국 시간의 오늘. 브라우저·서버의 로컬 시간대와 무관하다. */
+export function todayInSeoul(now = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(now);
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+/** 외부 예약 링크만 보정한다. 원본 일정은 변경하지 않는다.
+ * 오늘·미래 날짜는 그대로, 시작일만 과거이고 종료일이 미래라면 종료일 유지.
+ * 둘 다 지났거나 종료일이 오늘이면 오늘부터 원래 박수만큼 이동한다.
+ * 잘못된 날짜/역전된 일정은 날짜 없는 검색으로 보낸다.
+ */
+export function bookingDates(startDate: string, endDate: string, now = new Date()): { startDate: string; endDate: string } | null {
+  const nights = calendarDays(startDate, endDate) - 1;
+  if (!Number.isFinite(nights) || nights < 1) return null;
+  const today = todayInSeoul(now);
+  if (startDate >= today) return { startDate, endDate };
+  return { startDate: today, endDate: endDate > today ? endDate : addCalendarDays(today, nights) };
+}
