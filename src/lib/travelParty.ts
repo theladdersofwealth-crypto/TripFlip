@@ -140,7 +140,10 @@ export function personalFit(p: PlaceV1, q: RegionQuery): { factor: number; flags
       const v = row?.[FIT_INDEX[c]];
       return typeof v === "number" && Number.isFinite(v) ? [Math.max(0, Math.min(1, v / 5))] : [];
     });
-    let fit = estimates.length ? Math.min(...estimates) : childBandOf(m) && kidScore != null ? kidScore : 1;
+    // 아이 자료가 없으면 중(0.6)과 상(1)의 중간값. 성인 및 명시된 적합도는 유지.
+    const child = childBandOf(m);
+    if (!estimates.length && child && kidScore == null) flags.push("아이 동행 적합도 미확인: 보수적으로 추정했어요");
+    let fit = estimates.length ? Math.min(...estimates) : child ? (kidScore ?? 0.8) : 1;
     if (m.mobility === "limited" && (p.longWalk || p.steep === true)) {
       fit *= 0.6;
       flags.push(`${p.name}: 보행 부담을 줄이려는 구성원에게 장시간 도보·급경사 부담이 있어요`);
