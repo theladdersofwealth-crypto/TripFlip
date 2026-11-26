@@ -39,15 +39,20 @@ const PILOT_OF = Object.fromEntries(Object.entries(PILOT_TWIN_OF).map(([k, v]) =
 const pilotKeys = new Set(PLACES_V1.map((p) => `${p.region}|${p.en.toLowerCase()}`));
 // 컨셉 태그가 관광 위주로 빈약해서, 장소 태그로 빠진 컨셉을 보충한다 (예: 쇼핑몰·시장 → 쇼핑)
 const TAG_CONCEPT: Record<string, Concept[]> = {
-  "쇼핑몰·아웃렛": ["쇼핑"], 시장: ["쇼핑", "미식"], "야경·야시장": ["쇼핑", "미식"], 핫플: ["쇼핑", "미식"],
+  "쇼핑몰·아웃렛": ["쇼핑"], 시장: ["쇼핑", "미식"], "야경·야시장": ["쇼핑"], 핫플: ["쇼핑"],
   로컬푸드: ["미식"], "카페·디저트": ["미식"],
   "해변·섬": ["휴양"], 온천: ["휴양"], "마사지·스파": ["휴양"],
   체험: ["액티비티"], 테마파크: ["액티비티"], 해양: ["액티비티"], "트레킹·하이킹": ["액티비티"], 스키: ["액티비티"], 골프: ["액티비티"],
 };
-const withConcepts = (p: PlaceV1): PlaceV1 => {
-  const add = p.tags.flatMap((t) => TAG_CONCEPT[t] ?? []).filter((c) => !p.concepts.includes(c));
+/** 복합 태그에서 실제 시장/음식점만 미식으로 보강. 기존 명시 컨셉과 쇼핑 분류는 유지한다. */
+export function withConcepts(p: PlaceV1): PlaceV1 {
+  const inferred = p.tags.flatMap((t) => TAG_CONCEPT[t] ?? []);
+  const ambiguous = p.tags.includes("야경·야시장") || p.tags.includes("핫플");
+  const namedMarket = /야시장|나이트\s*마켓|\bnight[\s-]*market\b|어시장|\bfish\s+market\b/i.test(p.name + " " + p.en);
+  if (ambiguous && (namedMarket || isMealPlace(p))) inferred.push("미식");
+  const add = inferred.filter((c) => !p.concepts.includes(c));
   return add.length ? { ...p, concepts: [...p.concepts, ...new Set(add)] } : p;
-};
+}
 export const ALL_PLACES: PlaceV1[] = withMapDining([
   ...PLACES_V1,
   ...WORLD_PLACES.flatMap((p) => {
@@ -323,10 +328,12 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       if (!openDuring(p, q.startDate, q.endDate)) continue;
       // 방문 가능한 볼거리는 추천 취향·등급과 별개로 센다.
       const admission = admissionFor(p, members);
-      if (admission !== "blocked") {
-        eligible++;
-        if (admission === "check" || (minors && (p.adultOnly || p.note?.includes("키 제한")))) admissionNeedsCheck = true;
+      if (admission === "blocked") {
+        excluded.push({ place: p, reason: "확인된 입장 조건을 충족하지 못해 추천 후보에서 제외" });
+        continue;
       }
+      eligible++;
+      if (admission === "check" || (minors && (p.adultOnly || p.note?.includes("키 제한")))) admissionNeedsCheck = true;
       if (p.grade == null) continue;
       const weight = conceptWeight(p.concepts, q);
       if (!weight) continue;

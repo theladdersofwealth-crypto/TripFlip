@@ -54,12 +54,12 @@ test("등록 명소 5곳인 모론다바는 10일 추천에 남고 11일 추천�
   assert.equal(sightseeingCoverage(10, 10).relaxed, false);
 });
 
-test("6일·볼거리 3곳이면 테마 일치 1곳으로도 통과하고, 확인된 입장 제한은 집계에서 뺀다", (t) => {
+test("6일·볼거리 3곳이면 테마 일치 1곳으로도 통과하고, 확인된 입장 제한은 집계와 점수에서 뺀다", (t) => {
   const regionId = "mad-morondava";
   const places = ALL_PLACES.filter((p) => p.region === regionId);
   const fixture = (i: number): PlaceV1 => ({
     id: `gate-fixture-${i}`, region: regionId, name: `테스트 명소 ${i}`, en: `Fixture ${i}`,
-    concepts: [i < 3 ? "관광" : "쇼핑"], tags: i < 3 ? [] : ["로컬푸드"], travel: "미확인", penalty: 0, grade: "A",
+    concepts: [i < 3 ? "관광" : "쇼핑"], tags: i < 3 ? [] : ["로컬푸드"], travel: "미확인", penalty: 0, grade: i === 0 ? "S" : "A",
   });
   const indices = places.map((p) => ALL_PLACES.indexOf(p));
   indices.forEach((index, i) => { ALL_PLACES[index] = fixture(i); });
@@ -91,7 +91,10 @@ test("6일·볼거리 3곳이면 테마 일치 1곳으로도 통과하고, 확�
   const restricted = result();
   assert.equal(restricted.status, "볼거리 부족");
   assert.equal(restricted.sightseeing.eligible, 2);
-  assert.equal(restricted.score, original.score);
+  assert.ok(restricted.score < original.score, "입장 불가인 S급 장소가 평균 점수에서 빠진다");
+  assert.equal(restricted.filled, 2);
+  assert.ok(!restricted.top.some(({ place: p }) => p.id === place.id));
+  assert.ok(restricted.excluded.some(({ place: p }) => p.id === place.id));
   assert.deepEqual(restricted.readiness, original.readiness);
   const adults = result({ ...q, members: q.members!.slice(0, 2) });
   assert.equal(adults.sightseeing.eligible, 3);
@@ -99,16 +102,19 @@ test("6일·볼거리 3곳이면 테마 일치 1곳으로도 통과하고, 확�
   const ageUnknown = result({ ...q, members: q.members!.map((m) => m.id === "c" ? { ...m, age: null } : m) });
   assert.equal(ageUnknown.sightseeing.eligible, 3);
   assert.equal(ageUnknown.admissionNeedsCheck, true);
+  assert.ok(ageUnknown.top.some(({ place: p }) => p.id === place.id));
 
   place.admission = evidence(fields("minimumHeightCm", 120));
   assert.equal(result().sightseeing.eligible, 3);
   assert.equal(result().admissionNeedsCheck, true);
   const shortChild = result({ ...q, members: q.members!.map((m) => m.id === "c" ? { ...m, height: 110 } : m) });
   assert.equal(shortChild.sightseeing.eligible, 2);
+  assert.ok(!shortChild.top.some(({ place: p }) => p.id === place.id));
 
   place.admission = evidence(fields("minimumAge", 18, "unverified"));
   assert.equal(result().status, "ranked");
   assert.equal(result().admissionNeedsCheck, true);
+  assert.ok(result().top.some(({ place: p }) => p.id === place.id));
   place.admission = evidence(fields("minimumAge", 18), "ai");
   place.adultOnly = "check";
   place.longWalk = true;

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { PLACES_V1, REGIONS_V1 } from "../src/data/regionsV1";
 import { PLACE_FIT } from "../src/data/placeFit";
+import { PLACE_ATTRS } from "../src/data/placeAttrs";
 import { KRW_PER_USD } from "../src/data/worldPrices";
 import { conceptWeight, coreInterests, dayVisitCapacity, membersOf, normalizeParty, personalFit, plannedVisitCount, roomEstimate } from "../src/lib/travelParty";
 import type { TravelMember } from "../src/lib/travelParty";
@@ -109,4 +110,24 @@ test("AI 동행 0점은 실제 입장 불가로 처리하지 않는다", () => {
 test("식당·카페를 하루 관광 장소 수에 섞어 채우지 않는다", () => {
   const results = scoreRegions(query({ interests: ["휴양", "액티비티", "미식"] }));
   assert.ok(results.flatMap((r) => r.top).every((t) => !isMealPlace(t.place)));
+});
+
+
+test("아이 적합도 미확인은 상보다 낮고 중보다 높다 (성인2·아이2)", (t) => {
+  const place = { ...PLACES_V1[0], id: "kid-fit-fixture" };
+  const q = query({ children: [{ band: "초등", height: null }, { band: "초등", height: null }] });
+  t.after(() => { delete PLACE_ATTRS[place.id]; delete PLACE_FIT[place.id]; });
+  const factor = () => 0.5 + personalFit(place, q).factor * 0.5;
+  assert.ok(Math.abs(factor() - 0.925) < 1e-10);
+  assert.match(personalFit(place, q).flags.join(" "), /아이 동행 적합도 미확인/);
+  assert.equal(personalFit(place, query()).factor, 1);
+  PLACE_ATTRS[place.id] = ["오전", 60, "상"];
+  assert.equal(factor(), 1);
+  PLACE_ATTRS[place.id][2] = "중";
+  assert.ok(Math.abs(factor() - 0.85) < 1e-10);
+  PLACE_ATTRS[place.id][2] = "하";
+  assert.ok(Math.abs(factor() - 0.7) < 1e-10);
+  // 명시적인 개인 점수는 기존처럼 우선한다.
+  PLACE_FIT[place.id] = Array(9).fill(5);
+  assert.equal(factor(), 1);
 });
