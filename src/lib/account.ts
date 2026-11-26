@@ -49,12 +49,15 @@ export async function startGoogle(intent: GoogleIntent, agree: boolean) {
   if (location.origin !== GOOGLE_ORIGIN) return { ok: false, error: "구글 로그인은 tripflip.co.kr에서 이용해 주세요. 기존 로그인은 계속 사용할 수 있어요." };
   const v = deviceId(), a = loadAuth();
   if (!agree || !v || (intent === "login" ? !!a : !a)) return { ok: false, error: GOOGLE_FAILURE };
-  try { sessionStorage.setItem(GOOGLE_PENDING, intent); } catch { return { ok: false, error: GOOGLE_FAILURE }; }
+  try { sessionStorage.removeItem(GOOGLE_PENDING); } catch { return { ok: false, error: GOOGLE_FAILURE }; }
   const r = await googlePost("start", { v, intent, agree, token: a?.token ?? null });
   if (r.ok && r.url) {
     try {
       const url = new URL(r.url);
       if (url.origin === "https://accounts.google.com" && url.pathname === "/o/oauth2/v2/auth" && (loadAuth()?.token ?? null) === (a?.token ?? null)) {
+        const state = url.searchParams.get("state");
+        if (!state || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: GOOGLE_FAILURE };
+        sessionStorage.setItem(GOOGLE_PENDING, JSON.stringify({ intent, state }));
         location.assign(url.href);
         return { ok: true };
       }
@@ -66,12 +69,17 @@ export async function startGoogle(intent: GoogleIntent, agree: boolean) {
 
 /** OAuth redirects contain no tokens. Consume the HttpOnly cookie exactly once with same-origin POST. */
 export async function finishGoogle(outcome: string) {
-  let intent: string | null = null;
-  try { intent = sessionStorage.getItem(GOOGLE_PENDING); sessionStorage.removeItem(GOOGLE_PENDING); } catch {}
-  if (outcome !== "done" || !["login", "link", "withdraw"].includes(intent ?? "")) return { ok: false, error: GOOGLE_FAILURE };
+  let pending: { intent?: string; state?: string } | null = null;
+  try {
+    const raw = sessionStorage.getItem(GOOGLE_PENDING);
+    sessionStorage.removeItem(GOOGLE_PENDING);
+    pending = JSON.parse(raw ?? "null");
+  } catch {}
+  const intent = pending?.intent, state = pending?.state;
+  if (outcome !== "done" || !["login", "link", "withdraw"].includes(intent ?? "") || typeof state !== "string" || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: GOOGLE_FAILURE };
   const v = deviceId(), a = loadAuth();
   if (!v || (intent === "login" ? !!a : !a)) return { ok: false, error: GOOGLE_FAILURE };
-  const r = await googlePost("complete", { v, token: a?.token ?? null });
+  const r = await googlePost("complete", { v, intent, state, token: a?.token ?? null });
   if ((loadAuth()?.token ?? null) !== (a?.token ?? null)) return { ok: false, error: "계정이 변경됐어요. 다시 시도해 주세요." };
   if (r.ok && intent === "withdraw" && r.withdrawn) {
     if (a?.uid) { try { localStorage.removeItem(`tripflip.acct.${a.uid}.plans`); localStorage.removeItem(`tripflip.acct.${a.uid}.pending`); } catch {} }

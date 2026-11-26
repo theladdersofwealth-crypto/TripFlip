@@ -87,6 +87,7 @@ function GoogleButton({ intent }: { intent: GoogleIntent }) {
     if (!r.ok) { setBusy(false); setError(r.error ?? "구글 로그인에 실패했어요. 기존 로그인 방식으로 다시 시도해 주세요."); }
   };
   return <div className="card-soft stack" style={{ marginTop: 16 }}>
+    {intent === "login" && <p className="xs muted">기존 닉네임 계정이 있다면 먼저 기존 방식으로 로그인하고 내 계정에서 구글을 연결해 주세요.</p>}
     {intent === "link" && <p className="small muted">지금 로그인한 계정에 구글을 연결하면 기존 내 여행을 그대로 이어 볼 수 있어요.</p>}
     <label className="check-row consent-row small">
       <input type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)} />

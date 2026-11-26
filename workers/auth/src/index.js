@@ -47,8 +47,8 @@ export default {
       }
       if (req.method === "POST" && url.pathname === "/auth/google/complete") {
         const b = await read(req), proof = browserProof(req.headers.get("cookie"));
-        if (!b || !validDevice(b.v) || !proof || (b.token != null && (typeof b.token !== "string" || !/^[a-f0-9]{48}$/.test(b.token)))) return json({ ok: false, error: fail }, 400);
-        const pending = await flow(env, proof.state).consume(proof.proof, b.v);
+        if (!b || !validDevice(b.v) || !proof || !same(b.state, proof.state) || !["login", "link", "withdraw"].includes(b.intent) || (b.token != null && (typeof b.token !== "string" || !/^[a-f0-9]{48}$/.test(b.token)))) return json({ ok: false, error: fail }, 400);
+        const pending = await flow(env, proof.state).consume(proof.proof, b.v, b.intent);
         if (!pending) return json({ ok: false, error: fail }, 400, { "set-cookie": cookie("", 0) });
         const result = await stats(env).oauthAccount(pending.profile, pending.intent, b.token ?? null, pending.sessionHash, b.v);
         return json(result.ok ? result : { ok: false, error: result.error ?? fail }, result.ok ? 200 : 409, { "set-cookie": cookie("", 0) });
@@ -93,9 +93,9 @@ export class OAuthFlow extends DurableObject {
     this.sql.exec("UPDATE flow SET phase='ready', data=? WHERE id=1", JSON.stringify({ ...data, profile }));
     return true;
   }
-  consume(proof, v) {
+  consume(proof, v, intent) {
     const data = this.get("ready", proof);
-    if (!data || data.v !== v) return null;
+    if (!data || data.v !== v || data.intent !== intent) return null;
     this.sql.exec("DELETE FROM flow WHERE id=1");
     const { profile, intent, sessionHash } = data;
     return { profile, intent, sessionHash };
