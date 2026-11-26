@@ -211,6 +211,7 @@ const kst = (ms: number) => new Date(ms + 9 * 3600000).toISOString();
 /** 11/23 17:05 (한국 시간) */
 const when = (ms: number | null) => (ms ? `${md(kst(ms))} ${kst(ms).slice(11, 16)}` : "–");
 const age = (birth: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(birth)) return "–"; // 구글 전용 회원은 미수집
   const t = kst(Date.now()).slice(0, 10);
   return Number(t.slice(0, 4)) - Number(birth.slice(0, 4)) - (t.slice(5) < birth.slice(5) ? 1 : 0);
 };
@@ -271,7 +272,7 @@ function MemberView({ adminKey, uid, onBack }: { adminKey: string; uid: string; 
     {back}
     <section className="card-soft">
       <b style={{ fontSize: 18 }}>{u.nick}</b>
-      <p className="small muted">{u.birth} ({age(u.birth)}세) · {genderKo(u.gender)} · 가입 {when(u.created)} · 로그인 기기 {d.devices}대{u.lock_until > Date.now() ? " · 🔒 PIN 잠김" : ""}</p>
+      <p className="small muted">{u.birth ? `${u.birth} (${age(u.birth)}세)` : "생년월일 미수집"} · {genderKo(u.gender)} · 가입 {when(u.created)} · 로그인 기기 {d.devices}대{u.lock_until > Date.now() ? " · 🔒 PIN 잠김" : ""}</p>
       <p className="small" style={{ marginTop: 6 }}>접속(화면 열람) {totalVisits}회 · 접속한 날 {d.daily.length}일{d.daily[0] ? ` · 마지막 ${md(d.daily[0].day)}` : ""}</p>
     </section>
     <section className="card-soft">

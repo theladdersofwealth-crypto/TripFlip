@@ -4,29 +4,44 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { NEXT_KEY } from "@/components/AppShell";
-import { AUTH_EVENT, ageOn, birthFrom8, loadAuth, login, logout, signup, withdraw } from "@/lib/account";
-import type { Auth } from "@/lib/account";
+import { AUTH_EVENT, ageOn, birthFrom8, loadAuth, login, logout, signup, withdraw, startGoogle, finishGoogle } from "@/lib/account";
+import type { Auth, GoogleIntent } from "@/lib/account";
 import { syncPlans } from "@/lib/planSync";
 
 export default function AccountPage() {
   const [auth, setAuth] = useState<Auth | null | undefined>(undefined);
   const [mode, setMode] = useState<"signup" | "login">("signup");
   const [gate, setGate] = useState(false);
+  const [oauthError, setOauthError] = useState("");
+  const [oauthBusy, setOauthBusy] = useState(false);
   const router = useRouter();
   useEffect(() => {
+    const outcome = new URLSearchParams(location.search).get("oauth");
+    let completing = outcome != null;
     const on = () => {
       const a = loadAuth();
       setAuth(a);
       // 추천 보려다 온 경우: 가입·로그인 끝나면 원래 화면으로
-      if (a) { let next: string | null = null; try { next = sessionStorage.getItem(NEXT_KEY); sessionStorage.removeItem(NEXT_KEY); } catch {} if (next && next.startsWith("/")) router.replace(next); }
+      if (a && !completing) { let next: string | null = null; try { next = sessionStorage.getItem(NEXT_KEY); sessionStorage.removeItem(NEXT_KEY); } catch {} if (next && next.startsWith("/") && !next.startsWith("//") && !next.includes("\\")) router.replace(next); }
     };
     on();
     if (location.hash === "#login") setMode("login");
     if (location.hash === "#gate") setGate(true);
     window.addEventListener(AUTH_EVENT, on);
+    if (outcome != null) {
+      history.replaceState(history.state, "", location.pathname + location.hash);
+      setOauthBusy(true);
+      void finishGoogle(outcome).then(r => {
+        completing = false;
+        setOauthBusy(false);
+        if (!r.ok) { setOauthError(r.error ?? "구글 로그인에 실패했어요."); setMode("login"); }
+        on();
+      });
+    }
     return () => window.removeEventListener(AUTH_EVENT, on);
   }, [router]);
   if (auth === undefined) return null;
+  if (oauthBusy) return <main className="container page" style={{ maxWidth: 420 }} aria-busy="true"><p role="status" className="small muted">구글 로그인 확인 중…</p></main>;
 
   if (auth) {
     return <main className="container page" style={{ maxWidth: 420 }}>
@@ -38,7 +53,9 @@ export default function AccountPage() {
         <button className="btn btn-block" onClick={() => logout(syncPlans)}>로그아웃</button>
       </div>
       <p className="xs faint" style={{ marginTop: 12 }}>저장한 여행은 계정에 보관돼 다른 기기에서 로그인해도 보여요. 로그아웃하면 이 기기 화면에서는 바로 숨겨져요.</p>
-      <Withdraw />
+      {oauthError && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{oauthError}</p>}
+      {auth.hasPin !== false && <GoogleButton intent="link" />}
+      <Withdraw hasPin={auth.hasPin !== false} />
     </main>;
   }
 
@@ -49,17 +66,51 @@ export default function AccountPage() {
       <button role="tab" aria-selected={mode === "signup"} className={mode === "signup" ? "on" : ""} onClick={() => setMode("signup")}>처음이에요</button>
       <button role="tab" aria-selected={mode === "login"} className={mode === "login" ? "on" : ""} onClick={() => setMode("login")}>계정 있어요</button>
     </div>
+    <GoogleButton intent="login" />
+    {oauthError && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{oauthError}</p>}
+    <p className="xs muted" style={{ textAlign: "center", marginTop: 14 }}>또는 기존 닉네임·PIN 방식</p>
     {mode === "signup" ? <SignupForm /> : <LoginForm />}
     <Link href="/" className="btn btn-ghost btn-block" style={{ marginTop: 12 }}>첫 화면으로</Link>
   </main>;
 }
 
-function Withdraw() {
+function GoogleButton({ intent }: { intent: GoogleIntent }) {
+  const [agree, setAgree] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const label = intent === "link" ? "기존 계정에 구글 연결" : intent === "withdraw" ? "구글로 확인하고 탈퇴" : "구글로 계속하기";
+  const go = async () => {
+    if (!agree || busy) return;
+    setBusy(true);
+    setError("");
+    const r = await startGoogle(intent, agree);
+    if (!r.ok) { setBusy(false); setError(r.error ?? "구글 로그인에 실패했어요. 기존 로그인 방식으로 다시 시도해 주세요."); }
+  };
+  return <div className="card-soft stack" style={{ marginTop: 16 }}>
+    {intent === "link" && <p className="small muted">지금 로그인한 계정에 구글을 연결하면 기존 내 여행을 그대로 이어 볼 수 있어요.</p>}
+    <label className="check-row consent-row small">
+      <input type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)} />
+      <span>{intent === "withdraw" ? "계정·내 여행·이용 기록을 삭제하는 데 동의해요." : <>만 14세 이상이며 <Link href="/legal/terms" target="_blank" rel="noopener">이용약관</Link> 및 이메일·이름 수집을 포함한 <Link href="/legal/privacy" target="_blank" rel="noopener">개인정보처리방침</Link>에 동의해요.</>}</span>
+    </label>
+    <button type="button" className="btn btn-block" disabled={!agree || busy} onClick={go}>
+      {busy ? "연결 중…" : label}
+    </button>
+    {error && <p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p>}
+  </div>;
+}
+
+function Withdraw({ hasPin }: { hasPin: boolean }) {
   const [open, setOpen] = useState(false);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   if (!open) return <button type="button" className="btn btn-ghost btn-block xs" style={{ marginTop: 20, color: "var(--faint)" }} onClick={() => setOpen(true)}>회원 탈퇴</button>;
+  if (!hasPin) return <section className="card-soft stack" style={{ marginTop: 20 }}>
+    <b>회원 탈퇴</b>
+    <p className="small">계정과 저장한 여행, 이용 기록이 삭제되며 되돌릴 수 없어요. 연결한 구글 계정으로 다시 확인해 주세요.</p>
+    <GoogleButton intent="withdraw" />
+    <button type="button" className="btn btn-ghost btn-block" onClick={() => setOpen(false)}>취소</button>
+  </section>;
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");

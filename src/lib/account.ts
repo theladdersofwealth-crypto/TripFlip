@@ -7,7 +7,11 @@ export const AUTH_KEY = "tripflip:auth";
 export const SIGNUP_LATER_KEY = "tripflip:signup-later";
 export const AUTH_EVENT = "tripflip:auth";
 
-export interface Auth { token: string; nick: string; uid?: string }
+export interface Auth { token: string; nick: string; uid?: string; hasPin?: boolean }
+export type GoogleIntent = "login" | "link" | "withdraw";
+const GOOGLE_PENDING = "tripflip:google-pending";
+const GOOGLE_ORIGIN = "https://tripflip.co.kr";
+const GOOGLE_FAILURE = "구글 로그인에 실패했어요. 기존 로그인 방식으로 다시 시도해 주세요.";
 
 export function loadAuth(): Auth | null {
   try {
@@ -23,13 +27,63 @@ function saveAuth(a: Auth | null) {
   window.dispatchEvent(new Event(AUTH_EVENT));
 }
 
-async function post(path: string, body: object): Promise<{ ok: boolean; error?: string; token?: string; nick?: string; uid?: string }> {
+async function post(path: string, body: object): Promise<{ ok: boolean; error?: string; token?: string; nick?: string; uid?: string; hasPin?: boolean }> {
   try {
     const res = await fetch(`${STATS_URL}${path}`, { method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" }, cache: "no-store" });
     return await res.json();
   } catch {
     return { ok: false, error: "서버에 연결하지 못했어요. 잠시 뒤 다시 해 주세요." };
   }
+}
+
+async function googlePost(path: string, body: object): Promise<{ ok: boolean; url?: string; error?: string; token?: string; nick?: string; uid?: string; hasPin?: boolean; withdrawn?: boolean }> {
+  try {
+    const res = await fetch("/auth/google/" + path, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify(body), credentials: "same-origin", cache: "no-store" });
+    if (!res.headers.get("content-type")?.includes("application/json")) return { ok: false, error: GOOGLE_FAILURE };
+    return await res.json();
+  } catch { return { ok: false, error: GOOGLE_FAILURE }; }
+}
+
+export async function startGoogle(intent: GoogleIntent, agree: boolean) {
+  if (location.origin !== GOOGLE_ORIGIN) return { ok: false, error: "구글 로그인은 tripflip.co.kr에서 이용해 주세요. 기존 로그인은 계속 사용할 수 있어요." };
+  const v = deviceId(), a = loadAuth();
+  if (!agree || !v || (intent === "login" ? !!a : !a)) return { ok: false, error: GOOGLE_FAILURE };
+  try { sessionStorage.setItem(GOOGLE_PENDING, intent); } catch { return { ok: false, error: GOOGLE_FAILURE }; }
+  const r = await googlePost("start", { v, intent, agree, token: a?.token ?? null });
+  if (r.ok && r.url) {
+    try {
+      const url = new URL(r.url);
+      if (url.origin === "https://accounts.google.com" && url.pathname === "/o/oauth2/v2/auth" && (loadAuth()?.token ?? null) === (a?.token ?? null)) {
+        location.assign(url.href);
+        return { ok: true };
+      }
+    } catch {}
+  }
+  try { sessionStorage.removeItem(GOOGLE_PENDING); } catch {}
+  return { ok: false, error: r.error ?? GOOGLE_FAILURE };
+}
+
+/** OAuth redirects contain no tokens. Consume the HttpOnly cookie exactly once with same-origin POST. */
+export async function finishGoogle(outcome: string) {
+  let intent: string | null = null;
+  try { intent = sessionStorage.getItem(GOOGLE_PENDING); sessionStorage.removeItem(GOOGLE_PENDING); } catch {}
+  if (outcome !== "done" || !["login", "link", "withdraw"].includes(intent ?? "")) return { ok: false, error: GOOGLE_FAILURE };
+  const v = deviceId(), a = loadAuth();
+  if (!v || (intent === "login" ? !!a : !a)) return { ok: false, error: GOOGLE_FAILURE };
+  const r = await googlePost("complete", { v, token: a?.token ?? null });
+  if ((loadAuth()?.token ?? null) !== (a?.token ?? null)) return { ok: false, error: "계정이 변경됐어요. 다시 시도해 주세요." };
+  if (r.ok && intent === "withdraw" && r.withdrawn) {
+    if (a?.uid) { try { localStorage.removeItem(`tripflip.acct.${a.uid}.plans`); localStorage.removeItem(`tripflip.acct.${a.uid}.pending`); } catch {} }
+    saveAuth(null);
+    return { ok: true };
+  }
+  if (r.ok && intent !== "withdraw" && r.token && r.nick && r.uid && typeof r.hasPin === "boolean") {
+    if (intent === "link" && a?.uid && r.uid !== a.uid) return { ok: false, error: GOOGLE_FAILURE };
+    saveAuth({ token: r.token, nick: r.nick, uid: r.uid, hasPin: r.hasPin });
+    return { ok: true };
+  }
+  return { ok: false, error: r.error ?? GOOGLE_FAILURE };
 }
 
 /** 생년월일 8자리(19850127) → 1985-01-27. 틀리면 null */
@@ -89,6 +143,8 @@ export async function refreshAuth() {
   const a = loadAuth();
   if (!a) return;
   const r = await post("/me", { token: a.token });
-  if (r.ok && r.uid && r.uid !== a.uid && loadAuth()?.token === a.token) saveAuth({ ...a, uid: r.uid, nick: r.nick ?? a.nick });
-  else if (!r.ok && r.error !== undefined && !/연결하지 못했/.test(r.error)) saveAuth(null);
+  if (loadAuth()?.token !== a.token) return; // 늦은 응답이 다른 계정을 덮지 않도록
+  if (r.ok && r.uid && (r.uid !== a.uid || (typeof r.hasPin === "boolean" && r.hasPin !== a.hasPin) || (r.nick && r.nick !== a.nick))) {
+    saveAuth({ ...a, uid: r.uid, nick: r.nick ?? a.nick, ...(typeof r.hasPin === "boolean" ? { hasPin: r.hasPin } : {}) });
+  } else if (!r.ok && r.error !== undefined && !/연결하지 못했/.test(r.error)) saveAuth(null);
 }
