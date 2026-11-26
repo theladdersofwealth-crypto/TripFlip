@@ -130,14 +130,14 @@ export default function Home() {
   const go = () => {
     if (error || pending || flying || !done[0]) return;
     commit();
-    track("search");
+    track("search", undefined, undefined, selectedAreas);
     setFlying(true); // 비행기 로딩은 결과 화면으로 넘어갈 때까지만(고정 대기 없음, 11/25)
     startTransition(() => router.push("/results"));
   };
   const openRegion = (id: string) => {
     if (error) return;
     commit();
-    track("search");
+    track("search", undefined, undefined, selectedAreas);
     router.push(`/results?r=${encodeURIComponent(id)}`);
   };
   const curQ = open == null ? null : STEPS[open].qs[qi];

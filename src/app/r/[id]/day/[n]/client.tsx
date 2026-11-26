@@ -33,7 +33,7 @@ function DayInner() {
   };
 
   const priceVersion = useLivePrices();
-  const r = useMemo(() => (q ? scoreRegions(q).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
+  const r = useMemo(() => (q ? scoreRegions(q, { includeOutsideAreas: true }).find((x) => x.region.id === id) : undefined), [q, id, priceVersion]);
   const days = useMemo(() => {
     if (!q) return [];
     const b = loadBoard(id, boardKey(id, q), plan) ?? emptyBoard(id, q);

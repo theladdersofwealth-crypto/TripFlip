@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { NO_TRACK_KEY, STATS_URL, activityLabel } from "@/lib/analytics";
 import { ALL_REGIONS } from "@/services/regionScore";
+import { TRAVEL_AREAS } from "@/data/travelAreas";
 
 const KEY_STORE = "tripflip:admin-key";
 
@@ -12,6 +13,7 @@ interface Stats {
   ok: true; today: string; from: string; days: number; totalVisitors: number; periodVisitors: number;
   members?: { total: number; today: number; activeToday: number };
   daily: Day[]; funnel: Record<string, number>;
+  searchAreas?: { area: string; searches: number }[];
   regions: { region: string; views: number; book: number; flight: number; hotel: number; save: number }[];
 }
 
@@ -168,6 +170,15 @@ function Dashboard({ data }: { data: Stats }) {
       <p className="xs faint" style={{ marginTop: 8 }}>예약처 이동: 항공 {f.flight ?? 0} · 숙소 {f.hotel ?? 0} (실제 결제 여부는 제휴 연결 후 확인 가능)</p>
     </section>
 
+    <section className="card-soft">
+      <b>희망 지역 검색 횟수 (최근 {data.days}일)</b>
+      <p className="xs muted">복수 선택은 지역마다 1회, 상관없음은 전체 1회. 고유 방문자 수가 아니며 개인별 기록은 저장하지 않아요.</p>
+      {!data.searchAreas?.length ? <p className="small muted">아직 지역 선택 통계가 없어요.</p> :
+        <div style={{ overflowX: "auto", marginTop: 8 }}><table className="admin-table small">
+          <thead><tr><th>희망 지역</th><th>검색 횟수</th></tr></thead>
+          <tbody>{data.searchAreas.map((r) => <tr key={r.area}><td>{r.area === "all" ? "상관없음(전체)" : TRAVEL_AREAS.find((a) => a.id === r.area)?.label ?? r.area}</td><td>{r.searches}</td></tr>)}</tbody>
+        </table></div>}
+    </section>
     <section className="card-soft">
       <b>인기 권역 (최근 {data.days}일)</b>
       {data.regions.length === 0 ? <p className="small muted" style={{ marginTop: 8 }}>아직 기록이 없어요.</p> :

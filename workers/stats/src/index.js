@@ -1,5 +1,5 @@
 // tripflip-stats: 사용 흐름 집계 + 간편 회원.
-//  POST /e      {v, s, r?, p?}  ← 앱(sendBeacon, text/plain). v=기기 무작위 번호, s=단계, r=권역 id, p=화면 주소
+//  POST /e      {v, s, r?, p?, g?}  ← 앱(sendBeacon, text/plain). v=기기 무작위 번호, s=단계, r=권역 id, p=화면 주소
 //  GET  /stats?days=30          ← 관리자 페이지 (Authorization: Bearer ADMIN_KEY)
 //  POST /signup {nick, birth, gender, pin, agree, v} → {token, nick}
 //  POST /login  {nick, pin, v}  → {token, nick}   (PIN 5번 틀리면 15분 잠금, 반복 시 두 배)
@@ -44,7 +44,7 @@ export default {
       // 자동 프로그램(검색 로봇 등)은 세지 않음
       const ua = req.headers.get("user-agent") || "";
       if (/bot|crawl|spider|headless|lighthouse/i.test(ua)) return json({ ok: true, skipped: true });
-      await stub.record(kstDay(), e.v, e.s, e.r, e.p ?? "");
+      await stub.record(kstDay(), e.v, e.s, e.r, e.p ?? "", e.g);
       return json({ ok: true });
     }
 
@@ -86,6 +86,8 @@ export class Stats extends DurableObject {
     this.sql = ctx.storage.sql;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS hits (day TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', n INTEGER NOT NULL DEFAULT 1, PRIMARY KEY (day, vid, step, region))`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS visitors (vid TEXT PRIMARY KEY, first_day TEXT NOT NULL)`);
+    // 개인·기기별 지역 선택은 저장하지 않음. 일별·지역별 검색 횟수 합계만.
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS search_areas (day TEXT NOT NULL, area TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 1, PRIMARY KEY (day, area))`);
     // 회원
     this.sql.exec(`CREATE TABLE IF NOT EXISTS users (uid TEXT PRIMARY KEY, nick TEXT NOT NULL, nick_key TEXT NOT NULL UNIQUE, birth TEXT NOT NULL, gender TEXT NOT NULL, salt TEXT NOT NULL, pin_hash TEXT NOT NULL, iter INTEGER NOT NULL, created INTEGER NOT NULL, fails INTEGER NOT NULL DEFAULT 0, locks INTEGER NOT NULL DEFAULT 0, lock_until INTEGER NOT NULL DEFAULT 0)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS sessions (tok TEXT PRIMARY KEY, uid TEXT NOT NULL, vid TEXT NOT NULL, created INTEGER NOT NULL)`);
@@ -126,17 +128,27 @@ export class Stats extends DurableObject {
     return ++h.n > limit;
   }
 
-  async record(day, vid, step, region, path = "") {
+  async record(day, vid, step, region, path = "", areas) {
     this.sql.exec(`INSERT INTO hits (day, vid, step, region) VALUES (?, ?, ?, ?) ON CONFLICT (day, vid, step, region) DO UPDATE SET n = n + 1`, day, vid, step, region);
     this.sql.exec(`INSERT OR IGNORE INTO visitors (vid, first_day) VALUES (?, ?)`, vid, day);
     // 로그인한 기기면 계정 이용 기록에 남김
     const uid = this.sql.exec(`SELECT uid FROM devices WHERE vid = ?`, vid).toArray()[0]?.uid;
     if (uid) this.sql.exec(`INSERT INTO log (ts, day, uid, vid, step, region, path) VALUES (?, ?, ?, ?, ?, ?, ?)`, Date.now(), day, uid, vid, step, region, path);
+    // 지역 선택은 회원 로그와 hits의 region/path에 쓰지 않는다.
+    // 기존 관리자 제외 조건을 수신 시점에 적용. 합계만 남으므로 개인별 소급 삭제는 불가능.
+    if (step === "search" && Array.isArray(areas)) {
+      if (this.hiddenKeys.length) this.syncHidden();
+      const hidden = this.sql.exec(`SELECT 1 FROM hidden_vids WHERE vid = ?`, vid).toArray().length > 0;
+      if (!hidden) for (const area of areas.length ? areas : ["all"]) {
+        this.sql.exec(`INSERT INTO search_areas (day, area) VALUES (?, ?) ON CONFLICT (day, area) DO UPDATE SET n = n + 1`, day, area);
+      }
+    }
     // 하루 한 번쯤 오래된 기록 정리
     if (Math.random() < 0.01) {
       const cut = kstDay(Date.now() - KEEP_DAYS * 86400000);
       this.sql.exec(`DELETE FROM hits WHERE day < ?`, cut);
       this.sql.exec(`DELETE FROM log WHERE day < ?`, cut);
+      this.sql.exec(`DELETE FROM search_areas WHERE day < ?`, cut);
     }
   }
 
@@ -345,6 +357,7 @@ export class Stats extends DurableObject {
       periodVisitors: funnel.visit,
       daily: [...byDay.values()],
       funnel,
+      searchAreas: rows(`SELECT area, SUM(n) AS searches FROM search_areas WHERE day >= ? GROUP BY area ORDER BY searches DESC, area`, from),
       regions: [...regions.values()].sort((a, b) => b.views - a.views).slice(0, 30),
     };
   }

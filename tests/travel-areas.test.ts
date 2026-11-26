@@ -35,8 +35,9 @@ test("선택 지역만 남고 12시간 초과 권역도 점수순으로 경쟁�
   assert.equal(selected.length, 27);
   assert.ok(selected.every((r) => travelAreaOf(r.region.country) === "central-eastern-europe"));
   const ranked = selected.filter((r) => r.status === "ranked");
-  const expected = all.filter((r) => r.status === "ranked" && travelAreaOf(r.region.country) === "central-eastern-europe").sort((a, b) => b.score - a.score);
-  assert.deepEqual(ranked.map((r) => r.region.id), expected.map((r) => r.region.id));
+  const expected = all.filter((r) => r.status === "ranked" && travelAreaOf(r.region.country) === "central-eastern-europe");
+  assert.deepEqual(ranked.map((r) => r.region.id).sort(), expected.map((r) => r.region.id).sort());
+  assert.deepEqual(ranked.map((r) => r.score), expected.map((r) => r.score).sort((a, b) => b - a));
   assert.ok(ranked.every((r, i) => i === 0 || ranked[i - 1].score >= r.score));
   assert.ok(ranked.some((r, i) => r.overFlight && ranked.slice(i + 1).some((x) => !x.overFlight)));
   for (const r of selected) {

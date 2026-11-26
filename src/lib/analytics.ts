@@ -2,6 +2,8 @@
 // 관리자 통계용 익명 이벤트. 기기마다 무작위 번호 하나만 쓰고 이름·IP·위치는 보내지 않는다.
 // 받는 곳: workers/stats (tripflip-stats Worker). 실패해도 앱 동작에는 영향 없음.
 
+import { normalizeTravelAreas, type TravelArea } from "@/data/travelAreas";
+
 export const STATS_URL = "https://tripflip-stats.ohysky0127.workers.dev";
 export const VID_KEY = "tripflip:vid";
 export const NO_TRACK_KEY = "tripflip:no-track";
@@ -45,12 +47,13 @@ export function deviceId(): string | null {
   }
 }
 
-export function track(s: StatStep, r?: string, p?: string) {
+/** g는 검색 선택 지역(빈 배열=전체). Worker에서 지역별 일별 합계에만 사용. */
+export function track(s: StatStep, r?: string, p?: string, areas?: readonly TravelArea[]) {
   if (typeof window === "undefined" || navigator.webdriver) return; // 자동 테스트·로봇 제외
   if (!/^https?:$/.test(location.protocol) || /^(localhost|127\.)/.test(location.hostname)) return; // 개발 중 제외
   const v = visitorId();
   if (!v) return;
-  const body = JSON.stringify({ v, s, ...(r ? { r } : {}), ...(p ? { p } : {}) });
+  const body = JSON.stringify({ v, s, ...(r ? { r } : {}), ...(p ? { p } : {}), ...(s === "search" && areas !== undefined ? { g: normalizeTravelAreas(areas) } : {}) });
   try {
     if (navigator.sendBeacon?.(`${STATS_URL}/e`, new Blob([body], { type: "text/plain" }))) return;
   } catch {}
