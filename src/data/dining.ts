@@ -34,6 +34,7 @@ export function withMapDining(places: PlaceV1[]): PlaceV1[] {
       travel: "위치 확인 필요", penalty: 0, grade: null,
     };
     // 기존 시장의 관광 분류와 저장된 장소 ID, 좌표 및 등급은 유지한다.
+    const guide = place.dining;
     const updated: PlaceV1 = {
       ...place,
       dining: {
@@ -45,6 +46,9 @@ export function withMapDining(places: PlaceV1[]): PlaceV1[] {
           status: row.status,
           nameLocal: row.nameLocal, nameEn: row.nameEn, nameKo: row.nameKo, area: row.area,
           signature: row.signature, priceLevel: row.priceLevel, confidence: row.confidence,
+          ...(guide?.sourceUrl && guide.license ? {
+            guideSource: { name: guide.source, url: guide.sourceUrl, license: guide.license, checkedAt: guide.checkedAt },
+          } : {}),
         },
       },
     };

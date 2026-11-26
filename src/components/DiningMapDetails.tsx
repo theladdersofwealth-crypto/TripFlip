@@ -26,6 +26,7 @@ export function DiningMapDetails({ place }: { place: PlaceV1 }) {
     <div>대표 메뉴 {mapRecord.signature.join(" · ") || "미확인"} · 가격대 {mapRecord.priceLevel ?? "미확인"}</div>
     <div>{mapRecord.status === "pending" ? "지도 확인 시도일" : "지도 확인일"} {dining.checkedAt} · 자료 신뢰도 {mapRecord.confidence ?? "미확인"}</div>
     {mapRecord.status === "confirmed" && (dining.sourceUrl ? <div><a href={dining.sourceUrl} target="_blank" rel="noopener noreferrer">출처 보기</a></div> : <div>출처 링크 미확인</div>)}
+    {mapRecord.guideSource && <div><a href={mapRecord.guideSource.url} target="_blank" rel="noopener noreferrer">{mapRecord.guideSource.name} 기존 자료</a> · {mapRecord.guideSource.checkedAt} · {mapRecord.guideSource.license}</div>}
     <a href={diningMapUrl(place) ?? undefined} target="_blank" rel="noopener noreferrer">지도에서 보기 ›</a>
   </>;
 }

@@ -47,9 +47,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 116);
+  assert.equal(imported.length, 225);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 15);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 35);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -67,6 +67,18 @@ test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처�
       assert.ok(isMealPlace(place));
     }
   }
+});
+
+test("기존 오사카 가이드 장소 ID와 출처를 유지하고 신규 다낭 메뉴 오탈자를 고친다", () => {
+  for (const id of ["wv-00bda7807878b6c85d", "wv-b770efa4a90acfcc5b", "wv-d873e2dea1cdcc2743"]) {
+    const previous = DINING_PLACES.find((p) => p.id === id)!;
+    const current = ALL_PLACES.filter((p) => p.id === id);
+    assert.equal(current.length, 1);
+    assert.equal(current[0].dining?.mapRecord?.status, "confirmed");
+    assert.equal(current[0].dining?.mapRecord?.guideSource?.url, previous.dining?.sourceUrl);
+    assert.equal(current[0].dining?.mapRecord?.guideSource?.license, "CC-BY-SA-4.0");
+  }
+  assert.ok(ALL_PLACES.find((p) => p.id === "vie-danang-x49")?.dining?.mapRecord?.signature.includes("새우와 돼지고기를 넣은 생춘권"));
 });
 
 test("확인 중 후보는 점심 목록에서 확인됨 뒤에 오고 지도 검색으로 찾을 수 있다", () => {
