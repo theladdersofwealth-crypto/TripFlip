@@ -1,7 +1,8 @@
+import type { TestContext } from "node:test";
 import assert from "node:assert/strict";
 import test, { beforeEach } from "node:test";
 // 고정된 예제 날짜가 지나도 링크 회귀 테스트는 동일한 기준으로 실행한다.
-beforeEach((t) => { t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-26T03:00:00Z") }); });
+beforeEach((t) => { (t as TestContext).mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-26T03:00:00Z") }); });
 import { pickSamples, airlineName } from "../src/lib/flightSamples";
 import { themeHighlights } from "../src/services/regionScore";
 import { HOTEL_KO } from "../src/data/hotelKo";

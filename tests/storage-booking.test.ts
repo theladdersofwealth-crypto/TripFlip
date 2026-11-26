@@ -1,3 +1,4 @@
+import type { TestContext } from "node:test";
 import { test, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 import { DEFAULT_QUERY, DEFAULT_PREFS, loadBoard, loadPlans, loadPrefs, saveBoard, savePlan, savePrefs } from "../src/lib/flow";
@@ -6,7 +7,7 @@ import { REGIONS_V1 } from "../src/data/regionsV1";
 import { boardKey, emptyBoard } from "../src/services/planner";
 import { childAgesForBooking, flightSearchUrl, hotelSearchUrl } from "../src/services/booking";
 // 고정된 예제 날짜가 지나도 링크 회귀 테스트는 동일한 기준으로 실행한다.
-beforeEach((t) => { t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-26T03:00:00Z") }); });
+beforeEach((t) => { (t as TestContext).mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-26T03:00:00Z") }); });
 const values = new Map<string, string>();
 beforeEach(() => {
   values.clear();
