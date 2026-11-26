@@ -11,6 +11,7 @@ import { EXTRA_PRICE_LEVEL, HOTEL_ESTIMATE_USD } from "@/data/hotelEstimates";
 import { liveFlightKrw, liveHotelPrices, liveSummary } from "@/lib/livePrices";
 import { applyApprovedFacts } from "@/data/approvedCatalog";
 import { DINING_PLACES, isPendingDining, withMapDining } from "@/data/dining";
+import { DINING_SCORE, scoreVerifiedDining, type DiningEvidence } from "@/services/diningScore";
 import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, personalFit, plannedVisitCount, roomEstimate } from "@/lib/travelParty";
 import type { TravelMember } from "@/lib/travelParty";
 
@@ -120,8 +121,8 @@ export interface RegionResult {
   admissionNeedsCheck: boolean;
   /** 일정 준비 상태: 등록된 식당·카페 수와, 관광·식사 모두 여행 기간을 채울 수 있는지 */
   readiness: { meals: number; mealsNeeded: number; ready: boolean };
-  /** 미식 선택 시에만 제공. null은 검증 자료가 없어서 업체 수를 알 수 없는 경우다. */
-  diningFit?: { verifiedCount: number | null; bonus: number };
+  /** 미식 선택 시에만 제공. score=null은 검증 자료 부족, share=0은 기존 볼거리 대체. */
+  diningFit?: DiningEvidence & { weight: number; share: number };
   weather: { month: number; judge: WeatherJudge; adj: number; source: string; tmax?: number; rainDays?: number };
   excluded: { place: PlaceV1; reason: string }[];
   flags: string[];
@@ -148,7 +149,6 @@ export interface RegionResult {
 }
 
 const MAX_SCORE = 5.5;
-const VERIFIED_DINING_SCORE = { pointsPerPlace: 0.025, maxPlaces: 15 };
 
 // 나라 물가: 10/31 자료 + 새 권역 나라(세계은행 PLI, 11/24 추가)
 const COUNTRY_PRICE_LEVEL: Record<string, number> = { ...WB_PRICE_LEVEL, ...EXTRA_PRICE_LEVEL };
@@ -360,13 +360,30 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
     const readiness = { meals, mealsNeeded, ready: top.length >= N && meals >= Math.ceil(mealsNeeded / 2) };
     // 현재 추천 숙소 데이터는 이름·평점·후기·가격만 제공해 확인된 시설이 없다.
     const sightseeing = sightseeingCoverage(days, eligible);
-    const base = { region, rank: 0, N, weather, readiness, sightseeing, admissionNeedsCheck, excluded, flags: [...flags], stay: estimateTripCost(region, q), flightHours, overFlight: false };
-    if (!places.length) return { ...base, status: "데이터 부족", score: 0, display: 0, top: [], filled: 0, reasons: [] };
-    if (!top.length) return { ...base, status: "조건 충족 장소 없음", score: 0, display: 0, top: [], filled: 0, reasons: [] };
+    const dining = diningWeight ? scoreVerifiedDining(mealPlaces, days) : undefined;
+    const diningFit = dining ? {
+      ...dining, weight: diningWeight,
+      share: dining.score == null ? 0 : top.length ? DINING_SCORE.share : 1,
+    } : undefined;
+    const diningKnown = diningFit?.score != null;
+    const diningEnough = diningKnown && !!diningFit?.enough;
+    const diningReason = diningFit
+      ? diningFit.score == null
+        ? "검증 식당 자료 미확인 · 기존 볼거리 기반 점수로 평가"
+        : `검증 식당·카페 등 ${diningFit.verifiedCount}곳 · 미식 선택지 점수 ${diningFit.score.toFixed(2)}/5 · 확인 중 제외`
+      : null;
+    const base = { region, rank: 0, N, weather, readiness, sightseeing, admissionNeedsCheck, excluded, flags: [...flags], stay: estimateTripCost(region, q), flightHours, overFlight: false,
+      ...(diningFit && { diningFit }) };
+    if (!places.length && !diningEnough) return { ...base, status: "데이터 부족", score: 0, display: 0, top: [], filled: 0, reasons: diningReason ? [diningReason] : [] };
+    if (!top.length && !diningEnough) return { ...base, status: "조건 충족 장소 없음", score: 0, display: 0, top: [], filled: 0, reasons: diningReason ? [diningReason] : [] };
 
-    const coverage = interests.length ? interests.filter((c) => top.some((t) => t.place.concepts.includes(c))).length / interests.length : 1;
-    // 미조사 자리를 0점으로 채우지 않는다. 데이터 충실도는 별도 사유로 알린다.
-    let score = top.reduce((s, x) => s + x.score, 0) / top.length * (0.6 + 0.4 * coverage) + wj.adj;
+    const coverage = interests.length ? interests.filter((c) => (c === "미식" && diningKnown) || top.some((t) => t.place.concepts.includes(c))).length / interests.length : 1;
+    // 미조사 자리를 0점으로 채우지 않는다. 비미식/미확인은 기존 평균 그대로.
+    const sightMean = top.length ? top.reduce((s, x) => s + x.score, 0) / top.length : 0;
+    const themeMean = diningFit && diningFit.score != null
+      ? (1 - diningFit.share) * sightMean + diningFit.share * diningFit.score * diningFit.weight
+      : sightMean;
+    let score = themeMean * (0.6 + 0.4 * coverage) + wj.adj;
     if (base.stay.budgetStatus === "over" && q.budgetMode !== "cap" && q.totalBudgetKrw && base.stay.partyTotalKrw) {
       score -= Math.min(1, base.stay.partyTotalKrw / q.totalBudgetKrw - 1);
       base.flags.push("예상 경비가 희망 예산을 넘어 적합도를 낮췄어요");
@@ -388,20 +405,11 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
       score *= 1 - 0.1 * unknown.length;
       base.flags.push(`${unknown.join("·")} 자료가 없어 추정값이라 적합도를 ${unknown.length * 10}% 낮췄어요`);
     }
-    const reasons = buildReasons(q, region, top, scored, weather, N, flightHours);
-    const verifiedCount = diningWeight ? mealPlaces.filter((p) => p.dining?.mapRecord?.status === "confirmed").length : 0;
-    const diningFit = diningWeight ? {
-      verifiedCount: verifiedCount || null,
-      bonus: Math.min(verifiedCount, VERIFIED_DINING_SCORE.maxPlaces) * VERIFIED_DINING_SCORE.pointsPerPlace * diningWeight,
-    } : undefined;
-    if (diningFit) {
-      score += diningFit.bonus;
-      reasons.unshift(diningFit.verifiedCount == null
-        ? "검증 식당 자료가 아직 없어요"
-        : `검증 식당·카페 등 ${diningFit.verifiedCount}곳 · 미식 가산점 반영`);
-    }
+    const reasons = buildReasons(q, region, top, scored, weather, N, flightHours, diningKnown);
+    if (diningReason) reasons.unshift(diningReason);
+    if (diningEnough && !sightseeing.passes) reasons.push("검증 식당은 충분하지만 볼거리 자료는 부족해요");
     const display = Math.min(100, Math.max(0, (score / MAX_SCORE) * 100));
-    return { ...base, ...(diningFit && { diningFit }), status: "ranked", score, display, top, filled: top.length, reasons, themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
+    return { ...base, status: "ranked", score, display, top, filled: top.length, reasons, themes: themeHighlights(coreInterests(q), scored).map((h) => ({ ...h, icon: THEME_ICON[h.theme] })) };
   });
 
   // 현지 물가 선택과 일행 전체 예산 상한을 서로 독립적으로 적용한다.
@@ -415,7 +423,7 @@ export function scoreRegions(input: RegionQuery): RegionResult[] {
   }
 
   for (const r of results) {
-    if (r.status === "ranked" && !r.sightseeing.passes) r.status = "볼거리 부족";
+    if (r.status === "ranked" && !r.sightseeing.passes && !r.diningFit?.enough) r.status = "볼거리 부족";
   }
 
   // 희망 비행시간을 넘는 곳은 빼지 않고 순위 맨 뒤로 보낸다 (형님 결정 2026-11-05)
@@ -447,11 +455,11 @@ export function themeHighlights(interests: Concept[], scored: ScoredPlace[], per
   }).filter((h) => h.names.length);
 }
 
-function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], scored: ScoredPlace[], w: RegionResult["weather"], N: number, flightHours: number | null): string[] {
+function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], scored: ScoredPlace[], w: RegionResult["weather"], N: number, flightHours: number | null, diningKnown = false): string[] {
   const out: string[] = [];
   const interests = coreInterests(q);
   const days = tripDays(q.startDate, q.endDate);
-  const fits = interests.filter((c) => top.some((t) => t.place.concepts.includes(c)));
+  const fits = interests.filter((c) => (c === "미식" && diningKnown) || top.some((t) => t.place.concepts.includes(c)));
   if (top.length >= N && fits.length) out.push(`${fits.join("·")} 위주로 ${days}일을 꽉 채울 만큼 갈 곳이 있어요`);
   for (const c of interests.filter((c) => !fits.includes(c))) out.push(`${c}에 맞는 곳은 아직 부족해요`);
   if (w.tmax != null && w.rainDays != null) {
