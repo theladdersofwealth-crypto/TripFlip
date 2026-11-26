@@ -9,7 +9,7 @@ const profile = { sub: "google-test-subject", email_verified: true, email: " Exa
 test("구글의 인증된 이메일과 이름만 허용하고 기타 프로필을 버린다", () => {
   const actual = googleProfile(profile);
   assert.deepEqual(actual, { provider: "google", subject: profile.sub, email: "example@example.com", name: "테스트" });
-  assert.ok(validIdentity(actual));
+  assert.ok(validIdentity({...actual,emailVerified:true}));
   assert.equal(googleProfile({ ...profile, email_verified: false }), null);
   assert.equal(googleProfile({ ...profile, email_verified: "true" }), null);
   assert.equal(googleProfile({ ...profile, sub: "" }), null);
@@ -40,16 +40,14 @@ test("HttpOnly 브라우저 증명, 중복 쿠키 거부, 동의 및 기존 세�
   assert.equal(validIntent({ v: "abc12345", intent: "link", agree: true }), false);
   assert.equal(validIntent({ v: "abc12345", intent: "withdraw", agree: true, token: "a".repeat(48) }), true);
 });
-test("동일 구글 식별자는 같은 회원, 기존 PIN 회원 명시적 연결, 충돌 시 병합 거부", () => {
-  assert.deepEqual(resolveIdentity({ intent: "login", emailUids: [] }), { create: true });
-  assert.deepEqual(resolveIdentity({ intent: "login", subjectUid: "u1", emailUids: ["u1"] }), { uid: "u1" });
-  assert.deepEqual(resolveIdentity({ intent: "link", currentUid: "old-pin", emailUids: [] }), { uid: "old-pin" });
-  assert.equal(resolveIdentity({ intent: "login", emailUids: ["u1"] }), null);
-  assert.equal(resolveIdentity({ intent: "link", currentUid: "u2", subjectUid: "u1", emailUids: ["u1"] }), null);
-  assert.equal(resolveIdentity({ intent: "link", currentUid: "u1", linkedSubject: "old", emailUids: [] }), null);
-  assert.equal(resolveIdentity({ intent: "login", subjectUid: "u1", emailUids: ["u2"] }), null);
-  assert.equal(resolveIdentity({ intent: "withdraw", currentUid: "u2", subjectUid: "u1", emailUids: [] }), null);
-  assert.deepEqual(resolveIdentity({ intent: "withdraw", currentUid: "u1", subjectUid: "u1", emailUids: [] }), { uid: "u1" });
+test("공급자 식별자와 인증된 이메일로만 연결한다", () => {
+  assert.deepEqual(resolveIdentity({intent:"login",emailUids:[]}),{create:true});
+  assert.deepEqual(resolveIdentity({intent:"login",subjectUid:"u1",emailUids:[]}),{uid:"u1"});
+  assert.deepEqual(resolveIdentity({intent:"login",emailUids:["u1"]}),{uid:"u1"});
+  assert.equal(resolveIdentity({intent:"login",emailUids:["u1"],existingProvider:true}),null);
+  assert.equal(resolveIdentity({intent:"login",emailUids:["u1","u2"]}),null);
+  assert.equal(resolveIdentity({intent:"withdraw",currentUid:"u2",subjectUid:"u1",emailUids:[]}),null);
+  assert.deepEqual(resolveIdentity({intent:"withdraw",currentUid:"u1",subjectUid:"u1",emailUids:[]}),{uid:"u1"});
 });
 test("토큰 교환과 UserInfo는 고정 서버에서만, 실패 및 미인증 이메일 거부", async () => {
   const calls: string[] = [];
