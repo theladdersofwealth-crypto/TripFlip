@@ -501,6 +501,7 @@ p { margin: 0; }
 .rank-bg.has-flag { background: #0d2238; overflow: hidden; }
 .rank-bg .rank-flag-fill { position: absolute; inset: -12%; width: 124%; height: 124%; object-fit: cover; filter: blur(14px) saturate(.9); opacity: .55; }
 .rank-bg .rank-flag { position: absolute; top: 0; right: 0; height: 100%; width: auto; max-width: 100%; object-fit: contain; object-position: right center; display: block; }
+.rank-hero .rank-flag { inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-position: center; }
 .rank-bg.has-flag::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,22,38,.84) 0%, rgba(8,22,38,.6) 55%, rgba(8,22,38,.35) 100%); }
 .rank-en { position: absolute; z-index: 1; right: -.04em; bottom: -.17em; font-family: "Bebas Neue", "Arial Narrow", Impact, sans-serif; font-weight: 700; line-height: 1; color: rgba(255,255,255,.18); white-space: nowrap; letter-spacing: .01em; pointer-events: none; }
 .rank-hero-name { text-shadow: 0 1px 8px rgba(0,0,0,.25); }
