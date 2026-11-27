@@ -132,6 +132,17 @@ export function SightsTab({ r }: { r: RegionResult }) {
       {r.themes?.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span className="theme-detail"><b>{t.theme}</b> · {t.names.slice(0, 2).join(", ")}<span className="theme-count muted"> 등 {t.count}곳</span></span></div>)}
       {r.reasons.length > 0 && <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>}
     </div>}
+    {r.weather.tmean != null && r.weather.precipMm != null && r.weather.snowWaterMm != null &&
+      <details className="day-options" style={{ marginTop: 10 }}>
+        <summary>{r.weather.month}월 기후 · 최근 5년 평균</summary>
+        <p className="small">평균 {r.weather.tmean}℃ · 총강수량 {r.weather.precipMm}mm · 적설 수분량 {r.weather.snowWaterMm}mm</p>
+        <p className="xs muted">2021~2025년 여행지 대표 좌표의 격자 추정값이에요. 여행일 예보가 아니에요. 적설 수분량은 땅에 쌓인 눈을 녹였을 때의 물 두께로, 눈 높이나 새로 내린 양과 달라요.</p>
+        <p className="xs muted">
+          출처: <a href="https://doi.org/10.24381/cds.f17050d7">Copernicus C3S/ECMWF ERA5</a> · <a href="https://doi.org/10.5065/BH6N-5N20">NSF NCAR GDEX</a> · <a href="https://registry.opendata.aws/planette_era5_reanalysis/">Planette ERA5 Archive</a> · <a href="https://power.larc.nasa.gov/docs/referencing/">NASA POWER</a> (2026-11-27 조회, 트립플립 가공)
+          {" · "}<a href="https://cds.climate.copernicus.eu/licences/licence-to-use-copernicus-products">Copernicus 이용 조건</a>
+        </p>
+        <p className="xs muted">Contains modified Copernicus Climate Change Service information (2026). Neither the European Commission nor ECMWF is responsible for any use that may be made of the Copernicus information or data this product contains.</p>
+      </details>}
     {r.region.id==="HK"&&<MacauDayTrip/>}
     {!all.length ? <p className="empty-tab">이 지역 관광지는 준비 중이에요</p> : <>
       <div className="row-wrap" style={{ margin: "12px 0 10px" }}>

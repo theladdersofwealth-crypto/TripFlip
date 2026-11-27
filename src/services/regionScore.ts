@@ -1,5 +1,5 @@
 // 권역 추천 정의서 V1 (§1-1, §1-4, §3) 점수 계산.
-import { GRADE_SCORE, PLACES_V1, REGIONS_V1, WEATHER_V1 } from "@/data/regionsV1";
+import { GRADE_SCORE, PLACES_V1, REGIONS_V1 } from "@/data/regionsV1";
 import type { Concept, MonthWeather, PlaceV1, RegionV1, WeatherJudge } from "@/data/regionsV1";
 import { WORLD_PLACES, WORLD_REGIONS } from "@/data/worldV1";
 import { applyWikiBoost } from "@/data/wikiBoost";
@@ -16,7 +16,7 @@ import { conceptWeight, coreInterests, membersOf, normalizeParty, partyFlags, pe
 import type { TravelMember } from "@/lib/travelParty";
 import { normalizeTravelAreas, travelAreaOf, type TravelArea } from "@/data/travelAreas";
 
-// 시범 5개 권역은 날씨·도보 정보가 있는 regionsV1을 쓰고, 나머지는 전 세계 데이터(worldV1)를 붙인다.
+// 시범 5개 권역의 기본 정보는 regionsV1을 쓰되 기후는 같은 기간의 세계 권역 자료를 연결한다.
 export const PILOT_TWIN_OF: Record<string, string> = { OS: "jap-osaka", NT: "vie-nhatrang", HK: "hon-hongkong", DN: "vie-danang", PQ: "vie-phuquoc" };
 const PILOT_TWINS = new Set(Object.values(PILOT_TWIN_OF));
 const TONES = ["#00ACB8", "#102F54", "#f2994a", "#2d9cdb", "#eb5757", "#27ae60", "#9b51e0"];
@@ -129,7 +129,7 @@ export interface RegionResult {
   readiness: { meals: number; mealsNeeded: number; ready: boolean };
   /** 미식 선택 시에만 제공. score=null은 검증 자료 부족, share=0은 기존 볼거리 대체. */
   diningFit?: DiningEvidence & { weight: number; share: number };
-  weather: { month: number; judge: WeatherJudge; adj: number; source: string; tmax?: number; rainDays?: number };
+  weather: { month: number; judge: WeatherJudge; adj: number; source: string; tmax?: number; rainDays?: number; tmean?: number; precipMm?: number; snowWaterMm?: number };
   excluded: { place: PlaceV1; reason: string }[];
   flags: string[];
   reasons: string[];
@@ -353,10 +353,10 @@ export function scoreRegions(input: RegionQuery, options: { includeOutsideAreas?
       scored.push({ place: p, weight, score: (GRADE_SCORE[p.grade] - p.penalty) * weight * (0.5 + fit.factor * 0.5) });
     }
 
-    const w = WEATHER_V1[region.id] ?? (WORLD_WEATHER[region.id] ? { source: WORLD_WEATHER_SOURCE, months: WORLD_WEATHER[region.id] } : undefined);
-    const wj = w?.months[month] ? judgeWeather(w.months[month], month, Number(q.startDate.slice(0, 4))) : { judge: "미확인" as const, adj: 0 };
-    const mw = w?.months[month];
-    const weather = { month, ...wj, source: w?.source ?? "날씨 데이터 없음", tmax: mw?.tmax, rainDays: mw?.rainDays };
+    const mw = WORLD_WEATHER[PILOT_TWIN_OF[region.id] ?? region.id]?.[month];
+    const wj = mw ? judgeWeather(mw, month, Number(q.startDate.slice(0, 4))) : { judge: "미확인" as const, adj: 0 };
+    const weather = { month, ...wj, source: mw ? WORLD_WEATHER_SOURCE : "날씨 데이터 없음",
+      tmax: mw?.tmax, rainDays: mw?.rainDays, tmean: mw?.tmean, precipMm: mw?.precipMm, snowWaterMm: mw?.snowWaterMm };
     const flightHours = estimateFlightHours(region.id);
     const top = balancedTop(scored, N, interests);
 
@@ -480,8 +480,8 @@ function buildReasons(q: RegionQuery, region: RegionV1, top: ScoredPlace[], scor
   if (top.length >= N && fits.length) out.push(`${fits.join("·")} 위주로 ${days}일을 꽉 채울 만큼 갈 곳이 있어요`);
   for (const c of interests.filter((c) => !fits.includes(c))) out.push(`${c}에 맞는 곳은 아직 부족해요`);
   if (w.tmax != null && w.rainDays != null) {
-    const feel = w.adj > 0 ? "다니기 좋아요" : w.adj < 0 ? `${w.judge}라 감점했어요` : "무난해요";
-    out.push(`${w.month}월 낮 최고 ${Math.round(w.tmax)}℃, 비 오는 날 월 ${Math.round(w.rainDays)}일 안팎으로 ${feel}`);
+    const feel = w.adj > 0 ? "다니기 좋아요" : w.adj < 0 ? `${w.judge}라 감점했어요` : w.judge === "미확인" ? "기후 유형은 미확인이에요" : "무난해요";
+    out.push(`${w.month}월 평균 최고 ${Math.round(w.tmax)}℃ · 강수일 약 ${Math.round(w.rainDays)}일 · ${feel}`);
   } else if (w.adj !== 0) out.push(`${w.month}월 ${w.judge}`);
   if (flightHours != null) out.push(`인천에서 편도 약 ${flightHours}시간 (거리로 추정)`);
   if (top.length < N) out.push(`일정 ${N}칸에 비해 등록된 곳이 ${top.length}곳뿐이에요`);
