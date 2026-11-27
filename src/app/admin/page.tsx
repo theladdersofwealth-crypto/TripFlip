@@ -264,6 +264,7 @@ interface UsageReport {
   recent: { ts: number; kind: string; provider: string }[];
 }
 interface MemberDetail {
+  canDelete?: boolean;
   identities?: { provider: string; emailHint: string | null }[];
   usage?: UsageReport | null;
   ok: true; devices: number;
@@ -346,7 +347,7 @@ function MemberView({ adminKey, uid, rangeQuery, periodLabel, onBack, onUnauthor
     return () => controller.abort();
   }, [adminKey, url, rangeQuery, onUnauthorized]);
   const del = async () => {
-    if (deleteRequest.current || !confirmDel) return;
+    if (deleteRequest.current || !confirmDel || d?.canDelete === false) return;
     const controller = new AbortController();
     deleteRequest.current = controller;
     setDeleting(true);
@@ -356,7 +357,18 @@ function MemberView({ adminKey, uid, rangeQuery, periodLabel, onBack, onUnauthor
     deleteRequest.current = null;
     if (res?.status === 401) onUnauthorized();
     else if (res?.ok) onBack();
-    else { setDeleting(false); setDeleteError("삭제하지 못했어요."); }
+    else {
+      setDeleting(false);
+      if (res?.status === 403) {
+        const result = await res.json().catch(() => null);
+        if (controller.signal.aborted) return;
+        setConfirmDel(false);
+        if (result?.error === "administrator_account_protected") {
+          setD((prev) => prev && { ...prev, canDelete: false });
+        } else setDeleteError("이 계정을 삭제할 권한이 없어요.");
+      } else if (!res) setDeleteError("서버에 연결하지 못했어요. 회원 목록에서 삭제 여부를 확인해 주세요.");
+      else setDeleteError("서버가 삭제를 완료하지 못했어요. 다시 시도해 주세요.");
+    }
   };
   const back = <button className="btn btn-ghost" onClick={onBack}>← 회원 목록</button>;
   if (error) return <div style={{ marginTop: 12 }}>{back}<p role="alert" className="small" style={{ color: "var(--danger)" }}>{error}</p></div>;
@@ -395,7 +407,8 @@ function MemberView({ adminKey, uid, rangeQuery, periodLabel, onBack, onUnauthor
     </section>
     <section className={styles.dangerZone}>
       {deleteError && <p role="alert">{deleteError}</p>}
-      {!confirmDel ? <button className="btn btn-ghost xs" onClick={() => setConfirmDel(true)}>이 계정 삭제(탈퇴 처리)</button> :
+      {d.canDelete === false ? <p className="small muted">지금 로그인한 관리자 계정은 여기서 삭제할 수 없어요.</p>
+        : !confirmDel ? <button className="btn btn-ghost xs" onClick={() => { setDeleteError(""); setConfirmDel(true); }}>이 계정 삭제(탈퇴 처리)</button> :
         <div className="row-wrap"><span className="small">정말 삭제할까요? 기록도 모두 지워져요.</span><button className="btn" style={{ color: "var(--danger)" }} onClick={del} disabled={deleting}>{deleting ? "삭제 중…" : "삭제 확정"}</button><button className="btn btn-ghost" disabled={deleting} onClick={() => setConfirmDel(false)}>취소</button></div>}
     </section>
   </div>;

@@ -90,9 +90,12 @@ export default {
     if (url.pathname === "/user") {
       const id = url.searchParams.get("id") || "";
       if (!/^[a-f0-9]{16}$/.test(id)) return json({ ok: false, error: "bad id" }, 400);
-      if (req.method === "GET") { const r = await stub.user(id, range); return json(r, r.status ?? 200); }
+      if (req.method === "GET") {
+        const r = await stub.user(id, range);
+        return json(r.ok ? { ...r, canDelete: id !== adminUid } : r, r.status ?? 200);
+      }
       if (req.method === "DELETE") {
-        if (id === adminUid) return json({ ok: false, error: "cannot remove active administrator" }, 403);
+        if (id === adminUid) return json({ ok: false, error: "administrator_account_protected" }, 403);
         return json(await stub.deleteUser(id));
       }
     }

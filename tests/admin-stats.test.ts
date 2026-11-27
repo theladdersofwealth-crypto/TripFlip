@@ -90,7 +90,17 @@ test("관리자 통계는 소셜 회원 가입 후에도 퍼널과 회원 수를
       assert.equal((await verifyAdmin(path, owner.token)).status, 200);
     }
     assert.equal((await verifyAdmin(`/user?id=${user.uid}`, nonGoogle.token, "DELETE")).status, 401);
-    assert.equal((await verifyAdmin(`/user?id=${owner.uid}`, owner.token, "DELETE")).status, 403);
+    assert.equal((await (await verifyAdmin(`/user?id=${owner.uid}`, owner.token)).json()).canDelete, false);
+    const ownDelete = await verifyAdmin(`/user?id=${owner.uid}`, owner.token, "DELETE");
+    assert.equal(ownDelete.status, 403);
+    assert.equal((await ownDelete.json()).error, "administrator_account_protected");
+    const disposable = await ownerStats.oauthAccount(google("disposable@example.test", "disposable-subject", true), "login", null, null, vid);
+    assert.ok(disposable.uid);
+    assert.equal((await (await verifyAdmin(`/user?id=${disposable.uid}`, owner.token)).json()).canDelete, true);
+    assert.equal((await verifyAdmin(`/user?id=${disposable.uid}`, owner.token, "DELETE")).status, 200);
+    assert.equal((await verifyAdmin(`/user?id=${disposable.uid}`, owner.token)).status, 404);
+    assert.equal(await ownerStats.sessionOf(disposable.token), null);
+    assert.equal((await verifyAdmin("/stats", owner.token)).status, 200);
     await ownerStats.logout({ token: owner.token });
     assert.equal((await verifyAdmin("/stats", owner.token)).status, 401);
     const freshOwner = await ownerStats.oauthAccount(google(ownerEmail, "owner-subject", true), "login", null, null, vid);

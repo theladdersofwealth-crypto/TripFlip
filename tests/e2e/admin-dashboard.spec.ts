@@ -16,6 +16,7 @@ test("운영자 소셜 세션으로만 관리자 조회가 열리고 계정 전�
   let health: 200 | 503 = 503;
   let memberStatus: 200 | 401 = 200;
   let deletes = 0;
+  let protectedAccount = true;
   await page.route("**/stats?*", async (route) => {
     const header = route.request().headers().authorization;
     const query = new URL(route.request().url()).searchParams;
@@ -33,7 +34,7 @@ test("운영자 소셜 세션으로만 관리자 조회가 열리고 계정 전�
   await page.route("**/user?id=fixture-user*", (route) => {
     if (route.request().method() === "DELETE") deletes += 1;
     return route.fulfill({ json: {
-      ok: true, devices: 0, user: member, regions: [], daily: [], recent: [], saved: [],
+      ok: true, canDelete: !protectedAccount, devices: 0, user: member, regions: [], daily: [], recent: [], saved: [],
       identities: [{ provider: "google", emailHint: "f***@example.test" }],
       usage: { optedInSince: 1795700000000, measuredFrom: "2026-11-27", activeSeconds: 60, logins: 1, clicks: 2,
         visits: 1, saves: 1, outbound: 1, hotelOutbound: 0, otherOutbound: 0,
@@ -69,6 +70,11 @@ test("운영자 소셜 세션으로만 관리자 조회가 열리고 계정 전�
   await expect(page.getByText("현재 저장된 여행 0개")).toBeVisible();
   await expect(page.getByText("연결 계정: 구글 f***@example.test")).toBeVisible();
   await expect(page.getByText("외부 예약 링크 클릭", { exact: true })).toBeVisible();
+  await expect(page.getByText("지금 로그인한 관리자 계정은 여기서 삭제할 수 없어요.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "이 계정 삭제(탈퇴 처리)" })).toHaveCount(0);
+  await page.getByRole("button", { name: "회원 목록" }).click();
+  protectedAccount = false;
+  await page.getByRole("button", { name: nick, exact: true }).click();
   await page.getByRole("button", { name: "이 계정 삭제(탈퇴 처리)" }).click();
   await page.getByRole("button", { name: "취소", exact: true }).click();
   expect(deletes).toBe(0);
