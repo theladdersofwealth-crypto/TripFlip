@@ -15,6 +15,9 @@ import { KEEP_DAYS, STEPS, kstDay, parseEvent, sha256, randomHex } from "./lib.j
 
 import { DAY, reportRange, initUsage, usageAllowed, eraseUsage, purgeUsage, noteUsage, usageReport } from "./usage.js";
 
+const ownerHash = (value) => typeof value === "string" && /^[a-f0-9]{64}$/.test(value) ? value : null;
+const ADMIN_SESSION_MS = 7 * DAY;
+
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
@@ -69,11 +72,16 @@ export default {
       return json(r, r.status ?? (r.ok ? 200 : 400));
     }
 
-    const isAdmin = () => {
-      const auth = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
-      return !!env.ADMIN_KEY && safeEqual(auth, env.ADMIN_KEY);
-    };
-    if (["/stats", "/users", "/user"].includes(url.pathname) && !isAdmin()) return json({ ok: false, error: "unauthorized" }, 401);
+    let adminUid = null;
+    if (["/stats", "/users", "/user"].includes(url.pathname)) {
+      const bearer = (req.headers.get("authorization") || "").match(/^Bearer ([^\s]+)$/i)?.[1] ?? "";
+      if (env.ADMIN_GOOGLE_EMAIL_SHA256) {
+        adminUid = ownerHash(env.ADMIN_GOOGLE_EMAIL_SHA256) ? await stub.adminSessionUid(bearer) : null;
+        if (!adminUid) return json({ ok: false, error: "unauthorized" }, 401);
+      } else if (!env.ADMIN_KEY || !safeEqual(bearer, env.ADMIN_KEY)) {
+        return json({ ok: false, error: "unauthorized" }, 401);
+      }
+    }
     const days = Math.min(Math.max(parseInt(url.searchParams.get("days") || "30", 10) || 30, 1), 365);
     const range = reportRange(url.searchParams, days);
     if (["/stats", "/users", "/user"].includes(url.pathname) && req.method === "GET" && !range) return json({ ok: false, error: "bad date range" }, 400);
@@ -83,7 +91,10 @@ export default {
       const id = url.searchParams.get("id") || "";
       if (!/^[a-f0-9]{16}$/.test(id)) return json({ ok: false, error: "bad id" }, 400);
       if (req.method === "GET") { const r = await stub.user(id, range); return json(r, r.status ?? 200); }
-      if (req.method === "DELETE") return json(await stub.deleteUser(id));
+      if (req.method === "DELETE") {
+        if (id === adminUid) return json({ ok: false, error: "cannot remove active administrator" }, 403);
+        return json(await stub.deleteUser(id));
+      }
     }
 
     return json({ ok: true, service: "tripflip-stats" });
@@ -105,6 +116,9 @@ export class Stats extends DurableObject {
     this.sql.exec(`CREATE INDEX IF NOT EXISTS social_email ON social_identities(email,email_verified)`);
     this.storage = ctx.storage;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS sessions (tok TEXT PRIMARY KEY, uid TEXT NOT NULL, vid TEXT NOT NULL, created INTEGER NOT NULL)`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS admin_sessions (
+      tok TEXT PRIMARY KEY, uid TEXT NOT NULL, google_subject TEXT NOT NULL, email_hash TEXT NOT NULL, expires_at INTEGER NOT NULL)`);
+    this.adminEmailHash = ownerHash(env.ADMIN_GOOGLE_EMAIL_SHA256);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (vid TEXT PRIMARY KEY, uid TEXT NOT NULL, since INTEGER NOT NULL)`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, day TEXT NOT NULL, uid TEXT NOT NULL, vid TEXT NOT NULL, step TEXT NOT NULL, region TEXT NOT NULL DEFAULT '', path TEXT NOT NULL DEFAULT '')`);
     this.sql.exec(`CREATE INDEX IF NOT EXISTS log_uid ON log (uid, ts)`);
@@ -185,6 +199,8 @@ export class Stats extends DurableObject {
     const tokenHash = token ? await sha256(token) : null;
     if (tokenHash !== expectedHash) return fail;
     const subject = await sha256(profile.provider + ":" + profile.subject);
+    const emailHash = this.adminEmailHash && profile.provider === "google" && profile.emailVerified && profile.email
+      ? await sha256(profile.email) : null;
     const freshToken = randomHex(24), freshHash = await sha256(freshToken);
     // Same database transaction for identity resolution, user creation/link and session creation.
     return this.storage.transactionSync(() => {
@@ -205,9 +221,27 @@ export class Stats extends DurableObject {
       this.sql.exec(`UPDATE social_users SET nick=? WHERE uid=?`,nick,uid);
       this.sql.exec(`INSERT INTO sessions(tok,uid,vid,created) VALUES(?,?,?,?)`, freshHash, uid, v, Date.now());
       this.sql.exec(`INSERT INTO devices(vid,uid,since) VALUES(?,?,?) ON CONFLICT(vid) DO UPDATE SET uid=excluded.uid,since=excluded.since`, v, uid, Date.now());
+      if (profile.provider === "google") {
+        // Drop grants if Google no longer verifies the configured owner identity.
+        if (!verified || !emailHash || emailHash !== this.adminEmailHash) {
+          this.sql.exec("DELETE FROM admin_sessions WHERE google_subject = ?", subject);
+        } else {
+          this.sql.exec("DELETE FROM admin_sessions WHERE expires_at <= ?", Date.now());
+          this.sql.exec("INSERT INTO admin_sessions VALUES (?, ?, ?, ?, ?)", freshHash, uid, subject, emailHash, Date.now() + ADMIN_SESSION_MS);
+        }
+      }
       if (this.memberAnalytics) noteUsage(this.sql, uid, "login", randomHex(16), profile.provider);
       return { ok: true, uid, nick, token: freshToken };
     });
+  }
+
+  async adminSessionUid(token) {
+    if (!this.adminEmailHash || typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token)) return null;
+    const hash = await sha256(token);
+    return this.sql.exec(`SELECT a.uid FROM admin_sessions a
+      JOIN sessions s ON s.tok = a.tok AND s.uid = a.uid
+      JOIN social_identities g ON g.uid = a.uid AND g.provider = 'google' AND g.subject = a.google_subject AND g.email_verified = 1
+      WHERE a.tok = ? AND a.email_hash = ? AND a.expires_at > ?`, hash, this.adminEmailHash, Date.now()).toArray()[0]?.uid ?? null;
   }
 
   async sessionOf(token) {
@@ -258,6 +292,7 @@ export class Stats extends DurableObject {
   async logout(b) {
     const s = await this.sessionOf(b.token);
     if (s) {
+      this.sql.exec(`DELETE FROM admin_sessions WHERE tok = ?`, s.tok);
       this.sql.exec(`DELETE FROM sessions WHERE tok = ?`, s.tok);
       this.sql.exec(`DELETE FROM devices WHERE vid = ? AND uid = ?`, s.vid, s.uid);
     }
@@ -345,7 +380,7 @@ export class Stats extends DurableObject {
 
   eraseUser(uid) {
     eraseUsage(this.sql, uid);
-    for (const t of ["social_identities", "log", "plans", "sessions", "devices", "social_users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
+    for (const t of ["social_identities", "log", "plans", "admin_sessions", "sessions", "devices", "social_users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
   }
   async deleteUser(uid) {
     this.storage.transactionSync(() => this.eraseUser(uid));
