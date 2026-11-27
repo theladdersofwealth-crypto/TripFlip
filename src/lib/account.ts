@@ -17,6 +17,12 @@ const SOCIAL_ORIGINS = ["https://tripflip.co.kr", "https://www.tripflip.co.kr"] 
 const allowedSocialOrigin = (origin: string) => SOCIAL_ORIGINS.some(o => o === origin);
 const SOCIAL_FAILURE = "소셜 로그인에 실패했어요. 다시 시도해 주세요.";
 
+/** 원인 코드: 서버 사유(reason) 또는 브라우저 쪽 사유. 비밀값 없음. */
+function failureCode(outcome: string, reason: string | null | undefined, pending: { origin?: string } | null) {
+  const code = outcome === "error" ? (reason && /^[a-z0-9_]{1,40}$/.test(reason) ? reason : "server") : !pending ? "no_pending" : pending.origin !== location.origin ? "origin_mismatch" : "client";
+  return " (원인 코드: " + code + ")";
+}
+
 export function loadAuth(): Auth | null {
   try {
     const a = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
@@ -73,7 +79,7 @@ export async function startSocial(provider: SocialProvider, intent: SocialIntent
 }
 
 /** OAuth redirects contain no tokens. Consume the HttpOnly cookie exactly once with same-origin POST. */
-export async function finishSocial(outcome: string) {
+export async function finishSocial(outcome: string, reason?: string | null) {
   let pending: { provider?: SocialProvider; intent?: string; state?: string; origin?: string } | null = null;
   try {
     const raw = sessionStorage.getItem(SOCIAL_PENDING);
@@ -81,7 +87,7 @@ export async function finishSocial(outcome: string) {
     pending = JSON.parse(raw ?? "null");
   } catch {}
   const intent = pending?.intent, state = pending?.state, provider = pending?.provider;
-  if (!allowedSocialOrigin(location.origin) || pending?.origin !== location.origin || outcome !== "done" || !provider || !SOCIAL_PROVIDERS.includes(provider) || !["login", "withdraw"].includes(intent ?? "") || typeof state !== "string" || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: SOCIAL_FAILURE };
+  if (!allowedSocialOrigin(location.origin) || pending?.origin !== location.origin || outcome !== "done" || !provider || !SOCIAL_PROVIDERS.includes(provider) || !["login", "withdraw"].includes(intent ?? "") || typeof state !== "string" || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: SOCIAL_FAILURE + failureCode(outcome, reason, pending) };
   const v = deviceId(), a = loadAuth();
   if (!v || (intent === "login" ? !!a : !a)) return { ok: false, error: SOCIAL_FAILURE };
   const r = await socialPost(provider, "complete", { v, intent, state, token: a?.token ?? null });

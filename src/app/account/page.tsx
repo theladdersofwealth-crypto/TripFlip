@@ -15,7 +15,8 @@ export default function AccountPage() {
   const [withdraw, setWithdraw] = useState(false);
   const router = useRouter();
   useEffect(() => {
-    const outcome = new URLSearchParams(location.search).get("oauth");
+    const query = new URLSearchParams(location.search);
+    const outcome = query.get("oauth"), reason = query.get("reason");
     let completing = outcome != null;
     const on = () => {
       const a = loadAuth();
@@ -31,7 +32,7 @@ export default function AccountPage() {
     if (outcome != null) {
       history.replaceState(history.state, "", location.pathname + location.hash);
       setBusy(true);
-      void finishSocial(outcome).then(r => {
+      void finishSocial(outcome, reason).then(r => {
         completing = false;
         setBusy(false);
         if (!r.ok) setError(r.error ?? "인증에 실패했어요.");

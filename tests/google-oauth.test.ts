@@ -53,7 +53,7 @@ test("토큰 교환과 UserInfo는 고정 서버에서만, 실패 및 미인증 
   const calls: string[] = [];
   const request: typeof fetch = async (input, init) => {
     const url = String(input); calls.push(url);
-    assert.equal(init?.redirect, "error");
+    assert.equal(init?.redirect, "manual");
     if (url.endsWith("/token")) {
       const params = new URLSearchParams(String(init?.body));
       assert.equal(params.get("redirect_uri"), CALLBACK);

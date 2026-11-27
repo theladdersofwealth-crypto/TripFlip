@@ -1,4 +1,4 @@
-import { ORIGIN, callbackUri, authorizationUrl, exchangeGoogle } from "./lib.js";
+import { ORIGIN, callbackUri, authorizationUrl, exchangeGoogle, oauthFail, providerError, secret } from "./lib.js";
 export const PROVIDERS = ["google", "kakao", "naver"];
 export const config = {
   google: { auth: "https://accounts.google.com/o/oauth2/v2/auth", id: "GOOGLE_CLIENT_ID", secret: "GOOGLE_CLIENT_SECRET" },
@@ -34,14 +34,24 @@ export function socialProfile(p, raw) {
 export async function exchangeProvider(p, env, code, verifier, state, request=fetch, origin=ORIGIN) {
   if (p === "google") return {...await exchangeGoogle(env,code,verifier,request,origin),emailVerified:true};
   const c = config[p];
-  const body = new URLSearchParams({grant_type:"authorization_code",code,client_id:env[c.id],client_secret:env[c.secret],code_verifier:verifier,redirect_uri:callback(p,origin),...(p==="naver"?{state}:{})});
-  const res = await request(c.token,{method:"POST",redirect:"error",headers:{"content-type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(10000)});
-  if (!res.ok) throw Error("token exchange failed");
+  const body = new URLSearchParams({grant_type:"authorization_code",code,client_id:secret(env[c.id]),client_secret:secret(env[c.secret]),code_verifier:verifier,redirect_uri:callback(p,origin),...(p==="naver"?{state}:{})});
+  const res = await request(c.token,{method:"POST",redirect:"manual",headers:{"content-type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(10000)});
+  if (!res.ok) throw oauthFail("token_http",await providerError(res));
   const token=await res.json();
-  if (token.error || typeof token.access_token!=="string" || !token.access_token || String(token.token_type).toLowerCase()!=="bearer") throw Error("invalid token");
-  const profile=await request(c.user,{headers:{authorization:"Bearer "+token.access_token},redirect:"error",signal:AbortSignal.timeout(10000)});
-  if (!profile.ok) throw Error("profile failed");
-  const identity=socialProfile(p,await profile.json());
-  if (!identity) throw Error("profile name or identity unavailable");
+  // Naver answers token errors with HTTP 200 and an error field.
+  if (token.error) throw oauthFail("token_error",{error:String(token.error).slice(0,200),error_description:String(token.error_description??"").slice(0,200)});
+  if (typeof token.access_token!=="string" || !token.access_token || String(token.token_type).toLowerCase()!=="bearer") throw oauthFail("token_invalid",{hasAccessToken:typeof token.access_token==="string",tokenType:String(token.token_type).slice(0,40)});
+  const profile=await request(c.user,{headers:{authorization:"Bearer "+token.access_token},redirect:"manual",signal:AbortSignal.timeout(10000)});
+  if (!profile.ok) throw oauthFail("profile_http",await providerError(profile));
+  const raw=await profile.json();
+  const identity=socialProfile(p,raw);
+  if (!identity) throw oauthFail("profile_invalid",profileShape(p,raw));
   return identity;
+}
+// Field presence only (no values) to explain why a profile was rejected.
+export function profileShape(p, raw) {
+  const has = v => typeof v === "string" ? v.trim().length > 0 : v != null;
+  if (p === "kakao") { const a = raw?.kakao_account ?? {}; return { hasId: has(raw?.id), hasName: has(a.name), hasNickname: has(a.profile?.nickname), nicknameNeedsAgreement: a.profile_nickname_needs_agreement ?? null }; }
+  if (p === "naver") { const a = raw?.response ?? {}; return { resultcode: typeof raw?.resultcode === "string" ? raw.resultcode.slice(0, 10) : null, hasId: has(a.id), hasName: has(a.name), hasNickname: has(a.nickname) }; }
+  return {};
 }
