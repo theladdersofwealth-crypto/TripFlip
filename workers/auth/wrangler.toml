@@ -2,13 +2,16 @@ name = "tripflip-auth"
 main = "src/index.js"
 compatibility_date = "2026-11-01"
 workers_dev = false
-routes = [{ pattern = "tripflip.co.kr/auth/*", zone_name = "tripflip.co.kr" }]
+routes = [
+  { pattern = "https://tripflip.co.kr/auth/*", zone_name = "tripflip.co.kr" },
+  { pattern = "https://www.tripflip.co.kr/auth/*", zone_name = "tripflip.co.kr" }
+]
 
 [vars]
-# Public Web application OAuth client ID; configure before deployment.
-GOOGLE_CLIENT_ID = ""
-KAKAO_CLIENT_ID = ""
-NAVER_CLIENT_ID = ""
+# Public OAuth client IDs only. Credentials are injected at runtime as Worker secrets.
+GOOGLE_CLIENT_ID = "304568740572-o32248eah5296ub9d1lfgts7oe955skk.apps.googleusercontent.com"
+KAKAO_CLIENT_ID = "d6a21640216ba600a8ae8a3a84b538b4"
+NAVER_CLIENT_ID = "NgntigXy_fgMmgdFoDcO"
 
 [observability]
 enabled = false

@@ -1,6 +1,19 @@
 // OAuth provider adapter: future providers must implement their own verified identity exchange.
 export const ORIGIN = "https://tripflip.co.kr";
-export const CALLBACK = ORIGIN + "/auth/google/callback";
+export const ALLOWED_ORIGINS = Object.freeze([ORIGIN, "https://www.tripflip.co.kr"]);
+export const allowedOrigin = origin => ALLOWED_ORIGINS.includes(origin);
+export function callbackUri(provider, origin) {
+  if (!allowedOrigin(origin) || !["google", "kakao", "naver"].includes(provider)) throw Error("invalid OAuth origin or provider");
+  return origin + "/auth/" + provider + "/callback";
+}
+export const CALLBACK = callbackUri("google", ORIGIN);
+// Compare the persisted start origin and provider, not headers supplied by the caller.
+export const matchesFlow = (data, provider, origin) => !!data && allowedOrigin(origin) && data.origin === origin && data.provider === provider;
+export const sameOriginPost = (requestOrigin, origin) => allowedOrigin(origin) && requestOrigin === origin;
+export function accountReturn(origin, ok) {
+  if (!allowedOrigin(origin)) throw Error("invalid OAuth origin");
+  return origin + "/account?oauth=" + (ok ? "done" : "error");
+}
 export const TTL = 10 * 60 * 1000;
 export const COOKIE = "__Host-tf-oauth";
 export const random = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");
@@ -35,18 +48,18 @@ export function googleProfile(raw) {
   // Never return photo, locale, access/refresh token or other profile data.
   return { provider: "google", subject: raw.sub, email, name };
 }
-export function authorizationUrl(clientId, state, codeChallenge) {
+export function authorizationUrl(clientId, state, codeChallenge, origin = ORIGIN) {
   const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-  url.search = new URLSearchParams({ client_id: clientId, redirect_uri: CALLBACK, response_type: "code",
+  url.search = new URLSearchParams({ client_id: clientId, redirect_uri: callbackUri("google", origin), response_type: "code",
     scope: "openid email profile", state, code_challenge: codeChallenge, code_challenge_method: "S256",
     access_type: "online", prompt: "select_account" }).toString();
   return url.toString();
 }
-export async function exchangeGoogle(env, code, verifier, request = fetch) {
+export async function exchangeGoogle(env, code, verifier, request = fetch, origin = ORIGIN) {
   const response = await request("https://oauth2.googleapis.com/token", {
     method: "POST", redirect: "error", headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ code, client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: CALLBACK, grant_type: "authorization_code", code_verifier: verifier }),
+      redirect_uri: callbackUri("google", origin), grant_type: "authorization_code", code_verifier: verifier }),
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) throw Error("oauth exchange failed");

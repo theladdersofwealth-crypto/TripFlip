@@ -13,7 +13,8 @@ export const SOCIAL_PROVIDERS: readonly SocialProvider[] = ["google", "kakao", "
 const AUTH_URLS = {google:"https://accounts.google.com/o/oauth2/v2/auth",kakao:"https://kauth.kakao.com/oauth/authorize",naver:"https://nid.naver.com/oauth2/authorize"};
 export type SocialIntent = "login" | "withdraw";
 const SOCIAL_PENDING = "tripflip:social-pending";
-const SOCIAL_ORIGIN = "https://tripflip.co.kr";
+const SOCIAL_ORIGINS = ["https://tripflip.co.kr", "https://www.tripflip.co.kr"] as const;
+const allowedSocialOrigin = (origin: string) => SOCIAL_ORIGINS.some(o => o === origin);
 const SOCIAL_FAILURE = "소셜 로그인에 실패했어요. 다시 시도해 주세요.";
 
 export function loadAuth(): Auth | null {
@@ -49,7 +50,8 @@ async function socialPost(provider: SocialProvider, path: string, body: object):
 }
 
 export async function startSocial(provider: SocialProvider, intent: SocialIntent, agree: boolean) {
-  if (location.origin !== SOCIAL_ORIGIN) return { ok: false, error: "소셜 로그인은 tripflip.co.kr에서 이용해 주세요." };
+  const origin = location.origin;
+  if (!allowedSocialOrigin(origin)) return { ok: false, error: "소셜 로그인은 tripflip.co.kr 또는 www.tripflip.co.kr에서 이용해 주세요." };
   const v = deviceId(), a = loadAuth();
   if (!agree || !v || (intent === "login" ? !!a : !a)) return { ok: false, error: SOCIAL_FAILURE };
   try { sessionStorage.removeItem(SOCIAL_PENDING); } catch { return { ok: false, error: SOCIAL_FAILURE }; }
@@ -57,10 +59,10 @@ export async function startSocial(provider: SocialProvider, intent: SocialIntent
   if (r.ok && r.url) {
     try {
       const url = new URL(r.url);
-      if (url.origin + url.pathname === AUTH_URLS[provider] && (loadAuth()?.token ?? null) === (a?.token ?? null)) {
+      if (url.origin + url.pathname === AUTH_URLS[provider] && url.searchParams.get("redirect_uri") === origin + "/auth/" + provider + "/callback" && location.origin === origin && (loadAuth()?.token ?? null) === (a?.token ?? null)) {
         const state = url.searchParams.get("state");
         if (!state || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: SOCIAL_FAILURE };
-        sessionStorage.setItem(SOCIAL_PENDING, JSON.stringify({ provider, intent, state }));
+        sessionStorage.setItem(SOCIAL_PENDING, JSON.stringify({ provider, intent, state, origin }));
         location.assign(url.href);
         return { ok: true };
       }
@@ -72,14 +74,14 @@ export async function startSocial(provider: SocialProvider, intent: SocialIntent
 
 /** OAuth redirects contain no tokens. Consume the HttpOnly cookie exactly once with same-origin POST. */
 export async function finishSocial(outcome: string) {
-  let pending: { provider?: SocialProvider; intent?: string; state?: string } | null = null;
+  let pending: { provider?: SocialProvider; intent?: string; state?: string; origin?: string } | null = null;
   try {
     const raw = sessionStorage.getItem(SOCIAL_PENDING);
     sessionStorage.removeItem(SOCIAL_PENDING);
     pending = JSON.parse(raw ?? "null");
   } catch {}
   const intent = pending?.intent, state = pending?.state, provider = pending?.provider;
-  if (outcome !== "done" || !provider || !SOCIAL_PROVIDERS.includes(provider) || !["login", "withdraw"].includes(intent ?? "") || typeof state !== "string" || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: SOCIAL_FAILURE };
+  if (!allowedSocialOrigin(location.origin) || pending?.origin !== location.origin || outcome !== "done" || !provider || !SOCIAL_PROVIDERS.includes(provider) || !["login", "withdraw"].includes(intent ?? "") || typeof state !== "string" || !/^[a-f0-9]{64}$/.test(state)) return { ok: false, error: SOCIAL_FAILURE };
   const v = deviceId(), a = loadAuth();
   if (!v || (intent === "login" ? !!a : !a)) return { ok: false, error: SOCIAL_FAILURE };
   const r = await socialPost(provider, "complete", { v, intent, state, token: a?.token ?? null });
