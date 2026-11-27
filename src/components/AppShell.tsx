@@ -9,6 +9,7 @@ import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PLANS_CHANGED_EVENT } from "@/lib/flow";
 import { syncPlans } from "@/lib/planSync";
 import { Icon } from "./Icon";
+import { MemberUsageTracker } from "./MemberUsageTracker";
 import { useTripStore } from "@/store/TripStore";
 
 const NAV = [
@@ -55,6 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const isActive = (href: string) => (href === "/" ? !/^\/(my-trips|guide|legal|data-status)/.test(path) : href === "/guide" ? /^\/(guide|legal|data-status)/.test(path) : path.startsWith(href));
   return (
     <>
+      <MemberUsageTracker path={path} />
       <header className="header">
         <div className="container header-inner">
           <Link href="/" className="header-logo" aria-label="TripFlip 홈">

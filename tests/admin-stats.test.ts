@@ -23,7 +23,10 @@ test("관리자 통계는 소셜 회원 가입 후에도 퍼널과 회원 수를
     // @ts-expect-error The JavaScript Worker entry point has no TypeScript declarations.
     const { default: worker, Stats } = await import("../workers/stats/src/index.js");
     // Wrap the SQLite API with the part of Durable Object storage used by the worker.
+    let alarm: number | null = null;
     const storage = {
+      getAlarm: async () => alarm,
+      setAlarm: async (time: number) => { alarm = time; },
       sql: { exec: (q: string, ...args: (string | number | null)[]) => {
         const result = db.prepare(q).all(...args);
         return { toArray: () => result };
@@ -34,7 +37,7 @@ test("관리자 통계는 소셜 회원 가입 후에도 퍼널과 회원 수를
         catch (e) { db.exec("ROLLBACK"); throw e; }
       },
     };
-    const record = new Stats({ storage }, {});
+    const record = new Stats({ storage }, { MEMBER_ANALYTICS: "1" });
     const adminKey = "synthetic-local-admin-key";
     const env = { ADMIN_KEY: adminKey, STATS: { idFromName: (s: string) => s, get: () => record } };
     const email = "fixture@example.test";
@@ -68,6 +71,77 @@ test("관리자 통계는 소셜 회원 가입 후에도 퍼널과 회원 수를
     assert.equal(data.funnel.visit, 1);
     assert.equal(data.funnel.save, 0);
     assert.deepEqual(data.members, { total: 1, today: 1, activeToday: 1 });
+    const uid = user.uid!;
+    const request = (path: string, options: RequestInit = {}) => worker.fetch(new Request("https://worker.example.test" + path, options), env);
+    const admin = { headers: { authorization: `Bearer ${adminKey}` } };
+    const detail = async (suffix = "") => (await request(`/user?id=${uid}${suffix}`, admin)).json();
+    const action = (action: string, more: object = {}, token = user.token) => request("/usage", {
+      method: "POST", body: JSON.stringify({ action, token, ...more }),
+    });
+    assert.equal((await action("status")).status, 200);
+    assert.deepEqual(await (await action("status")).json(), { ok: true, enabled: false });
+    const click = { kind: "click", id: "1".repeat(32) };
+    await action("event", click);
+    const before = await detail();
+    assert.equal(before.usage.optedInSince, null);
+    assert.equal(before.usage.clicks, 0);
+    assert.deepEqual(before.identities, [{ provider: "google", emailHint: "f***@example.test" }]);
+    assert.equal(JSON.stringify(before).includes(email), false);
+
+    assert.equal((await action("consent", { version: 0 })).status, 400);
+    assert.equal((await action("consent", { version: 1 })).status, 200);
+    assert.notEqual(alarm, null);
+    const returnLogin = await record.oauthAccount({
+      provider: "google", subject: "synthetic-google-subject", name: "시험 회원", email, emailVerified: true,
+    }, "login", null, null, vid);
+    assert.equal(returnLogin.uid, uid);
+    await action("event", click);
+    await action("event", click);
+    await action("event", { kind: "active", id: "2".repeat(32) });
+    await action("event", { kind: "active", id: "3".repeat(32) }, returnLogin.token);
+    await action("event", { kind: "flight", id: "4".repeat(32) });
+    await action("event", { kind: "access", id: "5".repeat(32) });
+    assert.equal((await action("event", { kind: "login", id: "6".repeat(32) })).status, 400);
+    assert.equal((await action("event", click, "f".repeat(48))).status, 401);
+    const plan = { id: "fixture-plan", regionId: "jp-test", regionName: "테스트", query: {}, createdAt: "2026-11-27" };
+    for (let i = 0; i < 2; i++) assert.equal((await request("/plans", { method: "POST", body: JSON.stringify({ token: user.token, put: [plan] }) })).status, 200);
+    const selected = await detail("&from=2026-11-27&to=2026-11-27");
+    assert.equal(selected.usage.logins, 1);
+    assert.equal(selected.usage.clicks, 1);
+    assert.equal(selected.usage.visits, 1);
+    assert.equal(selected.usage.activeSeconds, 15);
+    assert.equal(selected.usage.saves, 1);
+    assert.equal(selected.usage.outbound, 1);
+    assert.ok(selected.usage.recent.some((e: { kind: string; provider: string }) => e.kind === "login" && e.provider === "google"));
+    const previous = await detail("&from=2026-11-26&to=2026-11-26");
+    assert.equal(previous.usage.logins, 0);
+    assert.equal(previous.usage.activeSeconds, 0);
+    assert.deepEqual(previous.recent, []);
+    const oldStats = await (await request("/stats?from=2026-11-23&to=2026-11-25", admin)).json();
+    assert.deepEqual(oldStats.daily.map((d: { day: string }) => d.day), ["2026-11-23", "2026-11-24", "2026-11-25"]);
+    assert.equal((await request("/stats?from=2026-11-31&to=2026-11-30", admin)).status, 400);
+    assert.equal((await request(`/user?id=${uid}`)).status, 401);
+
+    db.prepare("INSERT INTO usage_actions VALUES (?, ?, ?, ?, ?, ?)").run(uid, "expired", 123, "2026-01-01", "click", "");
+    await record.alarm();
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM usage_actions WHERE id='expired'").get()?.n, 0);
+    // Killing the collection switch still allows existing participants to withdraw.
+    const disabled = new Stats({ storage }, {});
+    const disabledEnv = { ...env, STATS: { idFromName: (s: string) => s, get: () => disabled } };
+    const off = (action: string) => worker.fetch(new Request("https://worker.example.test/usage", {
+      method: "POST", body: JSON.stringify({ action, token: user.token }),
+    }), disabledEnv);
+    assert.equal((await off("event")).status, 404);
+    assert.equal((await off("revoke")).status, 200);
+    assert.equal((await detail()).usage.logins, 0);
+    assert.equal(db.prepare("SELECT COUNT(*) AS n FROM usage_windows").get()?.n, 0);
+    await action("consent", { version: 1 });
+    await action("event", click);
+    assert.equal((await request(`/user?id=${uid}`, { ...admin, method: "DELETE" })).status, 200);
+    assert.equal((await request(`/user?id=${uid}`, admin)).status, 404);
+    for (const table of ["usage_actions", "usage_windows", "usage_optin"]) {
+      assert.equal(db.prepare(`SELECT COUNT(*) AS n FROM ${table}`).get()?.n, 0);
+    }
   } finally {
     db.close();
     hook.deregister();

@@ -13,6 +13,8 @@ import { hiddenNickKeys } from "./lib.js";
 import { validIdentity, resolveIdentity } from "./oauth.js";
 import { KEEP_DAYS, STEPS, kstDay, parseEvent, sha256, randomHex } from "./lib.js";
 
+import { DAY, reportRange, initUsage, usageAllowed, eraseUsage, purgeUsage, noteUsage, usageReport } from "./usage.js";
+
 const CORS = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
@@ -45,6 +47,15 @@ export default {
       return json({ ok: true });
     }
 
+    if (url.pathname === "/usage" && req.method === "POST") {
+      const text = await req.text();
+      if (text.length > 512) return json({ ok: false }, 413);
+      let body;
+      try { body = JSON.parse(text); } catch { return json({ ok: false }, 400); }
+      const result = await stub.usage(body);
+      return json(result, result.status ?? 200);
+    }
+
     // 회원: 앱에서 JSON 본문으로. IP는 잠깐 횟수 제한에만 쓰고 저장하지 않는다.
     const ip = req.headers.get("cf-connecting-ip") || "";
     if (req.method === "POST" && ["/logout", "/me", "/plans"].includes(url.pathname)) {
@@ -64,12 +75,14 @@ export default {
     };
     if (["/stats", "/users", "/user"].includes(url.pathname) && !isAdmin()) return json({ ok: false, error: "unauthorized" }, 401);
     const days = Math.min(Math.max(parseInt(url.searchParams.get("days") || "30", 10) || 30, 1), 365);
-    if (url.pathname === "/stats" && req.method === "GET") return json(await stub.stats(days));
-    if (url.pathname === "/users" && req.method === "GET") return json(await stub.users(days));
+    const range = reportRange(url.searchParams, days);
+    if (["/stats", "/users", "/user"].includes(url.pathname) && req.method === "GET" && !range) return json({ ok: false, error: "bad date range" }, 400);
+    if (url.pathname === "/stats" && req.method === "GET") return json(await stub.stats(range));
+    if (url.pathname === "/users" && req.method === "GET") return json(await stub.users(range));
     if (url.pathname === "/user") {
       const id = url.searchParams.get("id") || "";
       if (!/^[a-f0-9]{16}$/.test(id)) return json({ ok: false, error: "bad id" }, 400);
-      if (req.method === "GET") return json(await stub.user(id));
+      if (req.method === "GET") { const r = await stub.user(id, range); return json(r, r.status ?? 200); }
       if (req.method === "DELETE") return json(await stub.deleteUser(id));
     }
 
@@ -101,6 +114,8 @@ export class Stats extends DurableObject {
     // 통계에서 뺄 기기: 숨긴 회원이 한 번이라도 로그인한 기기(로그아웃해도 이용 기록에 남은 기기는 계속 뺀다)
     this.sql.exec(`CREATE TABLE IF NOT EXISTS hidden_vids (vid TEXT PRIMARY KEY)`);
     this.hiddenKeys = hiddenNickKeys(env.HIDE_NICKS);
+    this.memberAnalytics = env.MEMBER_ANALYTICS === "1";
+    initUsage(this.sql);
   }
 
   /** 숨긴 회원 uid 목록 (닉네임 기준) */
@@ -190,6 +205,7 @@ export class Stats extends DurableObject {
       this.sql.exec(`UPDATE social_users SET nick=? WHERE uid=?`,nick,uid);
       this.sql.exec(`INSERT INTO sessions(tok,uid,vid,created) VALUES(?,?,?,?)`, freshHash, uid, v, Date.now());
       this.sql.exec(`INSERT INTO devices(vid,uid,since) VALUES(?,?,?) ON CONFLICT(vid) DO UPDATE SET uid=excluded.uid,since=excluded.since`, v, uid, Date.now());
+      if (this.memberAnalytics) noteUsage(this.sql, uid, "login", randomHex(16), profile.provider);
       return { ok: true, uid, nick, token: freshToken };
     });
   }
@@ -197,6 +213,38 @@ export class Stats extends DurableObject {
   async sessionOf(token) {
     if (typeof token !== "string" || !/^[a-f0-9]{48}$/.test(token)) return null;
     return this.sql.exec(`SELECT s.tok, s.uid, s.vid, u.nick FROM sessions s JOIN social_users u ON u.uid = s.uid WHERE s.tok = ?`, await sha256(token)).toArray()[0] ?? null;
+  }
+
+  async usage(b) {
+    if (!this.memberAnalytics && !["status", "revoke"].includes(b?.action)) return { ok: false, available: false, status: 404 };
+    const s = await this.sessionOf(b?.token);
+    if (!s) return { ok: false, status: 401 };
+    const active = usageAllowed(this.sql, s.uid);
+    if (b.action === "status") return this.memberAnalytics || active ? { ok: true, enabled: !!active } : { ok: false, available: false, status: 404 };
+    if (b.action === "revoke") {
+      this.storage.transactionSync(() => eraseUsage(this.sql, s.uid));
+      return { ok: true, enabled: false };
+    }
+    if (b.action === "consent") {
+      if (b.version !== 1) return { ok: false, status: 400 };
+      // Schedule expiry before accepting the first opt-in.
+      if (await this.storage.getAlarm() == null) await this.storage.setAlarm(Date.now() + DAY);
+      const live = await this.sessionOf(b.token);
+      if (!live) return { ok: false, status: 401 };
+      this.sql.exec("INSERT OR IGNORE INTO usage_optin VALUES (?, ?)", live.uid, Date.now());
+      return { ok: true, enabled: true };
+    }
+    if (!active) return { ok: true, enabled: false };
+    const allowed = ["active", "access", "click", "flight", "hotel", "outbound"];
+    if (b.action !== "event" || !allowed.includes(b.kind) || typeof b.id !== "string" || !/^[a-f0-9]{32}$/.test(b.id)) return { ok: false, status: 400 };
+    if (this.throttled("usage:", s.uid, 3600)) return { ok: true, enabled: true };
+    noteUsage(this.sql, s.uid, b.kind, b.id);
+    return { ok: true, enabled: true };
+  }
+
+  async alarm() {
+    purgeUsage(this.sql);
+    if (this.sql.exec("SELECT 1 FROM usage_optin LIMIT 1").toArray().length) await this.storage.setAlarm(Date.now() + DAY);
   }
 
   async me(b) {
@@ -238,15 +286,15 @@ export class Stats extends DurableObject {
       if (!cur && live >= PLANS_PER_USER) { rejected.push({ id: p.id, error: `계정당 ${PLANS_PER_USER}개까지 저장돼요` }); continue; }
       if (!cur) live++;
       this.sql.exec(`INSERT INTO plans (uid, id, data, updated) VALUES (?, ?, ?, ?) ON CONFLICT (uid, id) DO UPDATE SET data = excluded.data, updated = excluded.updated`, s.uid, p.id, data, now);
+      if (!cur && this.memberAnalytics) noteUsage(this.sql, s.uid, "saved", randomHex(16));
       saved.push(p.id);
     }
     const plans = this.sql.exec(`SELECT data FROM plans WHERE uid = ? AND deleted = 0 ORDER BY updated DESC`, s.uid).toArray().map((r) => JSON.parse(r.data));
     return { ok: true, uid: s.uid, plans, saved, deleted, gone, rejected };
   }
 
-  async users(days) {
+  async users({ days, from, to }) {
     const hidden = new Set(this.syncHidden());
-    const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
     const all = rows(`SELECT u.uid, u.nick, u.created, MAX(l.ts) AS last,
         COUNT(CASE WHEN l.step = 'visit' THEN 1 END) AS visitsAll,
@@ -259,15 +307,17 @@ export class Stats extends DurableObject {
         COUNT(CASE WHEN step = 'flight' THEN 1 END) AS flight,
         COUNT(CASE WHEN step = 'hotel' THEN 1 END) AS hotel,
         COUNT(CASE WHEN step = 'save' THEN 1 END) AS save
-      FROM log WHERE day >= ? GROUP BY uid`, from).map((r) => [r.uid, r]));
+      FROM log WHERE day BETWEEN ? AND ? GROUP BY uid`, from, to).map((r) => [r.uid, r]));
     const list = all.map((u) => {
       const p = period.get(u.uid) ?? { visits: 0, days: 0, regions: 0, flight: 0, hotel: 0, save: 0 };
       return { ...u, last: u.last ?? null, visits: p.visits, days: p.days, regions: p.regions, flight: p.flight, hotel: p.hotel, save: p.save };
     }).filter((u) => !hidden.has(u.uid)).sort((a, b) => (b.last ?? b.created) - (a.last ?? a.created));
-    return { ok: true, days, from, users: list };
+    return { ok: true, days, from, to, users: list };
   }
 
-  async user(uid) {
+  async user(uid, range) {
+    const { from, to, days } = range;
+    if (this.hiddenUids().includes(uid)) return { ok: false, status: 404 };
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
     const u = rows(`SELECT uid, nick, created FROM social_users WHERE uid = ?`, uid)[0];
     if (!u) return { ok: false, error: "없는 계정", status: 404 };
@@ -278,15 +328,23 @@ export class Stats extends DurableObject {
         COUNT(CASE WHEN step = 'hotel' THEN 1 END) AS hotel,
         COUNT(CASE WHEN step = 'save' THEN 1 END) AS save,
         MAX(ts) AS last
-      FROM log WHERE uid = ? AND region != '' GROUP BY region ORDER BY views DESC, last DESC LIMIT 50`, uid);
-    const daily = rows(`SELECT day, COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits FROM log WHERE uid = ? GROUP BY day ORDER BY day DESC LIMIT 60`, uid);
-    const recent = rows(`SELECT ts, step, region, path FROM log WHERE uid = ? AND step IN ('visit','search','flight','hotel','save') ORDER BY ts DESC LIMIT 150`, uid);
+      FROM log WHERE uid = ? AND day BETWEEN ? AND ? AND region != '' GROUP BY region ORDER BY views DESC, last DESC LIMIT 50`, uid, from, to);
+    const daily = rows(`SELECT day, COUNT(CASE WHEN step = 'visit' THEN 1 END) AS visits FROM log WHERE uid = ? AND day BETWEEN ? AND ? GROUP BY day ORDER BY day DESC LIMIT 365`, uid, from, to);
+    const recent = rows(`SELECT ts, step, region, path FROM log WHERE uid = ? AND day BETWEEN ? AND ? AND step IN ('visit','search','flight','hotel','save') ORDER BY ts DESC LIMIT 150`, uid, from, to);
     const devices = rows(`SELECT COUNT(*) AS c FROM devices WHERE uid = ?`, uid)[0]?.c ?? 0;
     const saved = rows(`SELECT data FROM plans WHERE uid = ? AND deleted = 0 ORDER BY updated DESC LIMIT 50`, uid).map((r) => { const p = JSON.parse(r.data); return { regionId: p.regionId, regionName: p.regionName, createdAt: p.createdAt, start: p.query?.startDate ?? null, end: p.query?.endDate ?? null }; });
-    return { ok: true, user: u, devices, regions, daily, recent, saved };
+    // No raw account identifier, OAuth credential or unverified email is sent to the browser.
+    const identities = rows("SELECT provider, email, email_verified FROM social_identities WHERE uid = ? ORDER BY provider", uid).map((i) => {
+      const [name, domain] = i.email_verified && i.email ? i.email.split("@") : [];
+      return { provider: i.provider, emailHint: name && domain ? name.slice(0, 1) + "***@" + domain : null };
+    });
+    const usage = this.memberAnalytics ? usageReport(this.sql, uid, range) : null;
+    return { ok: true, from, to, days, user: u, devices, regions, daily, recent, saved, identities, usage };
+
   }
 
   eraseUser(uid) {
+    eraseUsage(this.sql, uid);
     for (const t of ["social_identities", "log", "plans", "sessions", "devices", "social_users"]) this.sql.exec(`DELETE FROM ${t} WHERE uid = ?`, uid);
   }
   async deleteUser(uid) {
@@ -294,34 +352,33 @@ export class Stats extends DurableObject {
     return { ok: true };
   }
 
-  async stats(days) {
+  async stats({ days, from, to }) {
     const hidden = this.syncHidden();
     const today = kstDay();
-    const from = kstDay(Date.now() - (days - 1) * 86400000);
     const rows = (q, ...a) => this.sql.exec(q, ...a).toArray();
 
     // 날짜별: 방문자(고유 기기), 화면 조회수(visit 횟수), 신규 방문자, 단계별 고유 기기
-    const daily = rows(`SELECT day, COUNT(DISTINCT vid) AS visitors, SUM(CASE WHEN step = 'visit' THEN n ELSE 0 END) AS views FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY day`, from);
-    const newBy = rows(`SELECT first_day AS day, COUNT(*) AS c FROM visitors WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND first_day >= ? GROUP BY first_day`, from);
-    const stepDaily = rows(`SELECT day, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY day, step`, from);
+    const daily = rows(`SELECT day, COUNT(DISTINCT vid) AS visitors, SUM(CASE WHEN step = 'visit' THEN n ELSE 0 END) AS views FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day BETWEEN ? AND ? GROUP BY day`, from, to);
+    const newBy = rows(`SELECT first_day AS day, COUNT(*) AS c FROM visitors WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND first_day BETWEEN ? AND ? GROUP BY first_day`, from, to);
+    const stepDaily = rows(`SELECT day, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day BETWEEN ? AND ? GROUP BY day, step`, from, to);
     const byDay = new Map();
     for (let t = Date.parse(from + "T00:00:00Z"); ; t += 86400000) {
       const d = new Date(t).toISOString().slice(0, 10);
       byDay.set(d, { day: d, visitors: 0, views: 0, newVisitors: 0, steps: {} });
-      if (d >= today) break;
+      if (d >= to) break;
     }
     for (const r of daily) Object.assign(byDay.get(r.day) ?? {}, { visitors: r.visitors, views: r.views });
     for (const r of newBy) if (byDay.has(r.day)) byDay.get(r.day).newVisitors = r.c;
     for (const r of stepDaily) if (byDay.has(r.day)) byDay.get(r.day).steps[r.step] = r.c;
 
     // 기간 전체 퍼널: 단계별 고유 기기 수 (항공·숙소 링크는 '예약처 이동'으로 합침)
-    const funnelRows = rows(`SELECT step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? GROUP BY step`, from);
+    const funnelRows = rows(`SELECT step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day BETWEEN ? AND ? GROUP BY step`, from, to);
     const funnel = Object.fromEntries(STEPS.map((s) => [s, 0]));
     for (const r of funnelRows) funnel[r.step] = r.c;
-    funnel.outbound = rows(`SELECT COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? AND step IN ('flight','hotel')`, from)[0]?.c ?? 0;
+    funnel.outbound = rows(`SELECT COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day BETWEEN ? AND ? AND step IN ('flight','hotel')`, from, to)[0]?.c ?? 0;
 
     // 권역별: 상세 본 기기, 예약처 이동, 저장
-    const regionRows = rows(`SELECT region, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day >= ? AND region != '' AND step IN ('region','book','flight','hotel','save') GROUP BY region, step`, from);
+    const regionRows = rows(`SELECT region, step, COUNT(DISTINCT vid) AS c FROM hits WHERE vid NOT IN (SELECT vid FROM hidden_vids) AND day BETWEEN ? AND ? AND region != '' AND step IN ('region','book','flight','hotel','save') GROUP BY region, step`, from, to);
     const regions = new Map();
     for (const r of regionRows) {
       const x = regions.get(r.region) ?? { region: r.region, views: 0, book: 0, flight: 0, hotel: 0, save: 0 };
@@ -341,13 +398,14 @@ export class Stats extends DurableObject {
       ok: true,
       today,
       from,
+      to,
       days,
       totalVisitors: total,
       members,
       periodVisitors: funnel.visit,
       daily: [...byDay.values()],
       funnel,
-      searchAreas: rows(`SELECT area, SUM(n) AS searches FROM search_areas WHERE day >= ? GROUP BY area ORDER BY searches DESC, area`, from),
+      searchAreas: rows(`SELECT area, SUM(n) AS searches FROM search_areas WHERE day BETWEEN ? AND ? GROUP BY area ORDER BY searches DESC, area`, from, to),
       regions: [...regions.values()].sort((a, b) => b.views - a.views).slice(0, 30),
     };
   }
