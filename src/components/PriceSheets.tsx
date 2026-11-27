@@ -13,6 +13,7 @@ import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { CenterModal } from "@/components/ui";
+import { AgodaStaySummary } from "@/components/AgodaStaySummary";
 import { Icon } from "@/components/Icon";
 
 const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString()}만원`;
@@ -114,7 +115,8 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelPi
   return (
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
-        <a className="btn btn-primary btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer sponsored">아고다에서 이 숙소 보기 (제휴 · 날짜·인원 입력됨) <Icon name="link" /></a>
+        <a className="btn btn-primary btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer sponsored">아고다에서 {region.name} 숙소 검색 (제휴) <Icon name="link" /></a>
+        <AgodaStaySummary region={region} query={q} />
         <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         {klookDetail && <a className="btn btn-block" href={klookDetail} target="_blank" rel="noopener noreferrer sponsored">클룩에서 이 숙소 보기 (제휴 · 날짜·인원 입력됨) <Icon name="link" /></a>}
         <a className="btn btn-block" href={bookingComUrl(region, q, name)} target="_blank" rel="noopener noreferrer">부킹닷컴에서 이 숙소 보기 (날짜·인원 입력됨) <Icon name="link" /></a>

@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BackButton } from "@/components/AppShell";
+import { AgodaStaySummary } from "@/components/AgodaStaySummary";
 import { Icon } from "@/components/Icon";
 import { relaxedNotice } from "@/lib/livePrices";
 import { currentAccount, loadBoard, loadPrefs, planState, savePlan, saveQuery, useFlowQuery } from "@/lib/flow";
@@ -106,7 +107,8 @@ export default function BookPage() {
           <a className="btn btn-block" href={klookStayUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 {r.region.name} 호텔 목록 <Icon name="link" /></a>
           <a className="btn btn-block" href={bookingComUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">부킹닷컴 <Icon name="link" /></a>
         </div>
-        <p className="xs faint">{klookStayPrefilled(r.region) ? "클룩·부킹닷컴·아고다 모두 날짜·인원이 입력된 채로 열려요. 클룩은 도시 호텔 목록으로 열려요." : `클룩 호텔은 ${r.region.name} 도시 번호를 아직 몰라 열린 화면에서 도시·날짜를 골라 주세요. 부킹닷컴·아고다는 날짜·인원이 입력된 채로 열려요.`} 숙소 후보를 누르면 아고다에서 그 숙소 이름으로 열려요.</p>
+        <AgodaStaySummary region={r.region} query={nextQuery} />
+        <p className="xs faint">아고다의 숙소 후보 링크는 도시 목록으로 열릴 수 있어요. {klookStayPrefilled(r.region) ? "클룩은 도시 호텔 목록으로 열려요." : "클룩에서 도시와 날짜를 직접 골라 주세요."}</p>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
       <section className="book-card">

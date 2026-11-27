@@ -110,14 +110,15 @@ export function bookingComUrl(region: RegionV1, q: RegionQuery, name?: string) {
  * 숙소 이름(name)은 도시 번호가 있으면 쓰지 않는다: 그 도시 검색 결과(날짜·인원 입력됨)로 연다.
  */
 export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) {
-  const dates = bookingDates(q.startDate, q.endDate);
+  const nights = calendarDays(q.startDate, q.endDate) - 1;
   const city = agodaCityId(region.id);
   const params = new URLSearchParams();
   if (city) params.set("city", String(city));
-  if (dates) {
-    params.set("checkIn", dates.startDate);
-    params.set("checkOut", dates.endDate);
-    params.set("los", String(calendarDays(dates.startDate, dates.endDate) - 1));
+  // Forward the user's selected dates. Do not shift old dates or drop distant dates.
+  if (Number.isFinite(nights) && nights > 0) {
+    params.set("checkIn", q.startDate);
+    params.set("checkOut", q.endDate);
+    params.set("los", String(nights));
   }
   params.set("rooms", String(roomEstimate(q).rooms));
   params.set("adults", String(q.adults));

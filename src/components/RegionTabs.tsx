@@ -2,6 +2,7 @@
 // 권역 상세 탭(형님 11/24: 나트랑앱처럼). 예약·관광지·음식점 탭 내용. 일정 탭은 /r/[id] client.tsx 그대로.
 import { useState } from "react";
 import Link from "next/link";
+import { AgodaStaySummary } from "@/components/AgodaStaySummary";
 import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
 import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
@@ -67,6 +68,7 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         {hotels.length > 3 && !all && <button type="button" className="xs link-btn" onClick={() => setAll(true)}>숙소 더 보기 ({hotels.length}곳) ▾</button>}
       </div>}
       <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
+      <AgodaStaySummary region={r.region} query={q} />
       <div className="grid-2">
         <a className="btn btn-block" href={klookStayUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
         <a className="btn btn-block" href={bookingComUrl(r.region, q)} onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>

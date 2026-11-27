@@ -419,3 +419,42 @@ test("추천 상단에서 고른 서브 테마가 PC 일정에 즉시 반영되�
   const interests = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}").interests);
   expect(interests).toEqual(["관광"]);
 });
+
+test("아고다 숙소에 입력한 날짜·인원·객실을 넘기고 항공 링크는 바꾸지 않는다", async ({ page, baseURL }) => {
+  await page.clock.setFixedTime(new Date("2026-11-27T12:22:00Z"));
+  const origin = new URL(baseURL!).origin;
+  await page.route("**/*", (route) => {
+    const url = new URL(route.request().url());
+    if (url.origin === origin) return route.continue();
+    if (url.origin === STATS_ORIGIN && url.pathname === "/me") return route.fallback();
+    return route.abort();
+  });
+  const itinerary = {
+    startDate: "2028-10-13", endDate: "2028-10-16", adults: 2,
+    children: [{ band: "유아", actualAge: 4, height: null }], roomCount: 2, elders: false, pet: false,
+    main: "휴양", subs: ["액티비티"], interests: ["휴양", "액티비티"], perDay: 2, price: "상관없음", stay: "가심비",
+  };
+  await page.addInitScript((query) => localStorage.setItem("tripflip.flow.query", JSON.stringify(query)), itinerary);
+  const targetOf = async (name: RegExp) => {
+    const link = page.getByRole("link", { name });
+    const href = await link.getAttribute("href");
+    return new URL(new URL(href!).searchParams.get("url")!);
+  };
+  for (const path of ["/r/mon-gobi", "/book/mon-gobi"]) {
+    await page.goto(path);
+    if (path.startsWith("/r")) await page.getByRole("tab", { name: "예약", exact: true }).click();
+    await expect(page.getByText(/아고다 검색 요청: 달란자드가드 · 2028-10-13 ~ 2028-10-16 · 성인 2명 · 자녀 1명 · 2객실/)).toBeVisible();
+    const hotel = await targetOf(/^아고다 (고비사막 호텔|검색)/);
+    for (const [key, value] of Object.entries({
+      city: "725293", checkIn: itinerary.startDate, checkOut: itinerary.endDate, adults: "2", children: "1", childages: "4", rooms: "2",
+    })) expect(hotel.searchParams.get(key)).toBe(value);
+    const flight = await targetOf(/^아고다 항공/);
+    expect(flight.pathname).toBe("/ko-kr/flights/results");
+    expect(flight.searchParams.get("departDate")).toBe(itinerary.startDate);
+    if (path.startsWith("/book")) {
+      await page.getByLabel("검색할 객실 수").selectOption("3");
+      expect((await targetOf(/^아고다 검색/)).searchParams.get("rooms")).toBe("3");
+      await expect(page.getByText(/아고다 검색 요청:.*3객실/)).toBeVisible();
+    }
+  }
+});
