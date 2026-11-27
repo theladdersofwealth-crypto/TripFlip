@@ -55,3 +55,18 @@ test("카카오·네이버 코드 교환: 고정 HTTPS, verifier, 네이버 stat
     await assert.rejects(exchangeProvider(p,env,"code","verifier","state",async()=>Response.json({error:"bad"})));
   }
 });
+
+test("네이버 OIDC 코드 교환에도 시작 호스트의 redirect_uri를 전달한다", async () => {
+  for (const origin of ["https://tripflip.co.kr","https://www.tripflip.co.kr"]) {
+    const mock: typeof fetch = async (input,init) => {
+      if (String(input).endsWith("/token")) {
+        const body = new URLSearchParams(String(init?.body));
+        assert.equal(body.get("redirect_uri"), origin + "/auth/naver/callback");
+        assert.equal(body.get("state"), "state");
+        return Response.json({access_token:"fake",token_type:"bearer"});
+      }
+      return Response.json({resultcode:"00",response:{id:"n1",name:"사용자"}});
+    };
+    assert.ok(await exchangeProvider("naver",env,"code","verifier","state",mock,origin));
+  }
+});
