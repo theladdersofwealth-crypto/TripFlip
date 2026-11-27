@@ -6,13 +6,16 @@ import { Icon } from "@/components/Icon";
 import { CompanionChooser } from "@/components/CompanionChooser";
 import { DateEditor } from "@/components/DateEditor";
 import { CONCEPTS } from "@/data/regionsV1";
-import { TRAVEL_AREAS, normalizeTravelAreas, type TravelArea } from "@/data/travelAreas";
+import { TRAVEL_AREAS, normalizeTravelAreas, travelAreaOf, type TravelArea } from "@/data/travelAreas";
+import { AUTH_EVENT, loadAuth } from "@/lib/account";
 import type { Concept } from "@/data/regionsV1";
 import { makeQuestionDraft, saveHomeDraft, saveQuestionPreview } from "@/lib/flow";
 import { QUESTIONS, type Question } from "@/lib/questionFlow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
+import { FlagBg } from "@/components/FlagBg";
+import { ALL_REGIONS, estimateFlightHours } from "@/services/regionScore";
 import type { IntensityV1, PriceLevel, RegionQuery, StayTier } from "@/services/regionScore";
 
 const INTENSITY: { v: IntensityV1; label: string }[] = [
@@ -24,6 +27,21 @@ const STAYS: StayTier[] = ["가성비", "가심비", "프리미엄", "하이엔�
 const FLIGHTS: { v: number | null; label: string }[] = [{ v: 5, label: "5시간" }, { v: 8, label: "8시간" }, { v: 12, label: "12시간" }, { v: null, label: "상관없음" }];
 
 type Q=Question;
+// 첫 화면 콘텐츠(11/27 형님: "맨 처음 버전처럼 뭐가 좀 있어야"). 10/27 첫 버전 구성(대표 문구·큰 시작 버튼·넘겨보는 여행지·테마로 시작하기)을 기준으로 채운다.
+// 여행지 카드는 '인기' 순위 데이터가 없어서 순위를 매기지 않고, 앱에 있는 권역 중 가까운 곳 위주로 고정 노출. 비행시간은 기존 추정값(estimateFlightHours).
+const HOME_REGIONS = ["NT", "DN", "OS", "HK", "PQ", "tha-bangkok", "jap-tokyo", "tai-taipei"];
+const THEMES: { c: Concept; icon: string; sub: string }[] = [
+  { c: "관광", icon: "compass", sub: "명소·랜드마크 중심" },
+  { c: "휴양", icon: "umbrella", sub: "리조트·해변에서 쉬기" },
+  { c: "액티비티", icon: "sparkles", sub: "체험·투어·물놀이" },
+  { c: "미식", icon: "utensils", sub: "확인된 식당 기준 맛집" },
+  { c: "쇼핑", icon: "card", sub: "시장·쇼핑 거리" },
+];
+const HOW: { t: string; d: string }[] = [
+  { t: "조건 고르기", d: "누구와 · 언제 · 어떤 여행인지 한 질문씩 골라요. 안 고른 건 기본값으로 둬요." },
+  { t: "추천 순위 보기", d: "조건에 맞는 여행지를 적합도 순으로 보여 주고, 경비·비행시간도 함께 추정해요." },
+  { t: "일정 · 예약", d: "날짜별 일정표를 만들고, 항공·숙소는 예약 사이트로 바로 이동해요." },
+];
 const Q_TITLE: Record<Q,string> = {who:"누구랑 가나요?",when:"언제 떠나요?",area:"가고 싶은 지역",vibe:"어떤 여행인가요?",flight:"비행은 몇 시간까지 괜찮아요?",intensity:"하루에 몇 곳 둘러볼까요?",budget:"일행 전체 예산은요?",stay:"어떤 숙소를 선호하나요?",price:"지역 물가는요?",rooms:"객실은 몇 개 필요해요?",pet:"반려동물도 함께 가나요?"};
 export default function Home() {
   const router = useRouter();
@@ -36,6 +54,9 @@ export default function Home() {
   const [prefilled,setPrefilled]=useState<Question[]>([]);
   // 첫 화면은 홈. 질문 팝업은 사용자가 시작 버튼을 누르거나 추천 미리보기에서 돌아올 때만 연다.
   const [show,setShow]=useState(false);
+  // 권역 상세는 회원 전용이라, 비회원이 여행지 카드를 누르면 그 지역으로 질문을 시작한다.
+  const [member,setMember]=useState(false);
+  useEffect(()=>{const on=()=>setMember(!!loadAuth());on();window.addEventListener(AUTH_EVENT,on);return ()=>window.removeEventListener(AUTH_EVENT,on);},[]);
   const [direction,setDirection]=useState<"forward"|"back">("forward");
   const dialog=useRef<HTMLDialogElement>(null);
   const body=useRef<HTMLDivElement>(null);
@@ -145,11 +166,45 @@ export default function Home() {
       </>;
     }
   };
-  return <main className="container page discovery-form" style={{maxWidth:560}}>
-    <h1 style={{fontSize:24,fontWeight:900}}>어디로 떠나볼까요?</h1>
-    <p className="small muted home-intro">누구와 가는지, 언제·어떤 여행인지 한 질문씩 고르면 갈 만한 여행지를 순위로 추천하고 날짜별 일정까지 짜 드려요.</p>
-    <button type="button" className="btn btn-primary btn-lg btn-block" onClick={()=>setShow(true)}><Icon name="plane"/> {started?"조건 이어서 고르기":"여행지 추천 받기"}</button>
-    <Link href="/guide" className="home-faq-link small">자주 묻는 질문 ›</Link>
+  const openWithTheme=(c:Concept)=>{
+    const rest=interests.filter(x=>x!==c);
+    mark("vibe");setQ(old=>old?{...old,interests:[c,...rest],main:c,subs:rest}:old);
+    setDirection("forward");setSlide(0);setShow(true);
+  };
+  const openWithArea=(country:string)=>{
+    const a=travelAreaOf(country);
+    if(a){mark("area");setQ(old=>old?{...old,preferredAreas:[a]}:old);}
+    setDirection("forward");setSlide(0);setShow(true);
+  };
+  const homeRegions=HOME_REGIONS.map(id=>ALL_REGIONS.find(r=>r.id===id)).filter((r):r is NonNullable<typeof r>=>!!r);
+  return <main className="container page discovery-form home">
+    <section className="home-hero">
+      <p className="home-eyebrow">나에게 맞는 여행을 발견하다</p>
+      <h1>어디로 떠나볼까요?</h1>
+      <p className="home-intro">누구와 가는지, 언제·어떤 여행인지 한 질문씩 고르면 갈 만한 여행지를 순위로 추천하고 날짜별 일정까지 짜 드려요.</p>
+      <button type="button" className="btn btn-primary btn-lg btn-block home-cta" onClick={()=>setShow(true)}><Icon name="plane"/> {started?"조건 이어서 고르기":"여행지 추천 받기"}</button>
+      <p className="home-cta-note">{started?"지난번 고른 조건이 저장돼 있어요. 이어서 고치거나 바로 추천받을 수 있어요.":"가입 없이 무료로 추천 1~3위까지 볼 수 있어요."}</p>
+    </section>
+    <nav className="home-links" aria-label="바로가기">
+      <Link href="/my-trips" className="home-link"><Icon name="suitcase"/><span><b>내 여행 보기</b><small>저장한 일정 다시 열기</small></span><Icon name="next" size={16}/></Link>
+      <Link href="/guide" className="home-link"><Icon name="info"/><span><b>자주 묻는 질문</b><small>가격·예약·데이터 출처 안내</small></span><Icon name="next" size={16}/></Link>
+    </nav>
+    <section className="home-sec" aria-labelledby="home-how">
+      <h2 id="home-how">이렇게 추천해요</h2>
+      <ol className="home-how">{HOW.map((h,i)=><li key={h.t}><span className="home-how-n">{i+1}</span><b>{h.t}</b><p>{h.d}</p></li>)}</ol>
+    </section>
+    <section className="home-sec" aria-labelledby="home-dest">
+      <div className="between"><h2 id="home-dest">넘겨보며 발견하기</h2><span className="xs muted">{member?"누르면 여행지 상세를 봐요":"누르면 이 지역으로 추천을 시작해요"} · 비행은 편도 추정</span></div>
+      <div className="home-dest">{homeRegions.map(r=>{const h=estimateFlightHours(r.id);const inner=<>
+        <FlagBg country={r.country} en={r.searchName} fallback={r.tone}/>
+        <span className="home-dest-name">{r.name}</span>
+        <span className="home-dest-sub">{r.country}{h!=null?` · 인천에서 약 ${h}시간`:""}</span>
+      </>;return member?<Link key={r.id} href={`/r/${r.id}`} className="home-dest-card">{inner}</Link>:<button key={r.id} type="button" className="home-dest-card" onClick={()=>openWithArea(r.country)}>{inner}</button>;})}</div>
+    </section>
+    <section className="home-sec" aria-labelledby="home-theme">
+      <h2 id="home-theme">테마로 시작하기</h2>
+      <div className="home-themes">{THEMES.map(t=><button key={t.c} type="button" className="home-theme" onClick={()=>openWithTheme(t.c)}><Icon name={t.icon} size={22}/><b>{t.c}</b><small>{t.sub}</small></button>)}</div>
+    </section>
     {show && <dialog ref={dialog} className="question-dialog" aria-labelledby="slide-title" onCancel={e=>{e.preventDefault();setShow(false);}}>
       <div className="question-panel">
         <header className="question-head">
