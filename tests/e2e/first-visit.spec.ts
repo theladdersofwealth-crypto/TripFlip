@@ -12,7 +12,12 @@ for (const vp of [{ name: "모바일", width: 390, height: 844 }, { name: "PC", 
     // 1) 첫 화면은 홈. 질문 팝업은 자동으로 뜨지 않는다.
     await expect(page.getByRole("heading", { name: "어디로 떠나볼까요?" })).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
-    await page.screenshot({ path: testInfo.outputPath("home.png") });
+    // 첫 화면 콘텐츠(11/27): 비어 보이지 않게 이용 방법·여행지 카드(국기)·테마가 있고, 신규 방문자 버튼은 '여행지 추천 받기'.
+    for (const h of ["이렇게 추천해요", "넘겨보며 발견하기", "테마로 시작하기"]) await expect(page.getByRole("heading", { name: h })).toBeVisible();
+    await expect(page.locator(".home-dest-card")).toHaveCount(8);
+    await expect(page.locator(".home-dest-card .rank-flag").first()).toHaveAttribute("src", "/flags/vn.svg");
+    await expect(page.getByRole("button", { name: "조건 이어서 고르기", exact: true })).toHaveCount(0);
+    await page.screenshot({ path: testInfo.outputPath("home.png"), fullPage: true });
     await page.getByRole("button", { name: "여행지 추천 받기", exact: true }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
@@ -53,4 +58,19 @@ test("지난 검색이 저장돼 있어도 팝업은 자동으로 안 뜨고, �
   await dialog.getByRole("button", { name: "지난 조건 그대로 선택", exact: true }).click();
   await expect(dialog.getByText("질문 1/11 · 선택 1개 · 지난 조건 10개", { exact: true })).toBeVisible();
   await expect(dialog.getByText("내가 고른 조건이에요.", { exact: true })).toBeVisible();
+});
+
+test("테마·여행지 카드를 누르면 그 조건이 고른 상태로 질문이 열리고, 닫으면 '조건 이어서 고르기'", async ({ page }) => {
+  await page.route("https://**/*", (r) => r.abort());
+  await page.goto("/");
+  await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
+  await page.reload();
+  await page.getByRole("button", { name: /^휴양/ }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByText("질문 1/11 · 선택 1개", { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "질문 닫기" }).click();
+  await page.getByRole("button", { name: /^다낭/ }).click();
+  await expect(dialog.getByText("질문 1/11 · 선택 2개", { exact: true })).toBeVisible();
+  await dialog.getByRole("button", { name: "질문 닫기" }).click();
+  await expect(page.getByRole("button", { name: "조건 이어서 고르기", exact: true })).toBeVisible();
 });
