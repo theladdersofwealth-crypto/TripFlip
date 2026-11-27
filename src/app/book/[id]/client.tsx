@@ -80,13 +80,13 @@ export default function BookPage() {
         <label className="field"><span className="label">항공 선호</span><select className="input" aria-label="항공 선호" value={flightPreference} onChange={(e) => setFlightPreference(e.target.value as typeof flightPreference)}><option value="any">상관없음</option><option value="lowcost">저가항공 우선</option><option value="fullservice">일반 항공사 우선</option></select></label>
         <p className="xs muted">선호는 계획에 저장돼요. 실제 항공사·수하물·도착시간은 예약처에서 비교해 주세요.</p>
         {unknownAges && <p className="xs muted">자녀 나이가 미확인이에요. 예약처에서 정확한 나이와 인원을 다시 입력해 주세요.</p>}
-        <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 <Icon name="link" /></a>
+        <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 <Icon name="link" /></a>
         {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
         <div className="grid-2">
-          <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">Aviasales <Icon name="link" /></a>
-          <a className="btn btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너 <Icon name="link" /></a>
+          <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">Aviasales <Icon name="link" /></a>
+          <a className="btn btn-block" href={flightSearchUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer">스카이스캐너 <Icon name="link" /></a>
         </div>
-        <a className="btn btn-block" href={welcomePickupsUrl()} target="_blank" rel="noopener noreferrer sponsored">공항 픽업 예약 (Welcome Pickups) <Icon name="link" /></a>
+        <a className="btn btn-block" href={welcomePickupsUrl()} data-usage-outbound="outbound" target="_blank" rel="noopener noreferrer sponsored">공항 픽업 예약 (Welcome Pickups) <Icon name="link" /></a>
         <label className="check-row"><input type="checkbox" checked={booked.flight} onChange={(e) => setBooked((v) => ({ ...v, flight: e.target.checked }))} />항공권 예약 완료 (직접 확인)</label>
       </section>
       <section className={`book-card ${booked.hotel ? "done" : ""}`}>
@@ -99,13 +99,13 @@ export default function BookPage() {
         <p className="xs muted">객실 정원·침대·자녀 추가요금은 숙소별로 확인해야 해요. 현재 자료의 종합 평점은 청결 세부평점을 보장하지 않아요.</p>
         {hotels.length > 0 ? <div className="stack" style={{ gap: 8 }}>
           <span className="small bold">기존 자료의 비교 후보 · {selectedTier}</span>
-          {hotels.map((h) => <a key={h.name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, h.name)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored"><span><b className="small">{hotelKo(h.name)}</b>{hotelKo(h.name) !== h.name && <span className="xs faint" style={{ display: "block" }}>{h.name}</span>}<span className="xs muted" style={{ display: "block" }}>{[h.rating != null ? `종합 ★ ${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}` : "", pickPrice(h)].filter(Boolean).join(" · ")}</span></span><Icon name="link" size={16} /></a>)}
+          {hotels.map((h) => <a key={h.name} className="card-soft between" href={hotelSearchUrl(r.region, nextQuery, h.name)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored"><span><b className="small">{hotelKo(h.name)}</b>{hotelKo(h.name) !== h.name && <span className="xs faint" style={{ display: "block" }}>{h.name}</span>}<span className="xs muted" style={{ display: "block" }}>{[h.rating != null ? `종합 ★ ${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}` : "", pickPrice(h)].filter(Boolean).join(" · ")}</span></span><Icon name="link" size={16} /></a>)}
           <p className="xs faint">최근 수집한 1박 최저가 평균(없으면 10/31 가격대)이에요. 날짜별 실시간 요금·청결 기준·정원은 재확인이 필요해요.</p>
         </div> : <p className="small muted">이 수준의 숙소 후보 자료가 아직 없어요. 예약처에서 조건에 맞춰 검색해 주세요.</p>}
         <div className="grid-2">
-          <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 검색 <Icon name="link" /></a>
-          <a className="btn btn-block" href={klookStayUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 {r.region.name} 호텔 목록 <Icon name="link" /></a>
-          <a className="btn btn-block" href={bookingComUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">부킹닷컴 <Icon name="link" /></a>
+          <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, nextQuery)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 검색 <Icon name="link" /></a>
+          <a className="btn btn-block" href={klookStayUrl(r.region, nextQuery)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 {r.region.name} 호텔 목록 <Icon name="link" /></a>
+          <a className="btn btn-block" href={bookingComUrl(r.region, nextQuery)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">부킹닷컴 <Icon name="link" /></a>
         </div>
         <AgodaStaySummary region={r.region} query={nextQuery} />
         <p className="xs faint">아고다의 숙소 후보 링크는 도시 목록으로 열릴 수 있어요. {klookStayPrefilled(r.region) ? "클룩은 도시 호텔 목록으로 열려요." : "클룩에서 도시와 날짜를 직접 골라 주세요."}</p>
@@ -115,8 +115,8 @@ export default function BookPage() {
         <div className="row"><Icon name="compass" size={22} /><b style={{ fontSize: 18 }}>현지 투어·입장권</b></div>
         <p className="small muted">{r.region.name}의 투어·입장권을 찾아요. 가격·운영 여부는 각 사이트에서 확인해 주세요.</p>
         <div className="grid-2">
-          <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">클룩 <Icon name="link" /></a>
-          <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} target="_blank" rel="noopener noreferrer sponsored">KKday <Icon name="link" /></a>
+          <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} data-usage-outbound="outbound" target="_blank" rel="noopener noreferrer sponsored">클룩 <Icon name="link" /></a>
+          <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" target="_blank" rel="noopener noreferrer sponsored">KKday <Icon name="link" /></a>
         </div>
       </section>
     </div>

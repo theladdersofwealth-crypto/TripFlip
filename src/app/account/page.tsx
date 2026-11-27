@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { MemberUsagePreference } from "@/components/MemberUsagePreference";
 import { NEXT_KEY } from "@/components/AppShell";
 import { AUTH_EVENT, loadAuth, logout, startSocial, finishSocial, SOCIAL_PROVIDERS } from "@/lib/account";
 import type { Auth, SocialIntent, SocialProvider } from "@/lib/account";
@@ -53,6 +54,7 @@ export default function AccountPage() {
         <Link href="/my-trips" className="btn btn-block">내 여행 (계정에 저장됨)</Link>
         <button className="btn btn-block" onClick={() => logout(syncPlans)}>로그아웃</button>
       </div>
+      <MemberUsagePreference key={auth.token} token={auth.token} />
       {withdraw ? <section className="card-soft stack" style={{ marginTop: 20 }}>
         <b>회원 탈퇴</b><p className="small">계정과 저장한 여행, 이용 기록이 삭제돼요. 연결된 소셜 계정으로 다시 인증해 주세요.</p>
         <SocialButtons intent="withdraw" />

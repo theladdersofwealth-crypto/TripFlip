@@ -52,11 +52,11 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
       <button type="button" className="cost-row" onClick={() => setOpen("flight")}>
         <span>1인 왕복 <b>약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
       </button>
-      <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>아고다 항공 <Icon name="link" /></a>
+      <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>아고다 항공 <Icon name="link" /></a>
       {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
       <div className="grid-2">
-        <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
-        <a className="btn btn-block" href={flightSearchUrl(r.region, q)} onClick={() => track("flight", id)} {...ext}>스카이스캐너 <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightSearchUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...ext}>스카이스캐너 <Icon name="link" /></a>
       </div>
     </section>
     <section className="book-card">
@@ -67,23 +67,23 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         {(all ? hotels : hotels.slice(0, 3)).map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
         {hotels.length > 3 && !all && <button type="button" className="xs link-btn" onClick={() => setAll(true)}>숙소 더 보기 ({hotels.length}곳) ▾</button>}
       </div>}
-      <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
+      <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
       <AgodaStaySummary region={r.region} query={q} />
       <div className="grid-2">
-        <a className="btn btn-block" href={klookStayUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
-        <a className="btn btn-block" href={bookingComUrl(r.region, q)} onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>
+        <a className="btn btn-block" href={klookStayUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
+        <a className="btn btn-block" href={bookingComUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>
       </div>
       {relaxedNotice(id) && <span className="xs warn">⚠ {relaxedNotice(id)}</span>}
     </section>
     <section className="book-card">
       <div className="row"><Icon name="car" size={20} /><b>공항 픽업</b></div>
-      <a className="btn btn-block" href={welcomePickupsUrl()} {...aff}>Welcome Pickups <Icon name="link" /></a>
+      <a className="btn btn-block" href={welcomePickupsUrl()} data-usage-outbound="outbound" {...aff}>Welcome Pickups <Icon name="link" /></a>
     </section>
     <section className="book-card">
       <div className="row"><Icon name="compass" size={20} /><b>투어·입장권</b></div>
       <div className="grid-2">
-        <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} {...aff}>클룩 <Icon name="link" /></a>
-        <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} {...aff}>KKday <Icon name="link" /></a>
+        <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>클룩 <Icon name="link" /></a>
+        <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>KKday <Icon name="link" /></a>
       </div>
     </section>
     <p className="xs muted">ⓘ {AFFILIATE_NOTE}</p>
