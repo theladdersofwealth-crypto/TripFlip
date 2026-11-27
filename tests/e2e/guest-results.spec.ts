@@ -19,8 +19,8 @@ test("비회원은 1~3위만 보이고 4위부터 흐리며, 로그인하면 전
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByRole("dialog", { name: "가입 안내" })).toBeVisible();
   await expect(page.getByText(/가입하면 4위부터 나머지 추천/)).toBeVisible();
-  // 가입 안내 항목이 실제 가입 양식(닉네임·생년월일·성별·PIN+확인)과 같다
-  await expect(page.getByRole("dialog", { name: "가입 안내" })).toContainText("닉네임·생년월일·성별, PIN 6자리(확인용 한 번 더)");
+  // 가입 안내 항목이 실제 소셜 로그인과 같다
+  await expect(page.getByRole("dialog", { name: "가입 안내" })).toContainText("구글·카카오·네이버");
   const open = page.locator(".rank-card:not(.guest-blur .rank-card)");
   await expect(open).toHaveCount(3);
   await expect(open.locator(".rank-pill")).toHaveText([/^🏆 1위 추천/, /^2위 추천/, /^3위 추천/]);

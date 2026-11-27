@@ -197,10 +197,10 @@ function Tile({ label, value, sub }: { label: string; value: number; sub?: strin
 }
 
 // ── 회원 이용 기록 ─────────────────────────────────────────
-interface Member { uid: string; nick: string; birth: string; gender: string; created: number; last: number | null; visitsAll: number; daysAll: number; visits: number; days: number; regions: number; flight: number; hotel: number; save: number }
+interface Member { uid: string; nick: string; created: number; last: number | null; visitsAll: number; daysAll: number; visits: number; days: number; regions: number; flight: number; hotel: number; save: number }
 interface MemberDetail {
   ok: true; devices: number;
-  user: { uid: string; nick: string; birth: string; gender: string; created: number; lock_until: number };
+  user: { uid: string; nick: string; created: number; lock_until: number };
   regions: { region: string; views: number; book: number; flight: number; hotel: number; save: number; last: number }[];
   daily: { day: string; visits: number }[];
   recent: { ts: number; step: string; region: string; path: string }[];
@@ -210,11 +210,6 @@ interface MemberDetail {
 const kst = (ms: number) => new Date(ms + 9 * 3600000).toISOString();
 /** 11/23 17:05 (한국 시간) */
 const when = (ms: number | null) => (ms ? `${md(kst(ms))} ${kst(ms).slice(11, 16)}` : "–");
-const age = (birth: string) => {
-  const t = kst(Date.now()).slice(0, 10);
-  return Number(t.slice(0, 4)) - Number(birth.slice(0, 4)) - (t.slice(5) < birth.slice(5) ? 1 : 0);
-};
-const genderKo = (g: string) => (g === "M" ? "남" : g === "F" ? "여" : "–");
 const rName = (id: string) => regionName.get(id) ?? id;
 
 function Members({ adminKey, days }: { adminKey: string; days: number }) {
@@ -240,9 +235,9 @@ function Members({ adminKey, days }: { adminKey: string; days: number }) {
     {list.length === 0 ? <p className="small muted">아직 가입한 회원이 없어요.</p> :
       <div style={{ overflowX: "auto" }}>
         <table className="admin-table small">
-          <thead><tr><th>닉네임</th><th>나이·성별</th><th>최근 접속</th><th>접속</th><th>접속일</th><th>본 권역</th><th>항공</th><th>숙소</th><th>저장</th><th>가입</th></tr></thead>
+          <thead><tr><th>닉네임</th><th>최근 접속</th><th>접속</th><th>접속일</th><th>본 권역</th><th>항공</th><th>숙소</th><th>저장</th><th>가입</th></tr></thead>
           <tbody>{list.map((u) => <tr key={u.uid} className="admin-row" tabIndex={0} onClick={() => setOpen(u.uid)} onKeyDown={(e) => e.key === "Enter" && setOpen(u.uid)}>
-            <td><b>{u.nick}</b></td><td>{age(u.birth)}·{genderKo(u.gender)}</td><td>{when(u.last)}</td><td>{u.visits}</td><td>{u.days}</td><td>{u.regions}</td><td>{u.flight}</td><td>{u.hotel}</td><td>{u.save}</td><td>{md(kst(u.created))}</td>
+            <td><b>{u.nick}</b></td><td>{when(u.last)}</td><td>{u.visits}</td><td>{u.days}</td><td>{u.regions}</td><td>{u.flight}</td><td>{u.hotel}</td><td>{u.save}</td><td>{md(kst(u.created))}</td>
           </tr>)}</tbody>
         </table>
       </div>}
@@ -271,7 +266,7 @@ function MemberView({ adminKey, uid, onBack }: { adminKey: string; uid: string; 
     {back}
     <section className="card-soft">
       <b style={{ fontSize: 18 }}>{u.nick}</b>
-      <p className="small muted">{u.birth} ({age(u.birth)}세) · {genderKo(u.gender)} · 가입 {when(u.created)} · 로그인 기기 {d.devices}대{u.lock_until > Date.now() ? " · 🔒 PIN 잠김" : ""}</p>
+      <p className="small muted">가입 {when(u.created)} · 로그인 기기 {d.devices}대</p>
       <p className="small" style={{ marginTop: 6 }}>접속(화면 열람) {totalVisits}회 · 접속한 날 {d.daily.length}일{d.daily[0] ? ` · 마지막 ${md(d.daily[0].day)}` : ""}</p>
     </section>
     <section className="card-soft">

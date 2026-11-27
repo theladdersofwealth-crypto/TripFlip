@@ -58,9 +58,9 @@ export function GuestPreview({ count, startRank = 1, beforeGo }: { count: number
     </div>
     <div className="guest-gate" role="dialog" aria-label="가입 안내">
       <b style={{ fontSize: 18 }}>🔒 {startRank > 1 ? `${startRank}위부터 ${count}곳 더 있어요` : `추천 여행지 ${count}곳을 찾았어요`}</b>
-      <p className="small muted">{startRank > 1 ? `가입하면 ${startRank}위부터 나머지 추천과 각 여행지의 예약·일정·관광지·음식점을 볼 수 있어요.` : "가입하면 추천 여행지를 볼 수 있어요."} 닉네임·생년월일·성별, PIN 6자리(확인용 한 번 더)만 넣으면 돼요. 30초면 끝나요. 가입·로그인하면 이 결과로 바로 돌아와요.</p>
+      <p className="small muted">{startRank > 1 ? `가입하면 ${startRank}위부터 나머지 추천과 각 여행지의 예약·일정·관광지·음식점을 볼 수 있어요.` : "가입하면 추천 여행지를 볼 수 있어요."} 구글·카카오·네이버 계정으로 가입하거나 로그인할 수 있어요. 가입·로그인하면 이 결과로 바로 돌아와요.</p>
       <button type="button" className="btn btn-primary btn-block" onClick={() => goAccount("")}>30초 가입하고 보기</button>
-      <button type="button" className="btn btn-block" onClick={() => goAccount("#login")}>이미 계정이 있어요</button>
+      <button type="button" className="btn btn-block" onClick={() => goAccount("#login")}>소셜 계정으로 로그인</button>
     </div>
   </div>;
 }
