@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { STORAGE_FAIL_EVENT } from "@/lib/flow";
 import { trackPage } from "@/lib/analytics";
 import { AUTH_EVENT, loadAuth, refreshAuth } from "@/lib/account";
-import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PLANS_CHANGED_EVENT } from "@/lib/flow";
 import { syncPlans } from "@/lib/planSync";
 import { Icon } from "./Icon";
@@ -83,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {!path.startsWith("/admin") && (
         <footer className="site-footer">
           <div><Link href="/guide">안내</Link>·<Link href="/legal/terms">이용약관</Link>·<Link href="/legal/privacy"><b>개인정보처리방침</b></Link>·<Link href="/guide#legal">문의</Link></div>
-          <p>트립플립은 예약을 직접 판매하지 않아요. {AFFILIATE_NOTE}</p>
+          <p><Link href="/guide#booking">예약·제휴 안내</Link></p>
         </footer>
       )}
       <nav className="bottom-nav" aria-label="주요 메뉴">

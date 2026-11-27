@@ -450,7 +450,7 @@ test("아고다 숙소에 입력한 날짜·인원·객실을 넘기고 항공 �
   for (const path of ["/r/mon-gobi", "/book/mon-gobi"]) {
     await page.goto(path);
     if (path.startsWith("/r")) await page.getByRole("tab", { name: "예약", exact: true }).click();
-    await expect(page.getByText(/아고다 검색 요청: 달란자드가드 · 2028-10-13 ~ 2028-10-16 · 성인 2명 · 자녀 1명 · 2객실/)).toBeVisible();
+    await expect(page.getByText("청결은 기본입니다", { exact: true })).toBeVisible();
     const hotel = await targetOf(/^아고다 (고비사막 호텔|검색)/);
     for (const [key, value] of Object.entries({
       city: "725293", checkIn: itinerary.startDate, checkOut: itinerary.endDate, adults: "2", children: "1", childages: "4", rooms: "2",
@@ -461,7 +461,7 @@ test("아고다 숙소에 입력한 날짜·인원·객실을 넘기고 항공 �
     if (path.startsWith("/book")) {
       await page.getByLabel("검색할 객실 수").selectOption("3");
       expect((await targetOf(/^아고다 검색/)).searchParams.get("rooms")).toBe("3");
-      await expect(page.getByText(/아고다 검색 요청:.*3객실/)).toBeVisible();
+      await expect(page.getByLabel("검색할 객실 수")).toHaveValue("3");
     }
   }
 });

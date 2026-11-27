@@ -857,3 +857,14 @@ button.home-dest-card { border: 0; font: inherit; text-align: left; cursor: poin
 
 .results-themes { display: grid; gap: 8px; margin-top: 12px; }
 .results-themes .toggle-chip { min-height: 44px; }
+
+.booking-affiliate-badge {
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  border-radius: 99px;
+  padding: 1px 5px;
+  font-size: 10px;
+  line-height: 1.35;
+  font-weight: 650;
+  white-space: nowrap;
+}
