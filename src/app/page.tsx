@@ -40,7 +40,9 @@ export default function Home() {
   const heading=useRef<HTMLHeadingElement>(null);
   const progress=()=>({open:null,question:0,done:[false,false,false],choice:null,slide,answered});
   useEffect(()=>{
-    const draft=makeQuestionDraft();
+    const resume = new URLSearchParams(location.search).get("resume")==="1";
+    const draft=makeQuestionDraft(resume);
+    if(resume) history.replaceState(history.state,"","/");
     setQ(draft.q);setSlide(draft.slide);setAnswered(draft.answered);
   },[]);
   useEffect(()=>{if(q)saveHomeDraft(q,progress());},[q,slide,answered]);

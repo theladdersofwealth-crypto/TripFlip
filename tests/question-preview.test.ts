@@ -38,3 +38,16 @@ test("마카오 당일치기 명소는 HK 자동 추천/시내 후보에서 제�
   assert.equal(hk?.weather.month,12);
   assert.ok(hk?.top.every(x=>!MACAU_DAY_TRIP_PLACES.some(p=>p.id===x.place.id)));
 });
+
+test("다른 탭에서 확정 조건이 변경되어도 명시적으로 이어서 고르면 현재 미리보기의 질문과 선택 복원",()=>{
+  const q={...makeQuestionDraft().q,totalBudgetKrw:4500000};
+  saveQuestionPreview(q,progress(6,["budget"]));
+  const other={...DEFAULT_QUERY,adults:4};
+  saveQuery(other);
+  assert.deepEqual(loadQuery(),other);
+  const resumed=makeQuestionDraft(true);
+  assert.equal(resumed.slide,6);
+  assert.equal(resumed.q.totalBudgetKrw,4500000);
+  assert.deepEqual(resumed.answered,["budget"]);
+  assert.deepEqual(loadQuery(),other);
+});

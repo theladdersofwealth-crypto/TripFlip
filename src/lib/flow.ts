@@ -56,7 +56,7 @@ const K = { query: "tripflip.flow.query", homeDraft: "tripflip.flow.home-draft",
 const mem = new Map<string, unknown>();
 export const STORAGE_FAIL_EVENT = "tripflip:storage-fail";
 /** 테스트용: 메모리 대체 저장 비우기 */
-export const resetStorageFallback = () => mem.clear();
+export const resetStorageFallback = () => { mem.clear(); previewMemory = null; };
 
 function read<T>(key: string, fallback: T): T {
   if (mem.has(key)) return mem.get(key) as T;
@@ -111,7 +111,9 @@ const PREVIEW_KEY = "tripflip.flow.question-preview";
 const CONFIRMED_DEFAULTS = "tripflip.flow.confirmed-defaults";
 type QuestionPreview = { q: RegionQuery; progress: HomeProgress; defaults: string[] };
 let previewMemory: QuestionPreview | null = null;
-export function makeQuestionDraft() {
+export function makeQuestionDraft(resume = false) {
+  const snapshot = resume ? loadQuestionPreview() : null;
+  if (snapshot) return { q:snapshot.q, slide:questionIndex(snapshot.progress.slide), answered:selectedQuestions(snapshot.progress.answered) };
   const saved = loadHomeDraft();
   const p = saved.progress;
   if (p && typeof p.slide === "number" && Array.isArray(p.answered)) {
@@ -126,7 +128,7 @@ export function makeQuestionDraft() {
     ...(changed([q.startDate,q.endDate,q.dateWindow],[base.startDate,base.endDate,base.dateWindow])?["when"]:[]),
     ...(q.preferredAreas?.length?["area"]:[]),
     ...(changed([q.main,q.subs,q.interests],[base.main,base.subs,base.interests])?["vibe"]:[]),
-    ...(q.maxFlightHours!==base.maxFlightHours?["flight"]:[]),...(q.perDay!==base.perDay?["intensity"]:[]),
+    ...(q.maxFlightHours!==base.maxFlightHours||p?.done?.[1]||p?.open===1&&p.question>0?["flight"]:[]),...(q.perDay!==base.perDay?["intensity"]:[]),
     ...(q.totalBudgetKrw!=null?["budget"]:[]),...(q.stay!==base.stay?["stay"]:[]),...(q.price!==base.price?["price"]:[]),
     ...(q.roomCount!=null?["rooms"]:[]),...(q.pet?["pet"]:[]),
   ]);
@@ -135,14 +137,14 @@ export function makeQuestionDraft() {
 export function saveQuestionPreview(q: RegionQuery, progress: HomeProgress) {
   const current=normalizeParty(q);
   const snapshot: QuestionPreview={q:current,progress,defaults:defaultLabels(current,selectedQuestions(progress.answered))};
-  previewMemory=snapshot;
-  try { sessionStorage.setItem(PREVIEW_KEY,JSON.stringify(snapshot)); } catch {}
+  try { sessionStorage.setItem(PREVIEW_KEY,JSON.stringify(snapshot)); previewMemory=null; }
+  catch { previewMemory=snapshot; }
   saveHomeDraft(q,progress);
   return snapshot;
 }
 export function loadQuestionPreview(): QuestionPreview | null {
   let snapshot: QuestionPreview | null=previewMemory;
-  try { const raw=sessionStorage.getItem(PREVIEW_KEY); snapshot=raw?JSON.parse(raw):previewMemory; } catch {}
+  if(!snapshot) { try { const raw=sessionStorage.getItem(PREVIEW_KEY); snapshot=raw?JSON.parse(raw):null; } catch {} }
   if (!snapshot || !queryShape(snapshot.q) || travelDateError(snapshot.q) || !Array.isArray(snapshot.progress?.answered)) return null;
   return {...snapshot,defaults:defaultLabels(snapshot.q,selectedQuestions(snapshot.progress.answered))};
 }

@@ -81,12 +81,12 @@ export default function ResultsPage() {
   return (
     <main className={split ? "container page pc-split" : "container page"} style={split ? undefined : { maxWidth: 560 }}>
       <div className="pc-list">
-      <BackButton href="/" label="조건 선택" />
+      <BackButton href={draftPreview?"/?resume=1":"/"} label="조건 선택" />
       <div className="between">
         <h1 style={{ fontSize: 24, fontWeight: 900 }}>추천 여행지</h1>
         <div className="row-wrap" style={{ gap: 6 }}>
           {ranked.length > 0 && !previewOnly && <ShareButton query={q} title={`${days - 1}박 ${days}일 · ${who} · ${coreInterests(q).join("·")} 여행지 추천`} />}
-          <Link href="/" className="btn btn-sm">{draftPreview?"조건 이어서 고르기":"조건 수정"}</Link>
+          <Link href={draftPreview?"/?resume=1":"/"} className="btn btn-sm">{draftPreview?"조건 이어서 고르기":"조건 수정"}</Link>
         </div>
       </div>
       {draftPreview&&<div className="card-soft stack" role="status" style={{marginTop:10}}><b>지금까지 고른 조건의 추천 미리보기</b><p className="small muted">마지막 확정 검색은 그대로예요. 원하면 조건을 더 고르거나 이 조건으로 확정할 수 있어요.</p><div className="row-wrap"><button type="button" className="btn btn-primary btn-sm" onClick={confirmDraft}>이 조건으로 확정</button></div></div>}
@@ -110,7 +110,7 @@ export default function ResultsPage() {
         {q.totalBudgetKrw != null && <span className="chip">전체 {Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원 {q.budgetMode === "cap" ? "상한" : "목표"}</span>}
       </div>
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}
-      {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href="/" className="btn btn-sm">조건 다시 선택하기</Link></div>}
+      {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href={draftPreview?"/?resume=1":"/"} className="btn btn-sm">조건 다시 선택하기</Link></div>}
       {!member && ranked.length > 0 ? <div className="stack">
         <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={open} previewOnly={previewOnly} />
         {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} returnTo={draftPreview?"/results?preview=1":undefined} />}
