@@ -6,7 +6,7 @@
  */
 import { KLOOK_CITY } from "@/data/klookCities";
 import { KLOOK_HOTEL } from "@/data/klookHotels";
-import { bookingDates, FLIGHT_PREFILL_DAYS, withinBookingHorizon } from "@/lib/travelDates";
+import { bookingDates, calendarDays } from "@/lib/travelDates";
 
 export type TpProgram = { p: string; campaignId: string };
 
@@ -81,7 +81,7 @@ export function aviasalesSearchUrl(
 ): string {
   const base = "https://www.aviasales.com/";
   const dates = bookingDates(o.startDate, o.endDate);
-  if (!/^[a-z]{3}$/i.test(o.from) || !/^[a-z]{3}$/i.test(o.to) || !dates || !withinBookingHorizon(dates.endDate, FLIGHT_PREFILL_DAYS)) return tpLink(base, prog, tp);
+  if (!/^[a-z]{3}$/i.test(o.from) || !/^[a-z]{3}$/i.test(o.to) || !dates) return tpLink(base, prog, tp);
   const ddmm = (d: string) => d.slice(8, 10) + d.slice(5, 7);
   const infants = o.childAges ? o.childAges.filter((a) => a < 2).length : 0;
   const kids = o.childCount - infants;
@@ -124,9 +124,7 @@ export type AgodaFlightQuery = { from: string; to: string; startDate: string; en
 
 /** 왕복 검색 결과로 바로 열 수 있는지(공항코드 3글자·날짜 형식·귀국일이 출발일 뒤) */
 export function agodaFlightsPrefilled(o?: AgodaFlightQuery): o is AgodaFlightQuery {
-  if (!o || !/^[a-z]{3}$/i.test(o.from) || !/^[a-z]{3}$/i.test(o.to)) return false;
-  const dates = bookingDates(o.startDate, o.endDate);
-  return !!dates && withinBookingHorizon(dates.endDate, FLIGHT_PREFILL_DAYS);
+  return !!o && /^[a-z]{3}$/i.test(o.from) && /^[a-z]{3}$/i.test(o.to) && calendarDays(o.startDate, o.endDate) >= 2;
 }
 
 export function agodaFlightsUrl(o?: AgodaFlightQuery, prog: CjProgram = CJ.agoda): string {

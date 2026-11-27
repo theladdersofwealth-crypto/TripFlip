@@ -27,15 +27,15 @@ for (const [label, startDate, endDate, expectedStart, expectedEnd] of [
   ["미래", "2026-11-28", "2026-11-30", "2026-11-28", "2026-11-30"],
   ["일부 과거", "2026-11-26", "2026-11-30", "2026-11-27", "2026-11-30"],
 ] as const) {
-  test(label + ": 모든 예약 링크 날짜·인원·제휴 유지, 원본 불변", (t) => {
+  test(label + ": 아고다 숙소는 원래 날짜, 다른 예약 링크는 기존 날짜 보정, 원본 불변", (t) => {
     t.mock.timers.enable({ apis: ["Date"], now });
     const q = { ...DEFAULT_QUERY, startDate, endDate, adults: 1, children: [], roomCount: 1 };
     const original = JSON.stringify(q);
     const a = inner(hotelSearchUrl(region, q));
     assert.equal(a.searchParams.get("city"), "2679");
-    assert.equal(a.searchParams.get("checkIn"), expectedStart);
-    assert.equal(a.searchParams.get("checkOut"), expectedEnd);
-    assert.equal(a.searchParams.get("los"), String((Date.parse(expectedEnd) - Date.parse(expectedStart)) / 86400000));
+    assert.equal(a.searchParams.get("checkIn"), startDate);
+    assert.equal(a.searchParams.get("checkOut"), endDate);
+    assert.equal(a.searchParams.get("los"), String((Date.parse(endDate) - Date.parse(startDate)) / 86400000));
     assert.equal(a.searchParams.get("adults"), "1");
     assert.equal(a.searchParams.get("rooms"), "1");
     assert.ok(new URL(hotelSearchUrl(region, q)).searchParams.has("url"));
@@ -77,40 +77,19 @@ test("잘못된 날짜는 예약 링크에 싣지 않는다", (t) => {
   assert.equal(inner(flightSearchUrl(region, q)).pathname, "/transport/flights/");
 });
 
-test("고비사막 2028년 일정: 항공 링크는 검색 홈, 숙소 링크는 도시만 전달", async (t) => {
+test("고비사막의 2028년 숙소 검색에도 입력한 날짜·일행·객실·알려진 자녀 나이를 정확히 전달한다", async (t) => {
   t.mock.timers.enable({ apis: ["Date"], now });
   const { ALL_REGIONS } = await import("../src/services/regionScore");
-  const { agodaStayNotice, flightDateNotice } = await import("../src/services/booking");
   const gobi = ALL_REGIONS.find((r) => r.id === "mon-gobi")!;
-  const q = { ...DEFAULT_QUERY, startDate: "2028-10-13", endDate: "2028-10-16", adults: 2 };
-  const original = JSON.stringify(q);
-  assert.equal(gobi.airportCode.toUpperCase(), "UBN");
-  const f = inner(agodaFlightUrl(gobi, q));
-  assert.equal(f.pathname, "/ko-kr/flights");
-  assert.equal(f.searchParams.has("departDate"), false);
-  assert.equal(inner(flightAffiliateUrl(gobi, q)).pathname, "/");
-  assert.equal(inner(flightSearchUrl(gobi, q)).pathname, "/transport/flights/");
-  const h = inner(hotelSearchUrl(gobi, q));
-  assert.equal(h.searchParams.get("city"), "725293");
-  assert.equal(h.searchParams.get("adults"), "2");
-  for (const key of ["checkIn", "checkOut", "los"]) assert.equal(h.searchParams.has(key), false);
-  assert.match(agodaStayNotice(gobi, q) ?? "", /365일/);
-  assert.match(flightDateNotice(q) ?? "", /360일/);
-  assert.equal(JSON.stringify(q), original);
-});
-
-test("항공 왕복 360일, 아고다 숙소 체크인 365일 경계와 원래 날짜 보존", async (t) => {
-  t.mock.timers.enable({ apis: ["Date"], now });
-  const { addCalendarDays } = await import("../src/lib/travelDates");
-  const { agodaStayNotice, flightDateNotice } = await import("../src/services/booking");
-  const today = todayInSeoul(now);
-  const at = (i: number) => addCalendarDays(today, i);
-  const range = (i: number, j: number) => ({ ...DEFAULT_QUERY, startDate: at(i), endDate: at(j) });
-  assert.equal(inner(agodaFlightUrl(region, range(359, 360))).searchParams.get("returnDate"), at(360));
-  assert.equal(flightDateNotice(range(359, 360)), null);
-  assert.equal(inner(agodaFlightUrl(region, range(359, 361))).pathname, "/ko-kr/flights");
-  assert.equal(inner(hotelSearchUrl(region, range(365, 367))).searchParams.get("checkIn"), at(365));
-  assert.equal(agodaStayNotice(region, range(365, 367)), null);
-  assert.equal(inner(hotelSearchUrl(region, range(366, 367))).searchParams.has("checkIn"), false);
-  assert.match(agodaStayNotice(region, range(-2, -1)) ?? "", /저장한 일정은 그대로/);
+  const q = { ...DEFAULT_QUERY, startDate: "2028-10-13", endDate: "2028-10-16", adults: 2, roomCount: 2,
+    children: [{ band: "유아" as const, height: null, actualAge: 4 }, { band: "초등" as const, height: null, actualAge: 8 }] };
+  const link = hotelSearchUrl(gobi, q);
+  const hotel = inner(link);
+  assert.equal(hotel.pathname, "/ko-kr/search");
+  for (const [key, value] of Object.entries({
+    city: "725293", checkIn: "2028-10-13", checkOut: "2028-10-16", los: "3", adults: "2", children: "2", childages: "4,8", rooms: "2",
+  })) assert.equal(hotel.searchParams.get(key), value);
+  assert.equal(new URL(link).hostname, "www.tkqlhce.com");
+  assert.equal(inner(agodaFlightUrl(gobi, q)).searchParams.get("departDate"), "2028-10-13");
+  assert.equal(inner(agodaFlightUrl(gobi, q)).searchParams.get("arrivalTo"), "UBN");
 });
