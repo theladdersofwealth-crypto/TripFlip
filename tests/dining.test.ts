@@ -48,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 882);
+  assert.equal(imported.length, 910);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 369);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 397);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -281,7 +281,7 @@ test("2차 음식점 자료는 달랏 등 5권역의 확인된 68곳만 추가�
 });
 
 test("일본 5권역의 확인된 71곳만 추가하고 기존 두 장소는 원래 ID에 연결한다", () => {
-  const rows = verifiedDining.slice(811);
+  const rows = verifiedDining.slice(811, 882);
   const counts = { "jap-nagoya": 14, "jap-beppu": 19, "jap-matsuyama": 13, "jap-nagasaki": 13, "jap-kagoshima": 12 };
   assert.equal(rows.length, 71);
   assert.deepEqual([...new Set(rows.map(({ region }) => region))].sort(), Object.keys(counts).sort());
@@ -306,4 +306,23 @@ test("일본 5권역의 확인된 71곳만 추가하고 기존 두 장소는 원
     assert.equal(existing[0].dining?.mapRecord?.status, "confirmed");
   }
   assert.equal(rows.filter(({ id }) => id.startsWith("verified-dining-")).length, 69);
+});
+
+test("4묶음 자료는 확인된 시안·샤먼·타이난 28곳만 추가한다", () => {
+  const rows = verifiedDining.slice(882);
+  const counts = { "chi-xian": 5, "chi-xiamen": 1, "tai-tainan": 22 };
+  assert.equal(rows.length, 28);
+  assert.deepEqual([...new Set(rows.map(({ region }) => region))].sort(), Object.keys(counts).sort());
+  const fields = Object.keys(verifiedDining[881]).sort();
+  for (const [region, count] of Object.entries(counts)) {
+    const group = rows.filter((row) => row.region === region);
+    assert.equal(group.length, count);
+    assert.equal(new Set(group.map(({ nameLocal }) => nameLocal)).size, count);
+  }
+  for (const row of rows) {
+    assert.deepEqual(Object.keys(row).sort(), fields);
+    assert.equal(row.checkedAt, "2026-11-27");
+    assert.ok(!pendingDining.some(({ region, nameLocal }) => region === row.region && nameLocal === row.nameLocal));
+  }
+  assert.equal(rows.find(({ region }) => region === "chi-xiamen")?.priceLevel, null);
 });
