@@ -1,4 +1,5 @@
 "use client";
+import { regionBookingHref } from "@/lib/regionRoutes";
 import Link from "next/link";
 import { NEXT_KEY } from "@/components/AppShell";
 import { Icon } from "@/components/Icon";
@@ -96,7 +97,7 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewO
             {previewOnly ? (
               <button type="button" className="row small" style={{ ...detailStyle, background: "none", border: 0, padding: 0, alignSelf: "flex-start", textAlign: "left" }} onClick={(e) => { e.stopPropagation(); go(r.region.id); }}>{detailLabel}</button>
             ) : (
-              <Link href={`/r/${r.region.id}`} className="row small" style={detailStyle} onClick={(e) => { e.stopPropagation(); if (onSelect) { e.preventDefault(); onSelect(r.region.id); } }}>{detailLabel}</Link>
+              <Link href={regionBookingHref(r.region.id)} className="row small" style={detailStyle} onClick={(e) => { e.stopPropagation(); if (onSelect) { e.preventDefault(); onSelect(r.region.id); } }}>{detailLabel}</Link>
             )}
           </article>
         ))}

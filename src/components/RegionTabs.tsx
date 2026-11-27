@@ -2,22 +2,20 @@
 // 권역 상세 탭(형님 11/24: 나트랑앱처럼). 예약·관광지·음식점 탭 내용. 일정 탭은 /r/[id] client.tsx 그대로.
 import { useState } from "react";
 import Link from "next/link";
-import { AgodaStaySummary } from "@/components/AgodaStaySummary";
+import { BookingAffiliateBadge } from "@/components/BookingAffiliateBadge";
 import { EsimoaBookingCard } from "@/components/EsimoaBookingCard";
 import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
 import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
 import { pendingDiningLast } from "@/data/dining";
-import { FlightSheet, HotelSheet, flightBasis, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
+import { FlightSheet, HotelSheet, hotelKo, pickPrice, tierText } from "@/components/PriceSheets";
 import { CONCEPTS } from "@/data/regionsV1";
 import type { Concept, PlaceV1 } from "@/data/regionsV1";
 import { PLACE_ATTRS } from "@/data/placeAttrs";
 import { KRW_PER_USD } from "@/data/worldPrices";
-import { relaxedNotice } from "@/lib/livePrices";
-import { AFFILIATE_NOTE } from "@/lib/legal";
 import { track } from "@/lib/analytics";
 import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
-import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
+import { agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
 import type { HotelPick } from "@/services/booking";
 import { isFood, placesOf } from "@/services/planner";
 import { MACAU_DAY_TRIP_PLACES, PILOT_TWIN_OF, hotelEstimated } from "@/services/regionScore";
@@ -51,44 +49,42 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
     <section className="book-card">
       <div className="row"><Icon name="plane" size={20} /><b>항공</b></div>
       <button type="button" className="cost-row" onClick={() => setOpen("flight")}>
-        <span>1인 왕복 <b>약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
+        <span>1인 왕복 <b>{s.flightKrw != null ? `약 ${man(s.flightKrw)}` : "미확인"}</b><small>항공사·시간 보기</small></span><Icon name="next" size={16} />
       </button>
-      <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>아고다 항공 <Icon name="link" /></a>
-      {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
+      <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>아고다 항공 <BookingAffiliateBadge /> <Icon name="link" /></a>
       <div className="grid-2">
-        <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...aff}>Aviasales <BookingAffiliateBadge /> <Icon name="link" /></a>
         <a className="btn btn-block" href={flightSearchUrl(r.region, q)} data-usage-outbound="flight" onClick={() => track("flight", id)} {...ext}>스카이스캐너 <Icon name="link" /></a>
       </div>
     </section>
     <section className="book-card">
       <div className="row"><Icon name="bed" size={20} /><b>숙소</b><span className="xs muted">{tier}({tierText(tier)})</span></div>
       <p className="small">{s.hotelNightUsd != null ? <>1박 <b>약 {man(s.hotelNightUsd * KRW_PER_USD)}{estimated ? "(추정)" : ""}</b> × {s.rooms}실 × {s.nights}박</> : "숙소 가격 미확인"}
-        {estimated && <span className="xs muted" style={{ display: "block" }}>숙소 자료 없음 · 나라 물가(세계은행)로 추정, 실측 아님</span>}</p>
+      </p>
+      <p className="small bold">청결은 기본입니다</p>
       {hotels.length > 0 && <div className="hotel-picks">
         {(all ? hotels : hotels.slice(0, 3)).map((h) => <button type="button" key={h.name} className="hotel-pick" onClick={() => setOpen(h)}><span><b>{hotelKo(h.name)}</b><small>{[h.rating != null ? `★${h.rating}` : "", h.reviews != null ? `후기 ${h.reviews.toLocaleString()}개` : "", pickPrice(h)].filter(Boolean).join(" · ")}</small></span><Icon name="next" size={16} /></button>)}
         {hotels.length > 3 && !all && <button type="button" className="xs link-btn" onClick={() => setAll(true)}>숙소 더 보기 ({hotels.length}곳) ▾</button>}
       </div>}
-      <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
-      <AgodaStaySummary region={r.region} query={q} />
+      <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <BookingAffiliateBadge /> <Icon name="link" /></a>
       <div className="grid-2">
-        <a className="btn btn-block" href={klookStayUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
+        <a className="btn btn-block" href={klookStayUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...aff}>클룩 <BookingAffiliateBadge /> <Icon name="link" /></a>
         <a className="btn btn-block" href={bookingComUrl(r.region, q)} data-usage-outbound="hotel" onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>
       </div>
-      {relaxedNotice(id) && <span className="xs warn">⚠ {relaxedNotice(id)}</span>}
     </section>
     <section className="book-card">
       <div className="row"><Icon name="car" size={20} /><b>공항 픽업</b></div>
-      <a className="btn btn-block" href={welcomePickupsUrl()} data-usage-outbound="outbound" {...aff}>Welcome Pickups <Icon name="link" /></a>
+      <a className="btn btn-block" href={welcomePickupsUrl()} data-usage-outbound="outbound" {...aff}>Welcome Pickups <BookingAffiliateBadge /> <Icon name="link" /></a>
     </section>
     <section className="book-card">
       <div className="row"><Icon name="compass" size={20} /><b>투어·입장권</b></div>
       <div className="grid-2">
-        <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>클룩 <Icon name="link" /></a>
-        <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>KKday <Icon name="link" /></a>
+        <a className="btn btn-block" href={klookSearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>클룩 <BookingAffiliateBadge /> <Icon name="link" /></a>
+        <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>KKday <BookingAffiliateBadge /> <Icon name="link" /></a>
       </div>
     </section>
     <EsimoaBookingCard country={r.region.country} />
-    <p className="xs muted">ⓘ {AFFILIATE_NOTE}</p>
+    <Link href="/guide#booking" className="xs link-btn" style={{ alignSelf: "flex-start" }}>예약 안내</Link>
     <Link href={`/book/${id}`} className="btn btn-primary btn-block">예약 상태 체크하고 내 여행에 저장 <Icon name="next" /></Link>
     {open === "flight" && <FlightSheet region={r.region} q={q} flightKrw={s.flightKrw} onClose={() => setOpen(null)} />}
     {open && open !== "flight" && <HotelSheet hotel={open} tier={tier} region={r.region} q={q} onClose={() => setOpen(null)} />}

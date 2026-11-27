@@ -187,7 +187,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(page.locator(".rank-card .rank-brief").first()).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("results-brief.png") });
   await page.locator(".rank-card").filter({ hasText: "나트랑" }).getByRole("link", { name: /^자세히 보기/ }).click();
-  await expect(page).toHaveURL(/\/r\/NT$/);
+  await expect(page).toHaveURL(/\/r\/NT\?tab=/);
+  await expect(page.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("heading", { name: "나트랑", exact: true })).toBeVisible();
   // 추천 이유(테마별 대표 명소)는 관광지 탭 맨 위로 옮김(11/24)
   await page.getByRole("tab", { name: "관광지", exact: true }).click();
@@ -400,11 +401,15 @@ test("추천 상단에서 고른 서브 테마가 PC 일정에 즉시 반영되�
   });
   await page.goto("/results");
   const detail = page.getByRole("complementary", { name: "선택한 권역 상세" });
+  await expect(detail.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
+  await detail.getByRole("tab", { name: "일정", exact: true }).click();
   await expect(detail.getByText("일정 테마 · 관광", { exact: true })).toBeVisible();
   const picker = page.getByRole("group", { name: "서브 테마 선택" });
   await picker.getByRole("button", { name: "미식", exact: true }).click();
+  await detail.getByRole("tab", { name: "일정", exact: true }).click();
   await expect(detail.getByText("일정 테마 · 관광 + 미식", { exact: true })).toBeVisible();
   await picker.getByRole("button", { name: "휴양", exact: true }).click();
+  await detail.getByRole("tab", { name: "일정", exact: true }).click();
   await expect(detail.getByText("일정 테마 · 관광 + 휴양", { exact: true })).toBeVisible();
   await expect(picker.getByRole("button", { name: "미식", exact: true })).toHaveAttribute("aria-pressed", "false");
   await page.setViewportSize({ width: 320, height: 844 });
@@ -412,6 +417,8 @@ test("추천 상단에서 고른 서브 테마가 PC 일정에 즉시 반영되�
   await expect(picker.getByRole("button", { name: "휴양", exact: true })).toHaveAttribute("aria-pressed", "true");
   await noHorizontalOverflow(page);
   await page.locator(".rank-card").first().getByRole("link", { name: /^자세히 보기/ }).click();
+  await expect(page.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("tab", { name: "일정", exact: true }).click();
   await expect(page.getByText("일정 테마 · 관광 + 휴양", { exact: true })).toBeVisible();
   await page.goto("/results");
   await picker.getByRole("button", { name: "없음", exact: true }).click();
@@ -443,7 +450,7 @@ test("아고다 숙소에 입력한 날짜·인원·객실을 넘기고 항공 �
   for (const path of ["/r/mon-gobi", "/book/mon-gobi"]) {
     await page.goto(path);
     if (path.startsWith("/r")) await page.getByRole("tab", { name: "예약", exact: true }).click();
-    await expect(page.getByText(/아고다 검색 요청: 달란자드가드 · 2028-10-13 ~ 2028-10-16 · 성인 2명 · 자녀 1명 · 2객실/)).toBeVisible();
+    await expect(page.getByText("청결은 기본입니다", { exact: true })).toBeVisible();
     const hotel = await targetOf(/^아고다 (고비사막 호텔|검색)/);
     for (const [key, value] of Object.entries({
       city: "725293", checkIn: itinerary.startDate, checkOut: itinerary.endDate, adults: "2", children: "1", childages: "4", rooms: "2",
@@ -454,7 +461,7 @@ test("아고다 숙소에 입력한 날짜·인원·객실을 넘기고 항공 �
     if (path.startsWith("/book")) {
       await page.getByLabel("검색할 객실 수").selectOption("3");
       expect((await targetOf(/^아고다 검색/)).searchParams.get("rooms")).toBe("3");
-      await expect(page.getByText(/아고다 검색 요청:.*3객실/)).toBeVisible();
+      await expect(page.getByLabel("검색할 객실 수")).toHaveValue("3");
     }
   }
 });

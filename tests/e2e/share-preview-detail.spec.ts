@@ -38,6 +38,8 @@ for (const width of [390, 1280]) {
     await first.getByRole("link", { name: /^자세히 보기/ }).click();
     if (width === 390) await expect(page).toHaveURL(/\/r\//);
     else await expect(page).toHaveURL(/\/results$/);
+    await expect(page.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("tab", { name: "일정", exact: true }).click();
     await expect(page.locator(".day-card")).toHaveCount(6);
   });
 }
