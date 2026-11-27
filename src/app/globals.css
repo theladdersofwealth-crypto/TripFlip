@@ -825,6 +825,9 @@ article.rank-card { cursor: pointer; }
 .home-how-n { position: absolute; left: 16px; top: 14px; width: 28px; height: 28px; border-radius: 50%; background: var(--teal-50); color: var(--teal-dark); font-weight: 900; display: grid; place-items: center; font-size: 14px; }
 .home-dest { display: grid; grid-auto-flow: column; grid-auto-columns: 62%; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scroll-padding-left: 16px; }
 .home-dest-card { scroll-snap-align: start; position: relative; isolation: isolate; overflow: hidden; container-type: inline-size; border-radius: 18px; min-height: 130px; padding: 14px; display: flex; flex-direction: column; justify-content: flex-end; color: #fff; text-decoration: none; box-shadow: 0 8px 24px rgba(16, 47, 84, .12); }
+/* 홈 카드에서는 국기 비율을 유지하고 남는 공간을 양쪽에 균등하게 둔다. */
+.home-dest-card .rank-flag { inset: 6px; width: calc(100% - 12px); height: calc(100% - 12px); object-position: center; }
+.home-dest-card .rank-bg.has-flag::after { background: linear-gradient(180deg, rgba(8,22,38,.25) 0%, rgba(8,22,38,.47) 52%, rgba(8,22,38,.85) 100%); }
 .home-dest-name { font-size: 22px; font-weight: 900; text-shadow: 0 1px 8px rgba(0, 0, 0, .3); position: relative; z-index: 1; }
 .home-dest-sub { font-size: 12.5px; opacity: .88; position: relative; z-index: 1; }
 .home-themes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
