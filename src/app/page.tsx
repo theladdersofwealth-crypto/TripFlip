@@ -33,19 +33,22 @@ export default function Home() {
   const [flying, setFlying] = useState(false);
   const [slide,setSlide]=useState(0);
   const [answered,setAnswered]=useState<Question[]>([]);
-  const [show,setShow]=useState(true);
+  const [prefilled,setPrefilled]=useState<Question[]>([]);
+  // 첫 화면은 홈. 질문 팝업은 사용자가 시작 버튼을 누르거나 추천 미리보기에서 돌아올 때만 연다.
+  const [show,setShow]=useState(false);
   const [direction,setDirection]=useState<"forward"|"back">("forward");
   const dialog=useRef<HTMLDialogElement>(null);
   const body=useRef<HTMLDivElement>(null);
   const heading=useRef<HTMLHeadingElement>(null);
-  const progress=()=>({open:null,question:0,done:[false,false,false],choice:null,slide,answered});
+  const progress=()=>({open:null,question:0,done:[false,false,false],choice:null,slide,answered,prefilled});
   useEffect(()=>{
     const resume = new URLSearchParams(location.search).get("resume")==="1";
     const draft=makeQuestionDraft(resume);
     if(resume) history.replaceState(history.state,"","/");
-    setQ(draft.q);setSlide(draft.slide);setAnswered(draft.answered);
+    setQ(draft.q);setSlide(draft.slide);setAnswered(draft.answered);setPrefilled(draft.prefilled);
+    if(resume)setShow(true);
   },[]);
-  useEffect(()=>{if(q)saveHomeDraft(q,progress());},[q,slide,answered]);
+  useEffect(()=>{if(q)saveHomeDraft(q,progress());},[q,slide,answered,prefilled]);
   useEffect(()=>{
     const el=dialog.current;
     if(!ready||!show||!el)return;
@@ -66,7 +69,11 @@ export default function Home() {
   const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "전체 예산은 0보다 큰 금액으로 입력해 주세요." : null;
   const error = dateError || partyError || budgetError;
   const curQ=QUESTIONS[slide];
-  const mark=(k:Question)=>setAnswered(old=>old.includes(k)?old:[...old,k]);
+  const mark=(k:Question)=>{setAnswered(old=>old.includes(k)?old:[...old,k]);setPrefilled(old=>old.filter(x=>x!==k));};
+  const picked=(k:Question)=>answered.includes(k)&&!prefilled.includes(k);
+  const pickedCount=answered.filter(k=>!prefilled.includes(k)).length;
+  const status=picked(curQ)?"내가 고른 조건이에요.":prefilled.includes(curQ)?"지난 검색 조건이에요 · 그대로 두거나 새로 골라 주세요.":"아직 고르지 않았어요 · 기본값으로 추천할 수 있어요.";
+  const started=answered.length>0;
   const patch=(value:Partial<RegionQuery>)=>{mark(curQ);setQ(old=>old?{...old,...value}:old);};
   const move=(delta:number)=>{setDirection(delta>0?"forward":"back");setSlide(n=>Math.max(0,Math.min(QUESTIONS.length-1,n+delta)));};
   const qError=(k:Q)=>k==="who"?partyError:k==="when"?dateError:k==="budget"?budgetError:null;
@@ -90,7 +97,7 @@ export default function Home() {
   };
   const question = (k: Q) => {
     switch (k) {
-      case "who": return <CompanionChooser members={members} error={partyError} onChange={(nx) => { mark("who"); if(nx.length!==members.length)setAnswered(old=>old.filter(k=>k!=="rooms")); setQ(normalizeParty({ ...q, members: nx, ...(nx.length !== members.length ? { roomCount: null } : {}) })); }} />;
+      case "who": return <CompanionChooser members={members} error={partyError} tag={picked("who")?null:prefilled.includes("who")?"지난 조건":"기본값"} onChange={(nx) => { mark("who"); if(nx.length!==members.length)setAnswered(old=>old.filter(k=>k!=="rooms")); setQ(normalizeParty({ ...q, members: nx, ...(nx.length !== members.length ? { roomCount: null } : {}) })); }} />;
       case "when": return <>
         <DateEditor query={q} onChange={(value)=>{mark("when");setQ(value);}} />
         {dateError ? <p className="small form-error" role="alert">{dateError}</p> : <p className="small muted">기준 일정 {days - 1}박 {days}일</p>}
@@ -140,20 +147,20 @@ export default function Home() {
   };
   return <main className="container page discovery-form" style={{maxWidth:560}}>
     <h1 style={{fontSize:24,fontWeight:900}}>어디로 떠나볼까요?</h1>
-    <p className="small muted">한 질문씩 고르고, 언제든 트립플립 추천을 확인해 보세요.</p>
-    <button type="button" className="btn btn-primary btn-block" onClick={()=>setShow(true)}>조건 이어서 고르기</button>
+    <p className="small muted home-intro">누구와 가는지, 언제·어떤 여행인지 한 질문씩 고르면 갈 만한 여행지를 순위로 추천하고 날짜별 일정까지 짜 드려요.</p>
+    <button type="button" className="btn btn-primary btn-lg btn-block" onClick={()=>setShow(true)}><Icon name="plane"/> {started?"조건 이어서 고르기":"여행지 추천 받기"}</button>
     <Link href="/guide" className="home-faq-link small">자주 묻는 질문 ›</Link>
     {show && <dialog ref={dialog} className="question-dialog" aria-labelledby="slide-title" onCancel={e=>{e.preventDefault();setShow(false);}}>
       <div className="question-panel">
         <header className="question-head">
-          <div className="between"><span className="small muted">질문 {slide+1}/{QUESTIONS.length} · 선택 {answered.length}개</span><button type="button" className="icon-btn" aria-label="질문 닫기" onClick={()=>setShow(false)}>×</button></div>
-          <div className="question-progress" aria-hidden>{QUESTIONS.map((k,i)=><span key={k} className={i===slide?"active":answered.includes(k)?"selected":""}/>)}</div>
+          <div className="between"><span className="small muted">질문 {slide+1}/{QUESTIONS.length} · 선택 {pickedCount}개{prefilled.length?` · 지난 조건 ${prefilled.length}개`:""}</span><button type="button" className="icon-btn" aria-label="질문 닫기" onClick={()=>setShow(false)}>×</button></div>
+          <div className="question-progress" aria-hidden>{QUESTIONS.map((k,i)=><span key={k} className={i===slide?"active":picked(k)?"selected":prefilled.includes(k)?"saved":""}/>)}</div>
           <h2 id="slide-title" ref={heading} tabIndex={-1}>{Q_TITLE[curQ]}</h2>
-          <p className="xs muted">{answered.includes(curQ)?"선택한 조건 반영":"미선택 · 기본값으로 추천할 수 있어요."}</p>
+          <p className={"xs question-status "+(picked(curQ)?"picked":"muted")}>{status}</p>
         </header>
         <div ref={body} className="question-scroll">
-          <div key={curQ} className={"question-content "+direction}>{question(curQ)}</div>
-          {!answered.includes(curQ)&&<button type="button" className="btn btn-block" disabled={!!qError(curQ)} onClick={()=>mark(curQ)}>현재 조건 선택</button>}
+          <div key={curQ} className={"question-content "+direction+(picked(curQ)?"":" unpicked")}>{question(curQ)}</div>
+          {!picked(curQ)&&<button type="button" className="btn btn-block" disabled={!!qError(curQ)} onClick={()=>mark(curQ)}>{prefilled.includes(curQ)?"지난 조건 그대로 선택":"현재 조건 선택"}</button>}
           {error && <p className="small form-error" role="alert">{error} <span>해당 질문에서 수정할 수 있어요.</span></p>}
         </div>
         <footer className="question-actions">

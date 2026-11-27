@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 // 비회원: 1~3위는 실제로 보이고, 4위부터는 흐린 가짜 카드(실제 여행지 이름은 화면에 없음) + 가입 안내. 회원: 전체가 선명하게.
 test("비회원은 1~3위만 보이고 4위부터 흐리며, 로그인하면 전체가 선명하게 보인다", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
   await page.getByRole("button", { name: "다음", exact: true }).click();

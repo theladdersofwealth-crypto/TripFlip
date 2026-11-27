@@ -5,6 +5,7 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     await page.route("https://**/*", (route) => route.abort());
     await page.goto("/");
+    await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
     await expect(page.getByRole("button", { name: "트립플립 추천", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "다음", exact: true }).click();
     await page.getByRole("button", { name: "다음", exact: true }).click();
@@ -17,6 +18,7 @@ for (const width of [390, 1440]) {
     await expect(chips.getByRole("button", { name: "동남아", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(chips.getByRole("button", { name: "동·중부유럽", exact: true })).toHaveAttribute("aria-pressed", "true");
     await page.reload();
+    await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
     await expect(chips.getByRole("button", { name: "동남아", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(chips.getByRole("button", { name: "동·중부유럽", exact: true })).toHaveAttribute("aria-pressed", "true");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
