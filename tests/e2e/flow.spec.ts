@@ -419,3 +419,39 @@ test("추천 상단에서 고른 서브 테마가 PC 일정에 즉시 반영되�
   const interests = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}").interests);
   expect(interests).toEqual(["관광"]);
 });
+
+test("고비사막: 2028년 일정은 그대로 두고 아고다에 자동 예약 날짜를 보내지 않는다", async ({ page, baseURL }) => {
+  await page.clock.setFixedTime(new Date("2026-11-27T12:13:00Z"));
+  const origin = new URL(baseURL!).origin;
+  await page.route("**/*", (route) => {
+    const url = new URL(route.request().url());
+    if (url.origin === origin) return route.continue();
+    if (url.origin === STATS_ORIGIN && url.pathname === "/me") return route.fallback();
+    return route.abort();
+  });
+  const itinerary = {
+    startDate: "2028-10-13", endDate: "2028-10-16", adults: 2, children: [], elders: false, pet: false,
+    main: "휴양", subs: ["액티비티"], interests: ["휴양", "액티비티"], perDay: 2, price: "상관없음", stay: "가심비",
+  };
+  await page.addInitScript((query) => localStorage.setItem("tripflip.flow.query", JSON.stringify(query)), itinerary);
+  const targetOf = async (name: RegExp) => {
+    const link = page.getByRole("link", { name });
+    const href = await link.getAttribute("href");
+    return new URL(new URL(href!).searchParams.get("url")!);
+  };
+  for (const path of ["/r/mon-gobi", "/book/mon-gobi"]) {
+    await page.goto(path);
+    if (path.startsWith("/r")) await page.getByRole("tab", { name: "예약", exact: true }).click();
+    await expect(page.getByText(/귀국일이 360일보다 멀어/)).toBeVisible();
+    await expect(page.getByText(/체크인까지 365일 이내/)).toBeVisible();
+    await expect(page.getByText(/도착은 울란바토르/)).toBeVisible();
+    await expect(page.getByText("숙소 검색 지역: 달란자드가드")).toBeVisible();
+    expect((await targetOf(/^아고다 항공/)).pathname).toBe("/ko-kr/flights");
+    const hotel = await targetOf(/^아고다 (고비사막 호텔|검색)/);
+    expect(hotel.searchParams.get("city")).toBe("725293");
+    expect(hotel.searchParams.has("checkIn")).toBe(false);
+    expect(hotel.searchParams.has("checkOut")).toBe(false);
+    const data = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}"));
+    expect(data).toEqual(itinerary);
+  }
+});

@@ -1,7 +1,7 @@
 import type { RegionV1 } from "@/data/regionsV1";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
 import { childBandOf, membersOf, roomEstimate } from "@/lib/travelParty";
-import { bookingDates, calendarDays } from "@/lib/travelDates";
+import { AGODA_STAY_PREFILL_DAYS, bookingDates, calendarDays, FLIGHT_PREFILL_DAYS, withinBookingHorizon } from "@/lib/travelDates";
 import { HOTELS } from "@/data/worldHotels";
 import type { HotelRow } from "@/data/worldHotels";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
@@ -72,7 +72,7 @@ export function childAgesForBooking(q: RegionQuery): number[] | null {
 export function flightSearchUrl(region: RegionV1, q: RegionQuery) {
   if (!/^[a-z]{3}$/i.test(region.airportCode)) return "https://www.skyscanner.co.kr/transport/flights/";
   const dates = bookingDates(q.startDate, q.endDate);
-  if (!dates) return "https://www.skyscanner.co.kr/transport/flights/";
+  if (!dates || !withinBookingHorizon(dates.endDate, FLIGHT_PREFILL_DAYS)) return "https://www.skyscanner.co.kr/transport/flights/";
   const ymd = (date: string) => date.slice(2).replaceAll("-", "");
   const ages = childAgesForBooking(q);
   const params = new URLSearchParams({ adultsv2: String(q.adults) });
@@ -87,6 +87,13 @@ export function agodaFlightUrl(region: RegionV1, q: RegionQuery) {
 /** 아고다 항공 링크에 아이 인원이 빠지는지(아고다 어린이 파라미터 미확인) */
 export const agodaFlightMissingKids = (region: RegionV1, q: RegionQuery) =>
   q.children.length > 0 && agodaFlightsPrefilled({ from: "ICN", to: region.airportCode, startDate: q.startDate, endDate: q.endDate, adults: q.adults });
+
+export function flightDateNotice(q: RegionQuery): string | null {
+  const dates = bookingDates(q.startDate, q.endDate);
+  return dates && !withinBookingHorizon(dates.endDate, FLIGHT_PREFILL_DAYS)
+    ? "선택한 귀국일이 360일보다 멀어 항공 검색에 날짜를 넣지 않았어요. 판매 시작일은 항공사마다 달라요."
+    : null;
+}
 
 /** 항공권 보조: Aviasales(Travelpayouts 제휴) 왕복 검색 */
 export function flightAffiliateUrl(region: RegionV1, q: RegionQuery) {
@@ -114,7 +121,7 @@ export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) 
   const city = agodaCityId(region.id);
   const params = new URLSearchParams();
   if (city) params.set("city", String(city));
-  if (dates) {
+  if (dates && withinBookingHorizon(dates.startDate, AGODA_STAY_PREFILL_DAYS)) {
     params.set("checkIn", dates.startDate);
     params.set("checkOut", dates.endDate);
     params.set("los", String(calendarDays(dates.startDate, dates.endDate) - 1));
@@ -129,6 +136,17 @@ export function hotelSearchUrl(region: RegionV1, q: RegionQuery, name?: string) 
 }
 /** 아고다 도시 번호를 아는 권역인지(목적지·날짜·인원이 채워져 열리는지) */
 export const agodaCityId = (regionId: string): number | undefined => AGODA_CITY[regionId] ?? AGODA_CITY[PILOT_TWIN_OF[regionId] ?? ""];
+
+export function agodaStayNotice(region: RegionV1, q: RegionQuery): string | null {
+  const dates = bookingDates(q.startDate, q.endDate);
+  if (!dates) return "아고다에서 체크인과 체크아웃 날짜를 직접 골라 주세요.";
+  if (!withinBookingHorizon(dates.startDate, AGODA_STAY_PREFILL_DAYS)) {
+    return "아고다에 선택한 숙소 날짜를 넣지 않았어요. 체크인까지 365일 이내일 때 다시 검색해 주세요.";
+  }
+  if (!agodaCityId(region.id)) return "아고다에서 목적지와 날짜를 직접 확인해 주세요.";
+  if (dates.startDate !== q.startDate) return `선택한 체크인 날짜가 지나 아고다 검색 날짜를 ${dates.startDate}~${dates.endDate}로 바꿨어요. 저장한 일정은 그대로예요.`;
+  return null;
+}
 
 /** 클룩 호텔(제휴). 도시 번호를 아는 권역은 날짜·인원·객실이 채워져 열린다. */
 export function klookStayUrl(region: RegionV1, q: RegionQuery) {

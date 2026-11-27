@@ -60,3 +60,12 @@ export function bookingDates(startDate: string, endDate: string, now = new Date(
   if (startDate >= today) return { startDate, endDate };
   return { startDate: today, endDate: endDate > today ? endDate : addCalendarDays(today, nights) };
 }
+
+
+/** 자동 입력에만 쓰는 제한. 여행 계획에 입력할 수 있는 날짜는 바꾸지 않는다. */
+export const FLIGHT_PREFILL_DAYS = 360;
+export const AGODA_STAY_PREFILL_DAYS = 365;
+export function withinBookingHorizon(date: string, maxDays: number, now = new Date()): boolean {
+  const daysAhead = calendarDays(todayInSeoul(now), date) - 1;
+  return daysAhead >= 0 && daysAhead <= maxDays;
+}

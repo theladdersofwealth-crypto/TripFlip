@@ -15,7 +15,7 @@ import { relaxedNotice } from "@/lib/livePrices";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { track } from "@/lib/analytics";
 import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
-import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
+import { agodaFlightMissingKids, agodaFlightUrl, agodaStayNotice, flightDateNotice, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
 import type { HotelPick } from "@/services/booking";
 import { isFood, placesOf } from "@/services/planner";
 import { MACAU_DAY_TRIP_PLACES, PILOT_TWIN_OF, hotelEstimated } from "@/services/regionScore";
@@ -52,6 +52,8 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         <span>1인 왕복 <b>약 {s.flightKrw != null ? man(s.flightKrw) : "미확인"}</b><small>{flightBasis(id, q.startDate)} · 항공사·시간 보기</small></span><Icon name="next" size={16} />
       </button>
       <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>아고다 항공 <Icon name="link" /></a>
+      {id === "mon-gobi" && <p className="xs muted">도착은 울란바토르(UBN)예요. 고비사막까지는 별도 이동이 필요해요.</p>}
+      {flightDateNotice(q) && <p className="xs muted">{flightDateNotice(q)}</p>}
       {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
       <div className="grid-2">
         <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} {...aff}>Aviasales <Icon name="link" /></a>
@@ -67,6 +69,8 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         {hotels.length > 3 && !all && <button type="button" className="xs link-btn" onClick={() => setAll(true)}>숙소 더 보기 ({hotels.length}곳) ▾</button>}
       </div>}
       <a className="btn btn-teal btn-block" href={hotelSearchUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>아고다 {r.region.name} 호텔 <Icon name="link" /></a>
+      {agodaStayNotice(r.region, q) && <p className="xs muted">{agodaStayNotice(r.region, q)}</p>}
+      {id === "mon-gobi" && <p className="xs muted">숙소 검색 지역: 달란자드가드</p>}
       <div className="grid-2">
         <a className="btn btn-block" href={klookStayUrl(r.region, q)} onClick={() => track("hotel", id)} {...aff}>클룩 <Icon name="link" /></a>
         <a className="btn btn-block" href={bookingComUrl(r.region, q)} onClick={() => track("hotel", id)} {...ext}>부킹닷컴 <Icon name="link" /></a>

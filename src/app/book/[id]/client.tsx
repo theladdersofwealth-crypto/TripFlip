@@ -13,7 +13,7 @@ import { boardKey, emptyBoard } from "@/services/planner";
 import { estimateTripCost, scoreRegions, tripDays } from "@/services/regionScore";
 import type { StayTier } from "@/services/regionScore";
 import { hotelKo, pickPrice } from "@/components/PriceSheets";
-import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayPrefilled, klookStayUrl } from "@/services/booking";
+import { agodaFlightMissingKids, agodaFlightUrl, agodaStayNotice, flightDateNotice, bookingComUrl, STAY_TIERS, childAgesForBooking, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayPrefilled, klookStayUrl } from "@/services/booking";
 import { useLivePrices } from "@/lib/livePrices";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/affiliate";
@@ -80,6 +80,8 @@ export default function BookPage() {
         <p className="xs muted">선호는 계획에 저장돼요. 실제 항공사·수하물·도착시간은 예약처에서 비교해 주세요.</p>
         {unknownAges && <p className="xs muted">자녀 나이가 미확인이에요. 예약처에서 정확한 나이와 인원을 다시 입력해 주세요.</p>}
         <a className="btn btn-teal btn-block" href={agodaFlightUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 <Icon name="link" /></a>
+        {id === "mon-gobi" && <p className="xs muted">도착은 울란바토르(UBN)예요. 고비사막까지는 별도 이동이 필요해요.</p>}
+        {flightDateNotice(q) && <p className="xs muted">{flightDateNotice(q)}</p>}
         {agodaFlightMissingKids(r.region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
         <div className="grid-2">
           <a className="btn btn-block" href={flightAffiliateUrl(r.region, q)} onClick={() => track("flight", id)} target="_blank" rel="noopener noreferrer sponsored">Aviasales <Icon name="link" /></a>
@@ -106,7 +108,9 @@ export default function BookPage() {
           <a className="btn btn-block" href={klookStayUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer sponsored">클룩 {r.region.name} 호텔 목록 <Icon name="link" /></a>
           <a className="btn btn-block" href={bookingComUrl(r.region, nextQuery)} onClick={() => track("hotel", id)} target="_blank" rel="noopener noreferrer">부킹닷컴 <Icon name="link" /></a>
         </div>
-        <p className="xs faint">{klookStayPrefilled(r.region) ? "클룩·부킹닷컴·아고다 모두 날짜·인원이 입력된 채로 열려요. 클룩은 도시 호텔 목록으로 열려요." : `클룩 호텔은 ${r.region.name} 도시 번호를 아직 몰라 열린 화면에서 도시·날짜를 골라 주세요. 부킹닷컴·아고다는 날짜·인원이 입력된 채로 열려요.`} 숙소 후보를 누르면 아고다에서 그 숙소 이름으로 열려요.</p>
+        {agodaStayNotice(r.region, nextQuery) && <p className="xs muted">{agodaStayNotice(r.region, nextQuery)}</p>}
+        {id === "mon-gobi" && <p className="xs muted">숙소 검색 지역: 달란자드가드</p>}
+        <p className="xs faint">아고다 숙소 후보 링크는 해당 도시 목록으로 열릴 수 있어요. {klookStayPrefilled(r.region) ? "클룩은 도시 호텔 목록으로 열려요." : "클룩에서 도시와 날짜를 직접 골라 주세요."}</p>
         <label className="check-row"><input type="checkbox" checked={booked.hotel} onChange={(e) => setBooked((v) => ({ ...v, hotel: e.target.checked }))} />숙소 예약 완료 (직접 확인)</label>
       </section>
       <section className="book-card">

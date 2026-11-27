@@ -8,7 +8,7 @@ import { liveFlightInfo, liveSummary } from "@/lib/livePrices";
 import { loadFlightSamples } from "@/lib/flightSamples";
 import type { FlightSample } from "@/lib/flightSamples";
 import type { HotelPick } from "@/services/booking";
-import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl, klookHotelStayUrl } from "@/services/booking";
+import { agodaFlightMissingKids, agodaFlightUrl, agodaStayNotice, flightDateNotice, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelSearchUrl, klookHotelStayUrl } from "@/services/booking";
 import { AFFILIATE_NOTE } from "@/lib/legal";
 import { PILOT_TWIN_OF } from "@/services/regionScore";
 import type { RegionQuery, StayTier } from "@/services/regionScore";
@@ -65,11 +65,13 @@ export function FlightSheet({ region, q, flightKrw, onClose }: { region: RegionV
     <CenterModal open onClose={onClose} title={`✈️ 인천 ↔ ${region.name} 항공`}
       foot={<>
         <a className="btn btn-primary btn-block" href={agodaFlightUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아고다 항공 (한국어) <Icon name="link" /></a>
+        {flightDateNotice(q) && <p className="xs muted">{flightDateNotice(q)}</p>}
         {agodaFlightMissingKids(region, q) && <p className="xs muted">아고다 항공 링크엔 어른 인원만 들어가요. 아이 인원은 아고다에서 추가해 주세요.</p>}
-        <a className="btn btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아비아세일즈로 내 날짜 검색 (제휴) <Icon name="link" /></a>
+        <a className="btn btn-block" href={flightAffiliateUrl(region, q)} target="_blank" rel="noopener noreferrer sponsored">아비아세일즈 항공 검색 (제휴) <Icon name="link" /></a>
         <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         <a className="btn btn-block" href={flightSearchUrl(region, q)} target="_blank" rel="noopener noreferrer">스카이스캐너 한국어로 검색 <Icon name="link" /></a>
       </>}>
+      {region.id === "mon-gobi" && <p className="small muted">도착은 울란바토르(UBN)예요. 고비사막까지는 별도 이동이 필요해요.</p>}
       <div className="sheet-box">
         <span className="xs muted">경비에 넣은 값</span>
         <b>{flightKrw == null ? "미확인" : `1인 왕복 약 ${man(flightKrw)}`}</b>
@@ -114,7 +116,9 @@ export function HotelSheet({ hotel, tier, region, q, onClose }: { hotel: HotelPi
   return (
     <CenterModal open onClose={onClose} title={`🏨 ${info?.[0] ?? name}`}
       foot={<>
-        <a className="btn btn-primary btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer sponsored">아고다에서 이 숙소 보기 (제휴 · 날짜·인원 입력됨) <Icon name="link" /></a>
+        <a className="btn btn-primary btn-block" href={hotelSearchUrl(region, q, name)} target="_blank" rel="noopener noreferrer sponsored">아고다에서 {region.name} 숙소 검색 (제휴) <Icon name="link" /></a>
+        {agodaStayNotice(region, q) && <p className="xs muted">{agodaStayNotice(region, q)}</p>}
+        {region.id === "mon-gobi" && <p className="xs muted">숙소 검색 지역: 달란자드가드</p>}
         <p className="xs faint" style={{ textAlign: "center" }}>{AFFILIATE_NOTE}</p>
         {klookDetail && <a className="btn btn-block" href={klookDetail} target="_blank" rel="noopener noreferrer sponsored">클룩에서 이 숙소 보기 (제휴 · 날짜·인원 입력됨) <Icon name="link" /></a>}
         <a className="btn btn-block" href={bookingComUrl(region, q, name)} target="_blank" rel="noopener noreferrer">부킹닷컴에서 이 숙소 보기 (날짜·인원 입력됨) <Icon name="link" /></a>
