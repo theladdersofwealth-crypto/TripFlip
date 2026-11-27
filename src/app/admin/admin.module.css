@@ -50,7 +50,7 @@
 .hero { background: #123d33; color: #fbfff9; border-radius: 20px; padding: clamp(17px, 4vw, 30px); }
 .hero p { margin: 0; color: #c6e5d9; font-size: 14px; }
 .heroRow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.exit { flex-shrink: 0; background: transparent; color: #fff; padding: 0 12px; border-color: #9ac4b4; font-size: 13px; }
+.exit { display: inline-flex; align-items: center; text-decoration: none; flex-shrink: 0; background: transparent; color: #fff; padding: 0 12px; border-color: #9ac4b4; font-size: 13px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 14px 0 2px; }
 .tabs, .period { display: flex; flex-wrap: wrap; gap: 5px; }
 .toolbar button { background: #fff; color: var(--admin-ink); padding: 0 10px; border-color: var(--admin-border); font-size: 13px; }

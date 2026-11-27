@@ -71,6 +71,37 @@ test("관리자 통계는 소셜 회원 가입 후에도 퍼널과 회원 수를
     assert.equal(data.funnel.visit, 1);
     assert.equal(data.funnel.save, 0);
     assert.deepEqual(data.members, { total: 1, today: 1, activeToday: 1 });
+    // Rollout mode: only a verified Google login for the configured account earns a grant.
+    const ownerEmail = "fixture-owner@example.test";
+    const ownerDigest = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ownerEmail)))].map((v) => v.toString(16).padStart(2, "0")).join("");
+    const ownerConfig = { ADMIN_GOOGLE_EMAIL_SHA256: ownerDigest };
+    const ownerStats = new Stats({ storage }, ownerConfig);
+    const ownerEnv = { ...env, ...ownerConfig, STATS: { idFromName: (s: string) => s, get: () => ownerStats } };
+    const google = (email: string, subject: string, emailVerified: boolean) => ({ provider: "google", email, subject, emailVerified, name: "테스트" });
+    const owner = await ownerStats.oauthAccount(google(ownerEmail, "owner-subject", true), "login", null, null, vid);
+    const nonGoogle = await ownerStats.oauthAccount({ ...google(ownerEmail, "kakao-subject", true), provider: "kakao" }, "login", null, null, vid);
+    const unverified = await ownerStats.oauthAccount(google("someone@example.test", "other-subject", false), "login", null, null, vid);
+    const verifyAdmin = (path: string, token?: string, method = "GET") => worker.fetch(new Request("https://worker.example.test" + path, {
+      method, headers: token ? { authorization: `Bearer ${token}` } : {},
+    }), ownerEnv);
+    assert.equal(owner.uid, nonGoogle.uid); // Even a linked provider’s session is not an admin session.
+    for (const path of ["/stats", "/users", `/user?id=${owner.uid}`]) {
+      for (const token of [undefined, adminKey, user.token, nonGoogle.token, unverified.token]) assert.equal((await verifyAdmin(path, token)).status, 401);
+      assert.equal((await verifyAdmin(path, owner.token)).status, 200);
+    }
+    assert.equal((await verifyAdmin(`/user?id=${user.uid}`, nonGoogle.token, "DELETE")).status, 401);
+    assert.equal((await verifyAdmin(`/user?id=${owner.uid}`, owner.token, "DELETE")).status, 403);
+    await ownerStats.logout({ token: owner.token });
+    assert.equal((await verifyAdmin("/stats", owner.token)).status, 401);
+    const freshOwner = await ownerStats.oauthAccount(google(ownerEmail, "owner-subject", true), "login", null, null, vid);
+    assert.equal((await verifyAdmin("/stats", freshOwner.token)).status, 200);
+    t.mock.timers.setTime(Date.now() + 8 * 86400000);
+    assert.equal((await verifyAdmin("/stats", freshOwner.token)).status, 401);
+    t.mock.timers.setTime(Date.parse("2026-11-27T12:00:00Z"));
+    ownerStats.eraseUser(owner.uid);
+    ownerStats.eraseUser(unverified.uid);
+    await record.me({ token: user.token });
+
     const uid = user.uid!;
     const request = (path: string, options: RequestInit = {}) => worker.fetch(new Request("https://worker.example.test" + path, options), env);
     const admin = { headers: { authorization: `Bearer ${adminKey}` } };

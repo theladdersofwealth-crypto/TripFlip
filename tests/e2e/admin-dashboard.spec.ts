@@ -6,7 +6,13 @@ const member = {
   visitsAll: 0, daysAll: 0, visits: 0, days: 0, regions: 0, flight: 0, hotel: 0, save: 0,
 };
 
-test("관리자 로그인·조회·회원 검색은 실데이터 없이 동작하고 관리자 키를 보관하지 않는다", async ({ page }) => {
+test("운영자 소셜 세션으로만 관리자 조회가 열리고 계정 전환 시 닫힌다", async ({ page }) => {
+  const setAccount = async (token: string) => page.evaluate((v) => {
+    localStorage.setItem("tripflip:auth", JSON.stringify({ token: v, nick: "테스트" }));
+    window.dispatchEvent(new Event("tripflip:auth"));
+  }, token);
+  await page.route("**/me", (route) => route.fulfill({ json: { ok: true, nick: "테스트" } }));
+  await page.route("**/plans", (route) => route.fulfill({ json: { ok: true, plans: [] } }));
   let health: 200 | 503 = 503;
   let memberStatus: 200 | 401 = 200;
   let deletes = 0;
@@ -37,14 +43,13 @@ test("관리자 로그인·조회·회원 검색은 실데이터 없이 동작�
 
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
-  await page.getByLabel("관리자 키").fill("wrong-key");
-  await page.getByRole("button", { name: "들어가기" }).click();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("키가 맞지");
-  await page.getByLabel("관리자 키").fill("fixture-admin");
-  await page.getByRole("button", { name: "들어가기" }).click();
+  await expect(page.getByRole("link", { name: "운영자 구글 계정으로 로그인" })).toBeVisible();
+  await setAccount("ordinary-member");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("권한이 없거나");
+  await setAccount("fixture-admin");
   await expect(page.getByRole("main").getByRole("alert")).toContainText("연결하지 못했어요");
   health = 200;
-  await page.getByRole("button", { name: "들어가기" }).click();
+  await page.getByRole("button", { name: "다시 시도", exact: true }).click();
   await expect(page.getByRole("heading", { name: "트립플립 운영 현황" })).toBeVisible();
   await expect(page.getByText("오늘 방문자", { exact: true })).toBeVisible();
 
@@ -73,8 +78,10 @@ test("관리자 로그인·조회·회원 검색은 실데이터 없이 동작�
   memberStatus = 401;
   await page.getByRole("button", { name: "새로고침", exact: true }).click();
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("키가 맞지");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("권한이 없거나");
+  memberStatus = 200;
   await page.reload();
+  await expect(page.getByRole("heading", { name: "트립플립 운영 현황" })).toBeVisible();
+  await page.evaluate(() => { localStorage.removeItem("tripflip:auth"); window.dispatchEvent(new Event("tripflip:auth")); });
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
-  await expect(page.getByLabel("관리자 키")).toHaveValue("");
 });

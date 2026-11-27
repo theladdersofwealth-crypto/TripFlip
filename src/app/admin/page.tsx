@@ -1,8 +1,11 @@
 "use client";
 // 관리자 통계: 일별 방문자, 사용 흐름(퍼널), 인기 권역. 데이터는 tripflip-stats Worker.
-// 메뉴에 노출하지 않고 /admin 주소로만 들어온다. 비밀번호는 Worker 비밀값 ADMIN_KEY.
+// The Worker authorizes only the owner’s Google session. UI state is not a permission check.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./admin.module.css";
+import Link from "next/link";
+import { AUTH_EVENT, AUTH_KEY, loadAuth } from "@/lib/account";
+import { NEXT_KEY } from "@/components/AppShell";
 import { NO_TRACK_KEY, STATS_URL, activityLabel } from "@/lib/analytics";
 import { ALL_REGIONS } from "@/services/regionScore";
 import { TRAVEL_AREAS } from "@/data/travelAreas";
@@ -37,7 +40,7 @@ const store = {
   get: (k: string) => { try { return localStorage.getItem(k); } catch { return null; } },
   set: (k: string, v: string | null) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} },
 };
-// The admin key only lives in memory. Old persistent copies are removed.
+// Remove old shared-key copies when migrating to the owner’s Google session.
 const clearLegacyAdminKey = () => {
   store.set(KEY_STORE, null);
   document.cookie = "tf_admin=; Max-Age=0; Path=/admin; SameSite=Strict" + (location.protocol === "https:" ? "; Secure" : "");
@@ -45,7 +48,8 @@ const clearLegacyAdminKey = () => {
 
 export default function AdminPage() {
   const [key, setKey] = useState("");
-  const [input, setInput] = useState("");
+  const sessionToken = useRef<string | null>(null);
+  const [accountLoaded, setAccountLoaded] = useState(false);
   const [days, setDays] = useState(30);
   const todayKst = kst(Date.now()).slice(0, 10);
   const earliest = kst(Date.now() - 364 * 86400000).slice(0, 10);
@@ -63,21 +67,32 @@ export default function AdminPage() {
   const [revision, setRevision] = useState(0);
   const [verified, setVerified] = useState(false);
 
-  const signOut = useCallback((message = "") => {
-    setKey("");
-    setInput("");
+  const reset = useCallback((message = "") => {
     setData(null);
     setVerified(false);
     setError(message);
     setLoading(false);
     setTab("stats");
   }, []);
-  const invalidKey = useCallback(() => signOut("관리자 키가 맞지 않아요. 다시 입력해 주세요."), [signOut]);
+  const invalidKey = useCallback(() => reset("관리자 권한이 없거나 세션이 만료됐어요. 운영자 구글 계정으로 다시 로그인해 주세요."), [reset]);
 
   useEffect(() => {
     clearLegacyAdminKey();
     setNoTrack(store.get(NO_TRACK_KEY) === "1");
-  }, []);
+    const update = () => {
+      const token = loadAuth()?.token ?? "";
+      if (sessionToken.current !== token) { sessionToken.current = token; reset(); setKey(token); }
+      setAccountLoaded(true);
+    };
+    const onStorage = (e: StorageEvent) => { if (e.key === AUTH_KEY || e.key === null) update(); };
+    update();
+    window.addEventListener(AUTH_EVENT, update);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, update);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, [reset]);
 
   useEffect(() => {
     if (!key) return;
@@ -88,13 +103,13 @@ export default function AdminPage() {
     setData(null);
     fetch(`${STATS_URL}/stats?${rangeQuery}`, { headers: { authorization: `Bearer ${key}` }, cache: "no-store", signal })
       .then(async (res) => {
-        if (signal.aborted) return;
+        if (signal.aborted || sessionToken.current !== key) return;
         if (res.status === 401) { invalidKey(); return; }
         if (!res.ok) throw new Error(String(res.status));
         const j = (await res.json()) as Stats;
         if (j.ok !== true || !Array.isArray(j.daily) || !Array.isArray(j.regions) || !j.funnel) throw new Error("Invalid stats");
         if (rangeQuery.startsWith("from=") && new URLSearchParams(rangeQuery).get("to") !== j.to) throw new Error("Range unavailable");
-        if (!signal.aborted) { setData(j); setDataRange(rangeQuery); setVerified(true); setInput(""); }
+        if (!signal.aborted && sessionToken.current === key) { setData(j); setDataRange(rangeQuery); setVerified(true); }
       })
       .catch(() => { if (!signal.aborted) setError("통계 서버에 연결하지 못했어요. 다시 시도해 주세요."); })
       .finally(() => { if (!signal.aborted) setLoading(false); });
@@ -108,20 +123,16 @@ export default function AdminPage() {
       <div className={styles.brand}>TRIPFLIP<span>운영 도구</span></div>
       <h1>관리자 로그인</h1>
       <p>방문 통계와 회원 이용 기록을 확인해요.</p>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        if (loading || !input.trim()) return;
-        setLoading(true);
-        setError("");
-        setKey(input.trim());
-        setRevision((n) => n + 1);
-      }}>
-        <label htmlFor="admin-key">관리자 키</label>
-        <input id="admin-key" type="password" autoComplete="current-password" value={input} disabled={loading} onChange={(e) => setInput(e.target.value)} required />
-        <button className={styles.primary} type="submit" disabled={loading}>{loading ? "확인 중…" : "들어가기"}</button>
+      {(!accountLoaded || loading) ? <p role="status">관리자 권한을 확인하고 있어요…</p> : <>
         {error && <p className={styles.alert} role="alert">{error}</p>}
-      </form>
-      <p className={styles.hint}>일반 회원 로그인과 별개예요. 페이지를 새로고침하면 관리자 키를 다시 입력해야 해요.</p>
+        <div className="stack" style={{ margin: "20px 0" }}>
+          <Link className="btn btn-primary btn-block" href="/account" onClick={() => {
+            if (!key) { try { sessionStorage.setItem(NEXT_KEY, "/admin"); } catch {} }
+          }}>{key ? "내 계정에서 로그인 확인" : "운영자 구글 계정으로 로그인"}</Link>
+          {key && error.startsWith("통계 서버") && <button className="btn" onClick={() => setRevision((n) => n + 1)}>다시 시도</button>}
+        </div>
+        <p className={styles.hint}>일반 트립플립 로그인과 같은 구글 계정을 사용해요. 기존 로그인이라면 내 계정에서 로그아웃한 뒤 다시 로그인해 주세요. 별도 관리자 비밀번호는 사용하지 않아요.</p>
+      </>}
     </section>
   </main>;
 
@@ -130,7 +141,7 @@ export default function AdminPage() {
       <div className={styles.brand}>TRIPFLIP<span>운영 도구</span></div>
       <div className={styles.heroRow}>
         <div><h1>트립플립 운영 현황</h1><p>방문부터 예약처 이동까지 한눈에</p></div>
-        <button className={styles.exit} onClick={() => signOut()}>나가기</button>
+        <Link className={styles.exit} href="/">나가기</Link>
       </div>
     </header>
     <div className={styles.toolbar}>
