@@ -39,10 +39,10 @@ test("관리자 로그인·조회·회원 검색은 실데이터 없이 동작�
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
   await page.getByLabel("관리자 키").fill("wrong-key");
   await page.getByRole("button", { name: "들어가기" }).click();
-  await expect(page.getByRole("alert")).toContainText("키가 맞지");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("키가 맞지");
   await page.getByLabel("관리자 키").fill("fixture-admin");
   await page.getByRole("button", { name: "들어가기" }).click();
-  await expect(page.getByRole("alert")).toContainText("연결하지 못했어요");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("연결하지 못했어요");
   health = 200;
   await page.getByRole("button", { name: "들어가기" }).click();
   await expect(page.getByRole("heading", { name: "트립플립 운영 현황" })).toBeVisible();
@@ -73,7 +73,7 @@ test("관리자 로그인·조회·회원 검색은 실데이터 없이 동작�
   memberStatus = 401;
   await page.getByRole("button", { name: "새로고침", exact: true }).click();
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText("키가 맞지");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("키가 맞지");
   await page.reload();
   await expect(page.getByRole("heading", { name: "관리자 로그인" })).toBeVisible();
   await expect(page.getByLabel("관리자 키")).toHaveValue("");
