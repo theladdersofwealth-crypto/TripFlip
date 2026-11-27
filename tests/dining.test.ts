@@ -48,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 811);
+  assert.equal(imported.length, 882);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 298);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 369);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -259,7 +259,7 @@ test("칭다오 후속 자료는 확인된 세 곳만 추가하고 기존 키와
 });
 
 test("2차 음식점 자료는 달랏 등 5권역의 확인된 68곳만 추가한다", () => {
-  const rows = verifiedDining.slice(743);
+  const rows = verifiedDining.slice(743, 811);
   const byRegion = { "vie-dalat": 17, "vie-hoian": 15, "phi-tagbilaran": 13, "mal-georgetown": 18, "chi-sanya": 5 };
   assert.equal(rows.length, 68);
   assert.deepEqual([...new Set(rows.map(({ region }) => region))].sort(), Object.keys(byRegion).sort());
@@ -278,4 +278,32 @@ test("2차 음식점 자료는 달랏 등 5권역의 확인된 68곳만 추가�
   }
   assert.ok(rows.some(({ nameLocal }) => nameLocal === "Quán 33 Ốc Nhồi Thịt"));
   assert.ok(!rows.some(({ nameLocal }) => nameLocal.includes("hẻm 27")));
+});
+
+test("일본 5권역의 확인된 71곳만 추가하고 기존 두 장소는 원래 ID에 연결한다", () => {
+  const rows = verifiedDining.slice(811);
+  const counts = { "jap-nagoya": 14, "jap-beppu": 19, "jap-matsuyama": 13, "jap-nagasaki": 13, "jap-kagoshima": 12 };
+  assert.equal(rows.length, 71);
+  assert.deepEqual([...new Set(rows.map(({ region }) => region))].sort(), Object.keys(counts).sort());
+  const keys = Object.keys(verifiedDining[810]).sort();
+  for (const [region, count] of Object.entries(counts)) {
+    const group = rows.filter((row) => row.region === region);
+    assert.equal(group.length, count);
+    assert.equal(new Set(group.map(({ nameLocal }) => nameLocal)).size, count);
+  }
+  for (const row of rows) {
+    assert.deepEqual(Object.keys(row).sort(), keys);
+    assert.equal(row.checkedAt, "2026-11-27");
+    assert.ok(!pendingDining.some(({ id, region, nameLocal }) => id === row.id || (region === row.region && nameLocal === row.nameLocal)));
+  }
+  for (const [id, nameLocal] of [
+    ["jap-beppu-10", "地獄蒸し工房 鉄輪"],
+    ["jap-nagasaki-11", "中華料理 四海樓"],
+  ]) {
+    const existing = ALL_PLACES.filter((p) => p.id === id);
+    assert.equal(existing.length, 1);
+    assert.equal(existing[0].dining?.mapRecord?.nameLocal, nameLocal);
+    assert.equal(existing[0].dining?.mapRecord?.status, "confirmed");
+  }
+  assert.equal(rows.filter(({ id }) => id.startsWith("verified-dining-")).length, 69);
 });
