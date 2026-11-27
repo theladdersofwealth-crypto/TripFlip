@@ -20,7 +20,7 @@ test("세 공급자 × 두 호스트: 인가·교환 URI 및 완료 복귀 주�
   assert.equal(ch,"E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM");
   for(const p of PROVIDERS) for(const origin of ALLOWED_ORIGINS){
     const cb = origin + "/auth/" + p + "/callback";
-    const url = new URL(providerUrl(p,env,state,ch,origin));
+    const url: URL = new URL(providerUrl(p,env,state,ch,origin));
     assert.equal(url.searchParams.get("redirect_uri"), cb);
     assert.equal(url.searchParams.get("state"),state);
     assert.equal(url.searchParams.get("code_challenge"),ch);
