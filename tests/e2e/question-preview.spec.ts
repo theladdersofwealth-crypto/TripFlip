@@ -1,0 +1,48 @@
+import {expect,test} from "@playwright/test";
+test("미선택 추천 → 날짜/동행 → 예산·숙소 → 이어서 고르기, 확정 조건 보존",async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.route("https://**/*",r=>r.abort());
+  await page.goto("/");
+  const next=page.getByRole("button",{name:"다음",exact:true});
+  const recommend=page.getByRole("button",{name:"트립플립 추천",exact:true});
+  const readCommitted=()=>page.evaluate(()=>localStorage.getItem("tripflip.flow.query"));
+  await expect(page.getByRole("button",{name:"이전",exact:true})).toHaveCount(0);
+  const initial=await readCommitted();
+  await recommend.click();
+  await expect(page.getByText("기본 조건으로 추천했어요",{exact:true})).toBeVisible();
+  await expect(page.getByText(/편도 5시간 이내 희망/)).toBeVisible();
+  expect(await readCommitted()).toBe(initial);
+  await page.getByRole("link",{name:"조건 이어서 고르기",exact:true}).click();
+  await page.getByRole("button",{name:"혼자",exact:true}).click();
+  await next.click();
+  for(const date of ["2027-05-10","2027-05-15"]){
+    const day=page.getByRole("button",{name:date,exact:true});
+    for(let i=0;i<24&&!(await day.isVisible());i++)await page.getByRole("button",{name:"다음 달",exact:true}).click();
+    await day.click();
+  }
+  await recommend.click();
+  await expect(page.getByText("5박 6일",{exact:true})).toBeVisible();
+  await expect(page.getByText("성인 1명",{exact:true})).toBeVisible();
+  expect(await readCommitted()).toBe(initial);
+  await page.getByRole("link",{name:"조건 이어서 고르기",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"언제 떠나요?"})).toBeVisible();
+  for(let i=0;i<5;i++)await next.click();
+  await page.getByRole("button",{name:"상한 금액",exact:true}).click();
+  await page.getByLabel("일행 전체 예산 만원").fill("300");
+  await next.click();
+  await page.getByLabel("숙소 선호").selectOption("프리미엄");
+  await recommend.click();
+  await expect(page.getByText("전체 300만원 상한",{exact:true})).toBeVisible();
+  expect(await readCommitted()).toBe(initial);
+  await page.getByRole("link",{name:"조건 이어서 고르기",exact:true}).click();
+  await expect(page.getByLabel("숙소 선호")).toHaveValue("프리미엄");
+  await page.getByRole("button",{name:"이전",exact:true}).click();
+  await expect(page.getByLabel("일행 전체 예산 만원")).toHaveValue("300");
+  for(let i=0;i<4;i++)await next.click();
+  await expect(next).toHaveCount(0);
+  await expect(recommend).toBeVisible();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await recommend.click();
+  await page.getByRole("button",{name:"이 조건으로 확정",exact:true}).click();
+  expect(JSON.parse((await readCommitted())??"{}")).toMatchObject({adults:1,startDate:"2027-05-10",endDate:"2027-05-15",stay:"프리미엄",totalBudgetKrw:3000000,maxFlightHours:5});
+});

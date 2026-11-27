@@ -14,7 +14,7 @@ import { MEAL_STYLES, REST, boardKey, byId, candidates, cellLabel, companionsOf,
 import type { MealStyle } from "@/services/planner";
 import { scoreRegions } from "@/services/regionScore";
 import { useLivePrices } from "@/lib/livePrices";
-import { BookTab, FoodTab, REGION_TABS, SightsTab, TabBar } from "@/components/RegionTabs";
+import { BookTab, FoodTab, REGION_TABS, SightsTab, TabBar, MacauDayTrip } from "@/components/RegionTabs";
 import type { RegionTab } from "@/components/RegionTabs";
 
 const CONDITIONS: Condition[] = ["보통", "피곤", "매우 피곤"];
@@ -113,6 +113,7 @@ function BoardInner({ regionId }: { regionId?: string }) {
       </div>
       <p className="small muted" style={{ marginTop: 10 }}>바꾸고 싶은 일정을 눌러보세요. 직접 고른 곳은 다시 추천할 때도 유지돼요.</p>
 
+      {id==="HK"&&<MacauDayTrip/>}
       <nav className="day-jump" aria-label="일차 바로가기">
         {board.days.map((d, di) => (
           <button key={d.date} type="button" onClick={() => document.getElementById(`day-${di + 1}`)?.scrollIntoView({ behavior: "smooth", block: "start" })}>

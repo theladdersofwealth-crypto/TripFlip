@@ -59,15 +59,15 @@ test.beforeEach(async ({ page }) => {
 test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".party-member")).toHaveCount(0);
-  // 1단계 질문이 하나씩: 누구와 → 언제 → 지역 → 취향. 1단계를 끝내기 전엔 추천 버튼이 없다.
-  const submit = page.getByRole("button", { name: /추천받기 · 조건/ });
-  await expect(submit).toHaveCount(0);
+  // 첫 질문부터 추천 가능. 선택하지 않은 항목은 기본값.
+  const submit = page.getByRole("button", { name: "트립플립 추천", exact: true });
+  await expect(submit).toBeEnabled();
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByRole("button", { name: "+ 자녀", exact: true }).click();
   await page.getByLabel("3번째 구성원 나이", { exact: true }).fill("21");
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
-  await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
 
   await expect(page.getByRole("heading", { name: "언제 떠나요?" })).toBeVisible();
   // 날짜는 출발 → 귀국 두 번만 누르면 되고, 박수는 따로 묻지 않는다.
@@ -75,15 +75,13 @@ test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) =
   await pickRange(page, "2027-05-10", "2027-05-20");
   await expect(page.getByText("기준 일정 10박 11일", { exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
-  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
-  await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await expect(page.getByText("여행 조건 반영 1/3", { exact: true })).toBeVisible();
-  // 1단계가 끝나면 "2단계로 / 이대로 추천" 중에 고른다.
-  await expect(page.getByRole("button", { name: /^2단계로 조건 더 넣기/ })).toBeVisible();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await expect(submit).toBeEnabled();
   await submit.click();
+  await expect(page).toHaveURL(/\/results\?preview=1$/);
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("성인 3명", { exact: true })).toBeVisible();
   const query = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}"));
@@ -137,12 +135,12 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await memberCards.nth(4).getByLabel("긴 도보·계단이 부담스러워요", { exact: true }).check();
 
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
-  await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await pickRange(page, "2027-05-07", "2027-05-17");
-  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
-  const travelStyle = page.locator(".flow-step.open");
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  const travelStyle = page.locator(".question-dialog");
   // 메인은 한 번 눌러 바꾸고(기본 메인 관광 → 휴양), 서브는 누른 순서대로 번호가 붙는다.
   await expect(travelStyle.getByRole("button", { name: "메인 관광", exact: true })).toHaveAttribute("aria-pressed", "true");
   await travelStyle.getByRole("button", { name: "메인 휴양", exact: true }).click();
@@ -152,29 +150,26 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(travelStyle.locator(".sub-num")).toHaveText(["1", "2"]);
   await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
   await expect(travelStyle.locator(".sub-num")).toHaveText(["1"]);
-  await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await expect(page.getByText("여행 조건 반영 1/3", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "알차게 · 3곳", exact: true })).toHaveCount(0);
-  // 1단계가 끝나면 2단계로 갈지 이대로 추천받을지 고른다. 하나만 고르는 질문은 누르면 바로 다음으로.
-  await expect(page.getByRole("button", { name: "이대로 추천받기 · 조건 1/3" })).toBeVisible();
-  await page.getByRole("button", { name: /^2단계로 조건 더 넣기/ }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "상관없음", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "알차게 · 3곳", exact: true }).click();
-  await expect(page.getByText("여행 조건 반영 2/3", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "이대로 추천받기 · 조건 2/3" })).toBeVisible();
-  await page.getByRole("button", { name: /^3단계로 조건 더 넣기/ }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
   await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
-  await page.getByRole("button", { name: "다음 · 숙소 →", exact: true }).click();
-  await page.getByRole("button", { name: "저렴", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("가성비");
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "저렴", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("3");
-  await page.getByRole("button", { name: /^3단계 완료/ }).click();
-  const findNow = page.getByRole("button", { name: "이대로 추천받기 · 조건 3/3" });
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  const findNow = page.getByRole("button", { name: "트립플립 추천", exact: true });
   await expect(findNow).toBeVisible();
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("family-mobile.png"), fullPage: true });
   await findNow.click();
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("성인 4명 · 자녀 2명", { exact: true })).toBeVisible();
   const query = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}"));
@@ -311,17 +306,20 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
-  await page.getByRole("button", { name: /^✓ 1단계 · 기본/ }).click();
-  await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
+  // Restore whichever slide the draft last used, then move back to the date slide.
+  for(let i=0;i<11 && !(await page.getByRole("heading",{name:"언제 떠나요?"}).isVisible());i++){
+    if(await page.getByRole("button",{name:"이전",exact:true}).isVisible()) await page.getByRole("button", { name: "이전", exact: true }).click();
+    else await page.getByRole("button", { name: "다음", exact: true }).click();
+  }
   await pickRange(page, "2027-06-01", "2027-06-04");
-  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
-  await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
-  await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await page.getByRole("button", { name: /^2단계로 조건 더 넣기/ }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "8시간", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "보통 · 2곳", exact: true }).click();
-  await page.getByRole("button", { name: /^이대로 추천받기/ }).click();
+  await page.getByRole("button", { name: "트립플립 추천", exact: true }).click();
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.goto("/r/NT");
   await expect(page.locator(".day-card")).toHaveCount(4);
@@ -353,7 +351,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
 test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼쳐서 확인한다", async ({ page }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("button", { name: /① 누구와/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "트립플립 추천", exact: true })).toBeVisible();
   // 1단계 첫 질문만 보이고, 날짜·2·3단계는 아직 펼치지 않는다.
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();
   await expect(page.getByRole("button", { name: "다음 달", exact: true })).toHaveCount(0);

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { RegionQuery } from "@/services/regionScore";
 import type { Board } from "@/services/planner";
 import { normalizeParty } from "@/lib/travelParty";
+import { QUESTIONS, recommendationDefaults, selectedQuestions, questionIndex, defaultLabels, type Question } from "@/lib/questionFlow";
 import { addCalendarDays, calendarDays, travelDateError } from "@/lib/travelDates";
 
 export type Transport = "택시·그랩" | "대중교통" | "렌터카" | "도보";
@@ -55,7 +56,7 @@ const K = { query: "tripflip.flow.query", homeDraft: "tripflip.flow.home-draft",
 const mem = new Map<string, unknown>();
 export const STORAGE_FAIL_EVENT = "tripflip:storage-fail";
 /** 테스트용: 메모리 대체 저장 비우기 */
-export const resetStorageFallback = () => mem.clear();
+export const resetStorageFallback = () => { mem.clear(); previewMemory = null; };
 
 function read<T>(key: string, fallback: T): T {
   if (mem.has(key)) return mem.get(key) as T;
@@ -89,7 +90,7 @@ function committedQuery(): RegionQuery | null {
 export const loadQuery = (): RegionQuery => committedQuery() ?? normalizeParty(DEFAULT_QUERY);
 export const saveQuery = (q: RegionQuery) => write(K.query, q);
 
-export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null };
+export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null; slide?: number; answered?: Question[] };
 type HomeDraft = { q: RegionQuery; progress: HomeProgress; base: string };
 
 // 홈에서 아직 추천에 적용하지 않은 편집은 기존 결과·일정과 별도. 다른 화면에서 조건을
@@ -104,6 +105,57 @@ export function loadHomeDraft(): { q: RegionQuery; progress: HomeProgress | null
 }
 export function saveHomeDraft(q: RegionQuery, progress: HomeProgress) {
   write(K.homeDraft, { q, progress, base: JSON.stringify(committedQuery()) });
+}
+// Preview is tab-local; it never writes the confirmed search or boards.
+const PREVIEW_KEY = "tripflip.flow.question-preview";
+const CONFIRMED_DEFAULTS = "tripflip.flow.confirmed-defaults";
+type QuestionPreview = { q: RegionQuery; progress: HomeProgress; defaults: string[] };
+let previewMemory: QuestionPreview | null = null;
+export function makeQuestionDraft(resume = false) {
+  const snapshot = resume ? loadQuestionPreview() : null;
+  if (snapshot) return { q:snapshot.q, slide:questionIndex(snapshot.progress.slide), answered:selectedQuestions(snapshot.progress.answered) };
+  const saved = loadHomeDraft();
+  const p = saved.progress;
+  if (p && typeof p.slide === "number" && Array.isArray(p.answered)) {
+    return { q: saved.q, slide: questionIndex(p.slide), answered: selectedQuestions(p.answered) };
+  }
+  if (!saved.hasSearch && !p) return { q: recommendationDefaults(saved.q), slide:0, answered:[] as Question[] };
+  const legacySlide = p?.open === 0 ? p.question : p?.open === 1 ? 4+p.question : p?.open === 2 ? 6+p.question : p?.choice === 2 ? 7 : p?.choice === 1 ? 6 : p?.choice === 0 ? 4 : 0;
+  const base = DEFAULT_QUERY, q = saved.q;
+  const changed = (a:unknown,b:unknown) => JSON.stringify(a)!==JSON.stringify(b);
+  const answered = saved.hasSearch ? [...QUESTIONS] : selectedQuestions([
+    ...(changed([q.members,q.adults,q.children,q.elders],[base.members,base.adults,base.children,base.elders])?["who"]:[]),
+    ...(changed([q.startDate,q.endDate,q.dateWindow],[base.startDate,base.endDate,base.dateWindow])?["when"]:[]),
+    ...(q.preferredAreas?.length?["area"]:[]),
+    ...(changed([q.main,q.subs,q.interests],[base.main,base.subs,base.interests])?["vibe"]:[]),
+    ...(q.maxFlightHours!==base.maxFlightHours||p?.done?.[1]||p?.open===1&&p.question>0?["flight"]:[]),...(q.perDay!==base.perDay?["intensity"]:[]),
+    ...(q.totalBudgetKrw!=null?["budget"]:[]),...(q.stay!==base.stay?["stay"]:[]),...(q.price!==base.price?["price"]:[]),
+    ...(q.roomCount!=null?["rooms"]:[]),...(q.pet?["pet"]:[]),
+  ]);
+  return { q: !answered.includes("flight") ? {...q,maxFlightHours:5} : q, slide:questionIndex(legacySlide), answered };
+}
+export function saveQuestionPreview(q: RegionQuery, progress: HomeProgress) {
+  const current=normalizeParty(q);
+  const snapshot: QuestionPreview={q:current,progress,defaults:defaultLabels(current,selectedQuestions(progress.answered))};
+  try { sessionStorage.setItem(PREVIEW_KEY,JSON.stringify(snapshot)); previewMemory=null; }
+  catch { previewMemory=snapshot; }
+  saveHomeDraft(q,progress);
+  return snapshot;
+}
+export function loadQuestionPreview(): QuestionPreview | null {
+  let snapshot: QuestionPreview | null=previewMemory;
+  if(!snapshot) { try { const raw=sessionStorage.getItem(PREVIEW_KEY); snapshot=raw?JSON.parse(raw):null; } catch {} }
+  if (!snapshot || !queryShape(snapshot.q) || travelDateError(snapshot.q) || !Array.isArray(snapshot.progress?.answered)) return null;
+  return {...snapshot,defaults:defaultLabels(snapshot.q,selectedQuestions(snapshot.progress.answered))};
+}
+export function confirmQuestionPreview(snapshot: QuestionPreview) {
+  saveQuery(snapshot.q);
+  saveHomeDraft(snapshot.q,snapshot.progress);
+  write(CONFIRMED_DEFAULTS,{base:JSON.stringify(committedQuery()),defaults:snapshot.defaults});
+}
+export function confirmedDefaultLabels(q: RegionQuery): string[] {
+  const record=read<{base:string;defaults:string[]}|null>(CONFIRMED_DEFAULTS,null);
+  return record?.base===JSON.stringify(q) && Array.isArray(record.defaults) ? record.defaults : [];
 }
 export const loadPrefs = (regionId: string, planId?: string | null) => ({ ...DEFAULT_PREFS, ...((planId ? loadPlans().find((p) => p.id === planId)?.prefs : undefined) ?? read<Record<string, DayPrefs>>(K.prefs, {})[regionId]) });
 export function savePrefs(regionId: string, p: DayPrefs, planId?: string | null) {
