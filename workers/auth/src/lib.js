@@ -10,10 +10,26 @@ export const CALLBACK = callbackUri("google", ORIGIN);
 // Compare the persisted start origin and provider, not headers supplied by the caller.
 export const matchesFlow = (data, provider, origin) => !!data && allowedOrigin(origin) && data.origin === origin && data.provider === provider;
 export const sameOriginPost = (requestOrigin, origin) => allowedOrigin(origin) && requestOrigin === origin;
-export function accountReturn(origin, ok) {
+export const validReason = r => typeof r === "string" && /^[a-z0-9_]{1,40}$/.test(r);
+export function accountReturn(origin, ok, reason) {
   if (!allowedOrigin(origin)) throw Error("invalid OAuth origin");
-  return origin + "/account?oauth=" + (ok ? "done" : "error");
+  return origin + "/account?oauth=" + (ok ? "done" : "error") + (!ok && validReason(reason) ? "&reason=" + reason : "");
 }
+// Coded failure: reason is a short public code; detail holds only provider error codes, HTTP status or field presence.
+// Never put secrets, codes, tokens, cookies or profile values into detail.
+export function oauthFail(reason, detail = {}) {
+  const e = Error(reason);
+  e.reason = reason; e.detail = detail;
+  return e;
+}
+const clip = v => typeof v === "string" ? v.slice(0, 200) : v === undefined ? undefined : String(v).slice(0, 200);
+// Read only the provider's public error fields from a failed token response.
+export async function providerError(response) {
+  let body = null;
+  try { body = await response.json(); } catch {}
+  return { status: response.status, error: clip(body?.error), error_description: clip(body?.error_description ?? body?.error_code) };
+}
+export const secret = v => typeof v === "string" ? v.trim() : v;
 export const TTL = 10 * 60 * 1000;
 export const COOKIE = "__Host-tf-oauth";
 export const random = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join("");
@@ -57,20 +73,21 @@ export function authorizationUrl(clientId, state, codeChallenge, origin = ORIGIN
 }
 export async function exchangeGoogle(env, code, verifier, request = fetch, origin = ORIGIN) {
   const response = await request("https://oauth2.googleapis.com/token", {
-    method: "POST", redirect: "error", headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ code, client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET,
+    method: "POST", redirect: "manual", headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ code, client_id: secret(env.GOOGLE_CLIENT_ID), client_secret: secret(env.GOOGLE_CLIENT_SECRET),
       redirect_uri: callbackUri("google", origin), grant_type: "authorization_code", code_verifier: verifier }),
     signal: AbortSignal.timeout(10000),
   });
-  if (!response.ok) throw Error("oauth exchange failed");
+  if (!response.ok) throw oauthFail("token_http", await providerError(response));
   const token = await response.json();
-  if (typeof token.access_token !== "string" || !token.access_token || String(token.token_type).toLowerCase() !== "bearer") throw Error("invalid token response");
+  if (typeof token.access_token !== "string" || !token.access_token || String(token.token_type).toLowerCase() !== "bearer") throw oauthFail("token_invalid", { hasAccessToken: typeof token.access_token === "string", tokenType: clip(token.token_type) });
   // Use only the authenticated Google UserInfo endpoint; do not trust browser claims or unverified JWT payloads.
   const profile = await request("https://openidconnect.googleapis.com/v1/userinfo", {
-    headers: { authorization: "Bearer " + token.access_token }, redirect: "error", signal: AbortSignal.timeout(10000),
+    headers: { authorization: "Bearer " + token.access_token }, redirect: "manual", signal: AbortSignal.timeout(10000),
   });
-  if (!profile.ok) throw Error("userinfo failed");
-  const identity = googleProfile(await profile.json());
-  if (!identity) throw Error("verified email required");
+  if (!profile.ok) throw oauthFail("profile_http", { status: profile.status });
+  const raw = await profile.json();
+  const identity = googleProfile(raw);
+  if (!identity) throw oauthFail("profile_invalid", { hasSub: typeof raw?.sub === "string", hasEmail: typeof raw?.email === "string", emailVerified: raw?.email_verified === true, hasName: typeof raw?.name === "string" });
   return identity;
 }

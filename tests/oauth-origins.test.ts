@@ -29,7 +29,7 @@ test("세 공급자 × 두 호스트: 인가·교환 URI 및 완료 복귀 주�
     assert.equal(accountReturn(origin,true),origin+"/account?oauth=done");
     assert.equal(accountReturn(origin,false),origin+"/account?oauth=error");
     const mock:typeof fetch = async(input,init)=>{
-      assert.equal(init?.redirect,"error");
+      assert.equal(init?.redirect,"manual");
       if(String(input).endsWith("/token")){
         const body=new URLSearchParams(String(init?.body));
         assert.equal(body.get("redirect_uri"),cb);

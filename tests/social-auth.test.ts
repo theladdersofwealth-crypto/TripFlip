@@ -41,7 +41,7 @@ test("카카오·네이버 코드 교환: 고정 HTTPS, verifier, 네이버 stat
     const calls:string[]=[];
     const mock:typeof fetch=async(input,init)=>{
       const url=String(input);calls.push(url);
-      assert.equal(init?.redirect,"error");
+      assert.equal(init?.redirect,"manual");
       if(url.endsWith("/token")){
         const body=new URLSearchParams(String(init?.body));
         assert.equal(body.get("code_verifier"),"verifier");

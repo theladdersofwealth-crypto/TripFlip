@@ -6,3 +6,4 @@ export function enabled(env: Record<string,string>, p: SocialProvider): boolean;
 export function providerUrl(p: SocialProvider, env: Record<string,string>, state: string, ch: string, origin?: string): string;
 export function socialProfile(p: SocialProvider, raw: unknown): SocialIdentity | null;
 export function exchangeProvider(p: SocialProvider, env: Record<string,string>, code: string, verifier: string, state: string, request?: typeof fetch, origin?: string): Promise<SocialIdentity>;
+export function profileShape(p: SocialProvider, raw: unknown): Record<string, unknown>;
