@@ -48,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 673);
+  assert.equal(imported.length, 740);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 160);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 227);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -175,7 +175,7 @@ test("4차 미식 데이터는 지정 필드만 넣고 기존 시장 ID와 확�
 });
 
 test("5차 자료는 앱의 4권역에만 연결하고 동네 및 기존 장소 ID를 유지한다", () => {
-  const confirmed = verifiedDining.slice(576);
+  const confirmed = verifiedDining.slice(576, 673);
   const pending = pendingDining.slice(42);
   assert.equal(confirmed.length, 97);
   assert.equal(pending.length, 2);
@@ -210,4 +210,38 @@ test("5차 자료는 앱의 4권역에만 연결하고 동네 및 기존 장소 
     assert.ok(lunch.slice(0, firstPending).some(({ p }) => p.dining?.mapRecord?.status === "confirmed"));
     assert.ok(lunch.slice(firstPending).every(({ p }) => p.dining?.mapRecord?.status === "pending"));
   }
+});
+
+test("나트랑 등 5권역에 확인된 식당만 추가하고 기존 장소를 중복 생성하지 않는다", () => {
+  const rows = verifiedDining.slice(673);
+  const countByRegion: Record<string, number> = { NT: 19, "nor-garapan": 10, "tha-pattaya": 14, "tai-kaohsiung": 23, "chi-qingdao": 1 };
+  const fields = ["id", "region", "nameLocal", "nameEn", "nameKo", "area", "kind", "styles", "cuisine", "signature", "priceLevel", "sourceUrl", "checkedAt"].sort();
+  assert.equal(rows.length, 67);
+  assert.equal(new Set(rows.map((row) => JSON.stringify([row.region, row.nameLocal]))).size, rows.length);
+  assert.deepEqual(new Set(rows.map((row) => row.region)), new Set(Object.keys(countByRegion)));
+  for (const [region, count] of Object.entries(countByRegion)) {
+    assert.equal(rows.filter((row) => row.region === region).length, count);
+  }
+  for (const row of rows) {
+    assert.deepEqual(Object.keys(row).sort(), fields);
+    assert.equal(row.checkedAt, "2026-11-27");
+    assert.equal(row.sourceUrl, null);
+    assert.deepEqual(row.signature, []);
+    assert.ok(!pendingDining.some((pending) => pending.id === row.id));
+  }
+  for (const id of ["wv-bd5889be1bb75f4d18", "vie-nhatrang-x22", "vie-nhatrang-x23", "vie-nhatrang-x40", "vie-nhatrang-x41"]) {
+    const places = ALL_PLACES.filter((place) => place.id === id);
+    assert.equal(places.length, 1);
+    assert.equal(places[0].dining?.mapRecord?.status, "confirmed");
+  }
+  const guide = DINING_PLACES.find((place) => place.id === "wv-bd5889be1bb75f4d18")!;
+  const lacCanh = ALL_PLACES.find((place) => place.id === guide.id)!;
+  assert.equal(lacCanh.lat, guide.lat);
+  assert.equal(lacCanh.lon, guide.lon);
+  assert.equal(lacCanh.dining?.mapRecord?.guideSource?.url, guide.dining?.sourceUrl);
+  assert.equal(lacCanh.dining?.mapRecord?.guideSource?.license, guide.dining?.license);
+  assert.ok(ALL_PLACES.some((place) => place.id === "nt-laccanh"), "예전에 저장한 장소 ID는 삭제하지 않는다");
+  const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
+  const picks = candidates("NT", "점심", q, emptyBoard("NT", q).days[1]);
+  assert.deepEqual(picks.filter(({ p }) => p.en === "Lac Canh").map(({ p }) => p.id), [guide.id]);
 });

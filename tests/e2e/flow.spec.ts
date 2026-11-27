@@ -377,7 +377,7 @@ test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼
   await sheet.getByLabel("후보 이름 또는 태그 검색", { exact: true }).fill("Lac Canh");
   await expect(sheet.locator(".choice-card")).toHaveCount(1);
   await sheet.locator("summary").click();
-  await expect(sheet.getByRole("link", { name: "Wikivoyage 원문", exact: true })).toBeVisible();
+  await expect(sheet.getByRole("link", { name: "Wikivoyage 기존 자료", exact: true })).toBeVisible();
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("dining-picker-mobile.png") });
   await sheet.getByRole("button", { name: /Lac Canh/ }).click();

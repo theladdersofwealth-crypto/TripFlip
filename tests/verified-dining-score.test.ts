@@ -48,7 +48,14 @@ test("검증 식당이 많은 권역은 미식 단독에서도 순위에 들어�
   assert.deepEqual(full.sightseeing, unknown.sightseeing);
 });
 
-test("기존 가이드만 있는 권역은 검증 식당 자료 없음으로 처리한다", () => {
+test("기존 가이드만 있는 권역은 검증 식당 자료 없음으로 처리한다", (t) => {
+  const confirmed = ALL_PLACES.map((place, index) => ({ place, index }))
+    .filter(({ place }) => place.region === "NT" && place.dining?.mapRecord?.status === "confirmed");
+  assert.equal(confirmed.length, 19);
+  t.after(() => confirmed.forEach(({ place, index }) => { ALL_PLACES[index] = place; }));
+  confirmed.forEach(({ place, index }) => {
+    ALL_PLACES[index] = { ...place, dining: { ...place.dining!, mapRecord: undefined } };
+  });
   const row = scoreRegions({ ...query, interests: ["관광", "미식"] }).find((r) => r.region.id === "NT")!;
   assert.ok(row.readiness.meals > 0);
   assert.equal(row.diningFit?.verifiedCount, null);
