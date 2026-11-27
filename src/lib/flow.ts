@@ -142,7 +142,7 @@ export function saveQuestionPreview(q: RegionQuery, progress: HomeProgress) {
 }
 export function loadQuestionPreview(): QuestionPreview | null {
   let snapshot: QuestionPreview | null=previewMemory;
-  try { const raw=sessionStorage.getItem(PREVIEW_KEY); if(raw) snapshot=JSON.parse(raw); } catch {}
+  try { const raw=sessionStorage.getItem(PREVIEW_KEY); snapshot=raw?JSON.parse(raw):previewMemory; } catch {}
   if (!snapshot || !queryShape(snapshot.q) || travelDateError(snapshot.q) || !Array.isArray(snapshot.progress?.answered)) return null;
   return {...snapshot,defaults:defaultLabels(snapshot.q,selectedQuestions(snapshot.progress.answered))};
 }

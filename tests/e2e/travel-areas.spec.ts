@@ -5,10 +5,9 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     await page.route("https://**/*", (route) => route.abort());
     await page.goto("/");
-    const shortcut = page.getByRole("button", { name: /가고 싶은 지역.*상관없음.*선택/ });
-    await expect(shortcut).toBeVisible();
-    await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
-    await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+    await expect(page.getByRole("button", { name: "트립플립 추천", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "다음", exact: true }).click();
+    await page.getByRole("button", { name: "다음", exact: true }).click();
     const chips = page.getByRole("group", { name: "가고 싶은 지역 선택" });
     await expect(chips.getByRole("button")).toHaveCount(15);
     await expect(chips.getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
@@ -25,7 +24,7 @@ for (const width of [390, 1440]) {
     await chips.getByRole("button", { name: "상관없음", exact: true }).click();
     await expect(chips.getByRole("button", { name: "동남아", exact: true })).toHaveAttribute("aria-pressed", "false");
     await expect(chips.getByRole("button", { name: "동·중부유럽", exact: true })).toHaveAttribute("aria-pressed", "false");
-    await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
+    await page.getByRole("button", { name: "다음", exact: true }).click();
     await expect(page.getByRole("button", { name: "메인 관광", exact: true })).toBeVisible();
   });
 }

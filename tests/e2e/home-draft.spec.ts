@@ -8,35 +8,39 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   });
   await page.goto("/");
   const logo = page.getByRole("link", { name: "TripFlip 홈", exact: true });
-  await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   for (const date of ["2027-05-07", "2027-05-21"]) {
     const day = page.getByRole("button", { name: date, exact: true });
     for (let i = 0; i < 24 && !(await day.isVisible()); i++) await page.getByRole("button", { name: "다음 달", exact: true }).click();
     await day.click();
   }
-  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "메인 휴양", exact: true }).click();
   // 추천 전의 진행 중 질문과 값도 홈을 다시 열었을 때 남는다.
+  await page.getByRole("button", { name: "질문 닫기" }).click();
   await page.getByRole("link", { name: /자주 묻는 질문/ }).click();
   await expect(page).toHaveURL(/\/guide/);
   await logo.click();
   await expect(page.getByRole("heading", { name: "어떤 여행인가요?" })).toBeVisible();
   await expect(page.getByRole("button", { name: "메인 휴양", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "1단계 완료", exact: true }).click();
-  await page.getByRole("button", { name: /^2단계로 조건 더 넣기/ }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "8시간", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "여유롭게 · 1곳", exact: true }).click();
-  await page.getByRole("button", { name: /^3단계로 조건 더 넣기/ }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
   await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
-  await page.getByRole("button", { name: "다음 · 숙소 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("하이엔드");
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("검색할 객실 수", { exact: true }).selectOption("2");
-  await page.getByRole("button", { name: "3단계 완료", exact: true }).click();
-  const recommend = page.getByRole("button", { name: /추천받기 · 조건 3\/3/ });
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  const recommend = page.getByRole("button", { name: "트립플립 추천", exact: true });
   await recommend.click();
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("14박 15일", { exact: true })).toBeVisible();
   const query = () => page.evaluate(() => localStorage.getItem("tripflip.flow.query"));
@@ -45,6 +49,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await logo.click();
   await expect(recommend).toBeEnabled();
   await recommend.click();
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page.getByText("14박 15일", { exact: true })).toBeVisible();
   expect(await query()).toBe(original);
 
@@ -60,6 +65,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await logo.click();
   await expect(recommend).toBeEnabled();
   await recommend.click();
+  await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.locator(`a[href="${region}"]`).first().click();
   await expect(morning).toContainText("숙소 휴식");

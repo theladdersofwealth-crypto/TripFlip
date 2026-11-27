@@ -28,6 +28,7 @@ const Q_TITLE: Record<Q,string> = {who:"누구랑 가나요?",when:"언제 떠�
 export default function Home() {
   const router = useRouter();
   const [q, setQ] = useState<RegionQuery | null>(null);
+  const ready = q !== null;
   const [pending, startTransition] = useTransition();
   const [flying, setFlying] = useState(false);
   const [slide,setSlide]=useState(0);
@@ -45,12 +46,12 @@ export default function Home() {
   useEffect(()=>{if(q)saveHomeDraft(q,progress());},[q,slide,answered]);
   useEffect(()=>{
     const el=dialog.current;
-    if(!q||!show||!el)return;
+    if(!ready||!show||!el)return;
     if(!el.open)el.showModal();
     const old=document.body.style.overflow;document.body.style.overflow="hidden";
     return ()=>{if(el.open)el.close();document.body.style.overflow=old;};
-  },[!!q,show]);
-  useEffect(()=>{body.current?.scrollTo({top:0});heading.current?.focus();},[slide,show,!!q]);
+  },[ready,show]);
+  useEffect(()=>{body.current?.scrollTo({top:0});heading.current?.focus();},[slide,show,ready]);
   if (!q) return null;
   const dateError = travelDateError(q);
   const days = calendarDays(q.startDate, q.endDate);
@@ -151,14 +152,14 @@ export default function Home() {
         <div ref={body} className="question-scroll">
           <div key={curQ} className={"question-content "+direction}>{question(curQ)}</div>
           {!answered.includes(curQ)&&<button type="button" className="btn btn-block" disabled={!!qError(curQ)} onClick={()=>mark(curQ)}>현재 조건 선택</button>}
-          {error && <p className="small form-error" role="alert">{error} <span>이전 질문에서 수정할 수 있어요.</span></p>}
+          {error && <p className="small form-error" role="alert">{error} <span>해당 질문에서 수정할 수 있어요.</span></p>}
         </div>
         <footer className="question-actions">
           <div>{slide>0&&<button type="button" className="btn btn-block" onClick={()=>move(-1)}>이전</button>}</div>
           <button type="button" className="btn btn-primary btn-block" disabled={!!error||pending||flying} onClick={go}><Icon name="plane"/> 트립플립 추천</button>
           <div>{slide<QUESTIONS.length-1&&<button type="button" className="btn btn-block" disabled={!!qError(curQ)} onClick={()=>move(1)}>다음</button>}</div>
         </footer>
-        {flying&&<p className="xs muted" role="status">여행지를 찾는 중…</p>}
+        {flying&&<span className="sr-only" role="status">여행지를 찾는 중…</span>}
       </div>
     </dialog>}
   </main>;

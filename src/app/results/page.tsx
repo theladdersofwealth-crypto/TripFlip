@@ -105,6 +105,7 @@ export default function ResultsPage() {
         <span className="chip"><Icon name="users" />{who}</span>
         <span className="chip">{coreInterests(q).join(" + ")}</span>
         <span className="chip">{q.stay}</span>
+        <span className="chip">편도 {q.maxFlightHours==null?"제한 없음":q.maxFlightHours+"시간 희망"}</span>
         {normalizeTravelAreas(q.preferredAreas).map((id) => <span key={id} className="chip">{TRAVEL_AREAS.find((a) => a.id === id)!.label}</span>)}
         {q.totalBudgetKrw != null && <span className="chip">전체 {Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원 {q.budgetMode === "cap" ? "상한" : "목표"}</span>}
       </div>

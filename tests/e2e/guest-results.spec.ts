@@ -5,18 +5,17 @@ test("비회원은 1~3위만 보이고 4위부터 흐리며, 로그인하면 전
   await page.goto("/");
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByRole("button", { name: "설정 완료", exact: true }).click();
-  await page.getByRole("button", { name: "다음 · 언제 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   for (const d of ["2027-05-10", "2027-05-15"]) {
     const day = page.getByRole("button", { name: d, exact: true });
     for (let i = 0; i < 24 && !(await day.isVisible()); i++) await page.getByRole("button", { name: "다음 달", exact: true }).click();
     await day.click();
   }
-  await page.getByRole("button", { name: "다음 · 지역 →", exact: true }).click();
+  await page.getByRole("button", { name: "다음", exact: true }).click();
   await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "다음 · 취향 →", exact: true }).click();
-  await page.getByRole("button", { name: /^1단계 완료/ }).click();
-  await page.getByRole("button", { name: /추천받기 · 조건/ }).click();
-  await expect(page).toHaveURL(/\/results$/);
+  await page.getByRole("button", { name: "다음", exact: true }).click();
+  await page.getByRole("button", { name: "트립플립 추천", exact: true }).click();
+  await expect(page).toHaveURL(/\/results\?preview=1$/);
   await expect(page.getByRole("dialog", { name: "가입 안내" })).toBeVisible();
   await expect(page.getByText(/가입하면 4위부터 나머지 추천/)).toBeVisible();
   // 가입 안내 항목이 실제 소셜 로그인과 같다

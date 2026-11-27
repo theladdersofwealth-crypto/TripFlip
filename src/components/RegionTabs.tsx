@@ -1,5 +1,4 @@
 "use client";
-import { MACAU_DAY_TRIP_PLACES } from "@/services/regionScore";
 // 권역 상세 탭(형님 11/24: 나트랑앱처럼). 예약·관광지·음식점 탭 내용. 일정 탭은 /r/[id] client.tsx 그대로.
 import { useState } from "react";
 import Link from "next/link";
@@ -19,7 +18,7 @@ import { kkdaySearchUrl, klookSearchUrl, welcomePickupsUrl } from "@/services/af
 import { agodaFlightMissingKids, agodaFlightUrl, bookingComUrl, flightAffiliateUrl, flightSearchUrl, hotelCandidates, hotelSearchUrl, klookStayUrl } from "@/services/booking";
 import type { HotelPick } from "@/services/booking";
 import { isFood, placesOf } from "@/services/planner";
-import { PILOT_TWIN_OF, hotelEstimated } from "@/services/regionScore";
+import { MACAU_DAY_TRIP_PLACES, PILOT_TWIN_OF, hotelEstimated } from "@/services/regionScore";
 import type { RegionQuery, RegionResult } from "@/services/regionScore";
 
 export type RegionTab = "예약" | "일정" | "관광지" | "음식점";
