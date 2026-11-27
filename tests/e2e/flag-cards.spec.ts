@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // 추천 카드 배경 깃발: 원본 SVG가 실제로 불러와지고, 모바일·PC 모두 카드 윗부분 안에 잘리지 않고 통째로 들어간다.
-for (const width of [390, 1440]) {
-  test(`추천 카드 깃발이 잘리지 않고 보인다 (${width}px)`, async ({ page }) => {
+for (const width of [320, 390, 1440]) {
+  test(`추천 결과 카드 깃발 전체가 가운데에 보인다 (${width}px)`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
     await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
@@ -29,20 +29,26 @@ for (const width of [390, 1440]) {
       await expect(flag).toHaveAttribute("src", /^\/flags\/[a-z]{2}\.svg$/);
       await flag.scrollIntoViewIfNeeded();
       await expect.poll(() => flag.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
+      await expect(flag).toHaveCSS("object-fit", "contain");
+      await expect(flag).toHaveCSS("object-position", "50% 50%");
       const box = await hero.boundingBox();
       // 그려진 깃발 영역(object-fit: contain)이 카드 윗부분 안에 모두 들어간다
       const drawn = await flag.evaluate((el: HTMLImageElement) => {
         const r = el.getBoundingClientRect();
         const s = Math.min(r.width / el.naturalWidth, r.height / el.naturalHeight);
         const w = el.naturalWidth * s, h = el.naturalHeight * s;
-        return { left: r.right - w, top: r.top + (r.height - h) / 2, right: r.right, bottom: r.top + (r.height + h) / 2, ratio: w / h, natural: el.naturalWidth / el.naturalHeight };
+        return { left: r.left + (r.width - w) / 2, top: r.top + (r.height - h) / 2, right: r.left + (r.width + w) / 2, bottom: r.top + (r.height + h) / 2 };
       });
       expect(box).not.toBeNull();
       expect(drawn.left).toBeGreaterThanOrEqual(box!.x - 0.5);
       expect(drawn.top).toBeGreaterThanOrEqual(box!.y - 0.5);
       expect(drawn.right).toBeLessThanOrEqual(box!.x + box!.width + 0.5);
       expect(drawn.bottom).toBeLessThanOrEqual(box!.y + box!.height + 0.5);
-      expect(Math.abs(drawn.ratio - drawn.natural)).toBeLessThan(0.01);
+      const leftMargin = drawn.left - box!.x;
+      const rightMargin = box!.x + box!.width - drawn.right;
+      expect(leftMargin).toBeGreaterThanOrEqual(5.5);
+      expect(rightMargin).toBeGreaterThanOrEqual(5.5);
+      expect(Math.abs(leftMargin - rightMargin)).toBeLessThan(1);
     }
     if (process.env.SHOT_DIR) await page.screenshot({ path: `${process.env.SHOT_DIR}/flag-cards-${width}.png`, fullPage: false });
   });
