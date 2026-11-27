@@ -11,7 +11,7 @@ import { DurableObject } from "cloudflare:workers";
 import { PLANS_BODY_MAX, PLAN_MAX, PLANS_PER_USER, planOk } from "./lib.js";
 import { hiddenNickKeys } from "./lib.js";
 import { validIdentity, resolveIdentity } from "./oauth.js";
-import { KEEP_DAYS, kstDay, parseEvent, sha256, randomHex } from "./lib.js";
+import { KEEP_DAYS, STEPS, kstDay, parseEvent, sha256, randomHex } from "./lib.js";
 
 const CORS = {
   "access-control-allow-origin": "*",
