@@ -55,6 +55,9 @@ export function withConcepts(p: PlaceV1): PlaceV1 {
   const add = inferred.filter((c) => !p.concepts.includes(c));
   return add.length ? { ...p, concepts: [...p.concepts, ...new Set(add)] } : p;
 }
+// Existing pilot Macau records are optional cross-border day-trip references, not Hong Kong sights.
+const MACAU_IDS=new Set(["hk-senado","hk-venetian","hk-macautower"]);
+export const MACAU_DAY_TRIP_PLACES=PLACES_V1.filter(p=>p.region==="HK"&&MACAU_IDS.has(p.id));
 export const ALL_PLACES: PlaceV1[] = withMapDining([
   ...PLACES_V1,
   ...WORLD_PLACES.flatMap((p) => {
@@ -65,7 +68,7 @@ export const ALL_PLACES: PlaceV1[] = withMapDining([
     return [{ ...p, region: pilot }];
   }),
   ...DINING_PLACES,
-]).map(withConcepts).map(applyApprovedFacts).map(applyWikiBoost);
+]).map(withConcepts).map(applyApprovedFacts).map(applyWikiBoost).filter(p=>!(p.region==="HK"&&MACAU_IDS.has(p.id)));
 
 export type ChildBand = "영아" | "유아" | "초등" | "중고등";
 export type IntensityV1 = 1 | 2 | 3;

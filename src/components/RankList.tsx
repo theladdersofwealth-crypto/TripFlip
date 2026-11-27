@@ -29,10 +29,10 @@ export const GUEST_OPEN = 3;
 
 /** 비회원용 흐린 결과: 공개분 이후(4위부터) 실제 여행지 이름·점수·경비는 화면(DOM)에 넣지 않고 모양만 같은 가짜 카드를 흐리게 보여 준다.
  *  count = 가려진 곳 수, startRank = 가짜 카드의 첫 순위 번호 */
-export function GuestPreview({ count, startRank = 1, beforeGo }: { count: number; startRank?: number; beforeGo?: () => void }) {
+export function GuestPreview({ count, startRank = 1, beforeGo, returnTo = "/results" }: { count: number; startRank?: number; beforeGo?: () => void; returnTo?: string }) {
   const goAccount = (hash: string) => {
     beforeGo?.();
-    try { sessionStorage.setItem(NEXT_KEY, "/results"); } catch {}
+    try { sessionStorage.setItem(NEXT_KEY, returnTo); } catch {}
     location.assign(`/account${hash}`);
   };
   const n = Math.max(1, Math.min(count, 4));
@@ -90,6 +90,7 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewO
               <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, budget)}</span>
             </div>
             {(r.flags.some((f) => f.includes("적합도를")) || r.overFlight || r.weather.judge === "스콜성 우기") && <span className="xs warn">⚠ {[r.flags.some((f) => f.includes("적합도를")) ? "일부 추정값" : "", r.overFlight ? "희망 비행시간 초과" : "", r.weather.judge === "스콜성 우기" ? "스콜성 우기" : ""].filter(Boolean).join(" · ")}</span>}
+            {r.region.id==="HK"&&<span className="xs muted">마카오 당일치기 별도 선택 · 홍콩 시내 일정에는 포함하지 않아요</span>}
             {r.admissionNeedsCheck && <span className="xs muted">일부 장소 입장 조건 확인 필요</span>}
             {r.sightseeing.relaxed && <span className="xs muted">여유로운 일정 중심</span>}
             {previewOnly ? (

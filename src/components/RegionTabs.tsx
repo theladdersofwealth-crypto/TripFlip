@@ -1,4 +1,5 @@
 "use client";
+import { MACAU_DAY_TRIP_PLACES } from "@/services/regionScore";
 // 권역 상세 탭(형님 11/24: 나트랑앱처럼). 예약·관광지·음식점 탭 내용. 일정 탭은 /r/[id] client.tsx 그대로.
 import { useState } from "react";
 import Link from "next/link";
@@ -132,6 +133,7 @@ export function SightsTab({ r }: { r: RegionResult }) {
       {r.themes?.map((t) => <div key={t.theme} className="theme-row"><span className="theme-ico" aria-hidden>{t.icon}</span><span className="theme-detail"><b>{t.theme}</b> · {t.names.slice(0, 2).join(", ")}<span className="theme-count muted"> 등 {t.count}곳</span></span></div>)}
       {r.reasons.length > 0 && <ul className="reason-list">{r.reasons.map((s) => <li key={s}>{s}</li>)}</ul>}
     </div>}
+    {r.region.id==="HK"&&<MacauDayTrip/>}
     {!all.length ? <p className="empty-tab">이 지역 관광지는 준비 중이에요</p> : <>
       <div className="row-wrap" style={{ margin: "12px 0 10px" }}>
         {(["전체", ...concepts] as const).map((c) => <button key={c} type="button" className={`chip-btn ${filter === c ? "on" : ""}`} onClick={() => { setFilter(c); setShown(15); }}>{c}</button>)}
@@ -154,3 +156,5 @@ export function FoodTab({ r }: { r: RegionResult }) {
     {list.length > shown && <button type="button" className="btn btn-block" style={{ marginTop: 10 }} onClick={() => setShown(shown + 15)}>더 보기 ({list.length - shown}곳)</button>}
   </div>;
 }
+
+export function MacauDayTrip(){return <section className="card-soft stack" style={{marginTop:12}} aria-label="마카오 당일치기"><b>마카오 당일치기 · 별도 선택</b><p className="small muted">홍콩 시내 명소 및 자동 일정에 섞지 않아요. 별도 하루를 비워 왕복 이동·출입경·운항편을 확인해 주세요. 추가 교통비는 기본 경비에 포함하지 않았어요.</p><ul className="small">{MACAU_DAY_TRIP_PLACES.map(p=><li key={p.id}>{p.name}</li>)}</ul></section>;}

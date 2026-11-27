@@ -9,7 +9,7 @@ import { PLACE_FIT } from "@/data/placeFit";
 import { openOn } from "@/data/seasonal";
 import { WORLD_REGIONS } from "@/data/worldV1";
 import { verifiedRegionCenter } from "@/data/approvedCatalog";
-import { ALL_PLACES, PILOT_TWIN_OF, tripDays } from "@/services/regionScore";
+import { ALL_PLACES, MACAU_DAY_TRIP_PLACES, PILOT_TWIN_OF, tripDays } from "@/services/regionScore";
 import type { Companion, RegionQuery } from "@/services/regionScore";
 import { addDays, rainFit } from "@/services/itineraryV1";
 import type { DayPlan } from "@/services/itineraryV1";
@@ -147,7 +147,8 @@ export function familyGrade(p: PlaceV1, q: RegionQuery) {
 
 // ---------- 후보 ----------
 export const placesOf = (regionId: string) => ALL_PLACES.filter((p) => p.region === regionId);
-export const byId = (id: string) => ALL_PLACES.find((p) => p.id === id);
+// Preserve lookup of manually saved places; new Hong Kong candidates exclude Macau.
+export const byId = (id: string) => ALL_PLACES.find((p) => p.id === id) ?? MACAU_DAY_TRIP_PLACES.find(p=>p.id===id);
 export function candidates(regionId: string, slot: SlotKey, q: RegionQuery, day: BoardDay) {
   const meal = slot === "점심" || slot === "저녁" || slot === "디저트";
   const normalize = (name: string) => name.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
