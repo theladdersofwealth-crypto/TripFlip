@@ -44,7 +44,7 @@ function BoardInner({ regionId }: { regionId?: string }) {
   const [pick, setPick] = useState<{ di: number; slot: SlotKey } | null>(null);
   const [toast, setToast] = useState("");
   const tabParam = sp.get("tab") as RegionTab | null;
-  const [tab, setTabState] = useState<RegionTab>(tabParam && REGION_TABS.includes(tabParam) ? tabParam : "일정");
+  const [tab, setTabState] = useState<RegionTab>(tabParam && REGION_TABS.includes(tabParam) ? tabParam : (embedded ? "예약" : "일정"));
   const setTab = (t: RegionTab) => {
     setTabState(t);
     if (embedded) { document.querySelector(".pc-detail")?.scrollTo({ top: 0 }); return; }

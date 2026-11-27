@@ -1,4 +1,5 @@
 "use client";
+import { regionBookingHref } from "@/lib/regionRoutes";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { BackButton } from "@/components/AppShell";
@@ -83,7 +84,7 @@ export default function ResultsPage() {
   const picked = ranked.some((r) => r.region.id === sel) ? sel! : ranked[0]?.region.id ?? null;
   const open = (id: string) => {
     if (previewOnly) { showToast(draftPreview ? "자세히 보려면 먼저 이 조건으로 확정해 주세요." : "자세히 보려면 먼저 '이 조건 사용'을 눌러 주세요."); return; }
-    router.push(`/r/${id}`);
+    router.push(regionBookingHref(id));
   };
   const others = results.filter((r) => (r.status === "데이터 부족" || r.status === "조건 충족 장소 없음") && !r.region.tier);
   const days = tripDays(q.startDate, q.endDate);

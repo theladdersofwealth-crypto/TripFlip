@@ -61,6 +61,8 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   const region = await firstResult.getAttribute("href");
   expect(region).toMatch(/^\/r\//);
   await firstResult.click();
+  await expect(page.getByRole("tab", { name: "예약", exact: true })).toHaveAttribute("aria-selected", "true");
+  await page.getByRole("tab", { name: "일정", exact: true }).click();
   const morning = page.locator(".day-card").nth(1).getByRole("button", { name: /^오전/ });
   await morning.click();
   await page.getByRole("dialog", { name: "2일차 오전 바꾸기" }).getByRole("button", { name: "숙소 휴식", exact: true }).click();
@@ -72,5 +74,6 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await page.locator(`a[href="${region}"]`).first().click();
+  await page.getByRole("tab", { name: "일정", exact: true }).click();
   await expect(morning).toContainText("숙소 휴식");
 });
