@@ -8,9 +8,11 @@ import { useWide } from "@/lib/useWide";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
-import { saveQuery, useFlowQuery, loadQuestionPreview, confirmQuestionPreview, confirmedDefaultLabels } from "@/lib/flow";
+import { saveQuery, useFlowQuery, loadQuestionPreview, saveQuestionPreview, saveResultThemes, confirmQuestionPreview, confirmedDefaultLabels } from "@/lib/flow";
 import { decodeShare } from "@/lib/shareLink";
 import { ShareButton } from "@/components/ShareButton";
+import { CONCEPTS, type Concept } from "@/data/regionsV1";
+import { resultThemes, withResultThemes } from "@/lib/resultThemes";
 import type { RegionQuery } from "@/services/regionScore";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
@@ -50,8 +52,8 @@ export default function ResultsPage() {
     router.replace("/results");
     showToast("공유받은 조건으로 바꿨어요.");
   };
-  const q = shared === null || home === null ? null : shared.q ?? home.snapshot?.q ?? own;
-  const defaults = shared?.q ? [] : home?.snapshot?.defaults ?? (q ? confirmedDefaultLabels(q) : []);
+  const q = shared === null || home === null ? null : (!shared.applied ? shared.q : null) ?? (draftPreview ? home.snapshot?.q : null) ?? own;
+  const defaults = shared?.q && !shared.applied ? [] : draftPreview ? home?.snapshot?.defaults ?? [] : q ? confirmedDefaultLabels(q) : [];
   const priceVersion = useLivePrices();
   const results = useMemo(() => (q ? scoreRegions(q) : []), [q, priceVersion]);
   // PC(넓은 화면): 왼쪽 추천 순위 + 오른쪽 권역 상세(예약·일정·관광지·음식점). 첫 화면 미리보기에서 고른 권역(?r=)부터 연다
@@ -67,6 +69,15 @@ export default function ResultsPage() {
       </div>
     </main>
   );
+  const { main, sub } = resultThemes(q);
+  const changeSub = (sub: Concept | null) => {
+    const next = withResultThemes(q, main, sub);
+    if (draftPreview && home?.snapshot) {
+      setHome({ ...home, snapshot: saveQuestionPreview(next, home.snapshot.progress) });
+    } else {
+      saveResultThemes(next, defaults);
+    }
+  };
   const ranked = results.filter((r) => r.status === "ranked").slice(0, 10);
   const split = wide && member && ranked.length > 0 && !previewOnly;
   const picked = ranked.some((r) => r.region.id === sel) ? sel! : ranked[0]?.region.id ?? null;
@@ -99,11 +110,23 @@ export default function ResultsPage() {
         </div>
       </div>}
       {shared?.bad && <div className="card-soft small muted" role="status" style={{ marginTop: 10 }}>공유 링크를 열 수 없어서(날짜가 지났거나 주소가 잘림) 내 조건으로 보여 드려요.</div>}
+      {(!shared?.q || shared.applied) && <section className="card-soft results-themes" aria-label="추천 테마">
+        <div className="between">
+          <b>추가 반영 항목</b><span className="small muted">메인 · {main}</span>
+        </div>
+        <div className="chips" role="group" aria-label="서브 테마 선택">
+          <button type="button" className={`toggle-chip ${sub === null ? "on" : ""}`} aria-pressed={sub === null} onClick={() => changeSub(null)}>없음</button>
+          {CONCEPTS.filter((c) => c !== main).map((c) =>
+            <button key={c} type="button" className={`toggle-chip ${sub === c ? "on also" : ""}`} aria-pressed={sub === c} onClick={() => changeSub(c)}>{c}</button>
+          )}
+        </div>
+        <p className="xs muted">하나만 선택 · 추천과 일정에 함께 반영돼요.</p>
+      </section>}
       <p className="small muted" style={{ marginTop: 8 }}>{defaults.length ? "기본값과 선택 조건을 반영한 적합도 추정이에요." : "이번 일행과 여행 조건에 대한 적합도예요. 조건을 바꾸면 순위도 달라져요."}</p>
       <div className="row-wrap" style={{ margin: "10px 0 14px" }}>
         <span className="chip"><Icon name="calendar" />{days - 1}박 {days}일</span>
         <span className="chip"><Icon name="users" />{who}</span>
-        <span className="chip">{coreInterests(q).join(" + ")}</span>
+        {shared?.q && !shared.applied && <span className="chip">{coreInterests(q).join(" + ")}</span>}
         <span className="chip">{q.stay}</span>
         <span className="chip">편도 {q.maxFlightHours==null?"제한 없음":q.maxFlightHours+"시간 희망"}</span>
         {normalizeTravelAreas(q.preferredAreas).map((id) => <span key={id} className="chip">{TRAVEL_AREAS.find((a) => a.id === id)!.label}</span>)}

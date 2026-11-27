@@ -200,6 +200,7 @@ export function optimize(board: Board, regionId: string, q: RegionQuery): Board 
     if (v && !SPECIAL.has(v)) (k === "점심" || k === "저녁" || k === "디저트" ? usedFood : used).add(v);
   }));
   const goals = coreInterests(q);
+  const diningWeight = conceptWeight(["미식"], q);
   const covered = new Map(goals.map((g) => [g, 0]));
   const cover = (p: PlaceV1) => p.concepts.forEach((g) => { if (covered.has(g)) covered.set(g, covered.get(g)! + 1); });
   for (const id of used) { const p = byId(id); if (p) cover(p); }
@@ -235,6 +236,7 @@ export function optimize(board: Board, regionId: string, q: RegionQuery): Board 
       .filter((x) => x.distance?.km != null && x.distance.km <= 8)
       .map((x) => {
         let adj = x.e.total;
+        if (x.p.dining?.mapRecord?.status === "confirmed") adj += 8 * diningWeight;
         if (usedFood.has(x.p.id)) adj -= 25;
         const cuisine = x.p.dining?.cuisine ?? x.p.tags[0] ?? "";
         if (usedCuisine.has(cuisine)) adj -= 8;

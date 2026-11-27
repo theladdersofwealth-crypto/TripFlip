@@ -7,6 +7,7 @@ import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
 import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
 import type { PlaceV1 } from "@/data/regionsV1";
+import { coreInterests } from "@/lib/travelParty";
 import { loadBoard, saveBoard, useFlowQuery } from "@/lib/flow";
 import { fmtDate } from "@/services/itineraryV1";
 import type { Board, Condition, DayWeather, SlotKey } from "@/services/planner";
@@ -111,6 +112,7 @@ function BoardInner({ regionId }: { regionId?: string }) {
         <button className="btn btn-teal" onClick={reopt}><Icon name="sparkle" /> 일정 다시 추천</button>
         <button className="btn" onClick={reset}>처음부터 다시</button>
       </div>
+      <p className="small" style={{ marginTop: 8 }}>일정 테마 · {coreInterests(q).join(" + ")}</p>
       <p className="small muted" style={{ marginTop: 10 }}>바꾸고 싶은 일정을 눌러보세요. 직접 고른 곳은 다시 추천할 때도 유지돼요.</p>
 
       {id==="HK"&&<MacauDayTrip/>}

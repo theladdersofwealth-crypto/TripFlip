@@ -144,15 +144,11 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await expect(page.getByRole("group", { name: "가고 싶은 지역 선택" }).getByRole("button", { name: "상관없음", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음", exact: true }).click();
   const travelStyle = page.locator(".question-dialog");
-  // 메인은 한 번 눌러 바꾸고(기본 메인 관광 → 휴양), 서브는 누른 순서대로 번호가 붙는다.
+  // 첫 질문에는 메인만 두고, 서브는 추천 결과에서 고른다.
   await expect(travelStyle.getByRole("button", { name: "메인 관광", exact: true })).toHaveAttribute("aria-pressed", "true");
   await travelStyle.getByRole("button", { name: "메인 휴양", exact: true }).click();
   await expect(travelStyle.getByText("메인 · 휴양", { exact: true })).toBeVisible();
-  await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
-  await travelStyle.getByRole("button", { name: "액티비티", exact: true }).click();
-  await expect(travelStyle.locator(".sub-num")).toHaveText(["1", "2"]);
-  await travelStyle.getByRole("button", { name: "관광", exact: true }).click();
-  await expect(travelStyle.locator(".sub-num")).toHaveText(["1"]);
+  await expect(travelStyle.getByRole("group", { name: "서브 테마 선택" })).toHaveCount(0);
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "상관없음", exact: true }).click();
   await page.getByRole("button", { name: "다음", exact: true }).click();
@@ -172,6 +168,12 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await noHorizontalOverflow(page);
   await page.screenshot({ path: testInfo.outputPath("family-mobile.png"), fullPage: true });
   await findNow.click();
+  const subThemes = page.getByRole("group", { name: "서브 테마 선택" });
+  await expect(subThemes.getByRole("button", { name: "없음", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await subThemes.getByRole("button", { name: "관광", exact: true }).click();
+  await subThemes.getByRole("button", { name: "액티비티", exact: true }).click();
+  await expect(subThemes.getByRole("button", { name: "관광", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await expect(subThemes.getByRole("button", { name: "휴양", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
   await expect(page).toHaveURL(/\/results$/);
   await expect(page.getByText("성인 4명 · 자녀 2명", { exact: true })).toBeVisible();
@@ -227,6 +229,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.screenshot({ path: testInfo.outputPath("tab-food.png") });
   await page.getByRole("tab", { name: "일정", exact: true }).click();
 
+  await expect(page.getByText("일정 테마 · 휴양 + 액티비티", { exact: true })).toBeVisible();
   const days = page.locator(".day-card");
   await expect(days).toHaveCount(11);
   await expect(days.first().getByRole("button", { name: /^오전/ })).toContainText("도착·체크인");
@@ -383,4 +386,36 @@ test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼
   await sheet.getByRole("button", { name: /Lac Canh/ }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(day.getByRole("button", { name: /^점심/ })).toContainText("Lac Canh");
+});
+
+test("추천 상단에서 고른 서브 테마가 PC 일정에 즉시 반영되고 모바일 새로고침에도 유지된다", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 920 });
+  await page.addInitScript(() => {
+    const key = "tripflip.flow.query";
+    if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify({
+      startDate: "2027-05-10", endDate: "2027-05-15", adults: 2, children: [],
+      elders: false, pet: false, main: "관광", subs: [], interests: ["관광"],
+      perDay: 2, price: "상관없음", stay: "가심비", maxFlightHours: 8,
+    }));
+  });
+  await page.goto("/results");
+  const detail = page.getByRole("complementary", { name: "선택한 권역 상세" });
+  await expect(detail.getByText("일정 테마 · 관광", { exact: true })).toBeVisible();
+  const picker = page.getByRole("group", { name: "서브 테마 선택" });
+  await picker.getByRole("button", { name: "미식", exact: true }).click();
+  await expect(detail.getByText("일정 테마 · 관광 + 미식", { exact: true })).toBeVisible();
+  await picker.getByRole("button", { name: "휴양", exact: true }).click();
+  await expect(detail.getByText("일정 테마 · 관광 + 휴양", { exact: true })).toBeVisible();
+  await expect(picker.getByRole("button", { name: "미식", exact: true })).toHaveAttribute("aria-pressed", "false");
+  await page.setViewportSize({ width: 320, height: 844 });
+  await page.reload();
+  await expect(picker.getByRole("button", { name: "휴양", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await noHorizontalOverflow(page);
+  await page.locator(".rank-card").first().getByRole("link", { name: /^자세히 보기/ }).click();
+  await expect(page.getByText("일정 테마 · 관광 + 휴양", { exact: true })).toBeVisible();
+  await page.goto("/results");
+  await picker.getByRole("button", { name: "없음", exact: true }).click();
+  await expect(picker.getByRole("button", { name: "없음", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const interests = await page.evaluate(() => JSON.parse(localStorage.getItem("tripflip.flow.query") ?? "{}").interests);
+  expect(interests).toEqual(["관광"]);
 });
