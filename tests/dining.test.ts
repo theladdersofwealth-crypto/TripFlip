@@ -48,9 +48,9 @@ test("시내 식당의 거리는 기존 섬 좌표 대신 출처 확인한 도�
 
 test("지도 확인 식당은 실제 권역에 연결되고 미확인 연락처와 자동 동선용 좌표는 가져오지 않는다", () => {
   const imported = ALL_PLACES.filter((place) => place.dining?.mapRecord?.status === "confirmed");
-  assert.equal(imported.length, 740);
+  assert.equal(imported.length, 743);
   assert.equal(new Set(imported.map((place) => place.id)).size, imported.length);
-  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 227);
+  assert.equal(imported.filter((place) => place.dining?.sourceUrl == null).length, 230);
   const regions = new Set(ALL_REGIONS.map((region) => region.id));
   for (const row of verifiedDining) {
     const place = imported.find((p) => p.id === row.id)!;
@@ -213,7 +213,7 @@ test("5차 자료는 앱의 4권역에만 연결하고 동네 및 기존 장소 
 });
 
 test("나트랑 등 5권역에 확인된 식당만 추가하고 기존 장소를 중복 생성하지 않는다", () => {
-  const rows = verifiedDining.slice(673);
+  const rows = verifiedDining.slice(673, 740);
   const countByRegion: Record<string, number> = { NT: 19, "nor-garapan": 10, "tha-pattaya": 14, "tai-kaohsiung": 23, "chi-qingdao": 1 };
   const fields = ["id", "region", "nameLocal", "nameEn", "nameKo", "area", "kind", "styles", "cuisine", "signature", "priceLevel", "sourceUrl", "checkedAt"].sort();
   assert.equal(rows.length, 67);
@@ -244,4 +244,16 @@ test("나트랑 등 5권역에 확인된 식당만 추가하고 기존 장소를
   const q = { ...DEFAULT_QUERY, startDate: "2027-05-10", endDate: "2027-05-15" };
   const picks = candidates("NT", "점심", q, emptyBoard("NT", q).days[1]);
   assert.deepEqual(picks.filter(({ p }) => p.en === "Lac Canh").map(({ p }) => p.id), [guide.id]);
+});
+
+test("칭다오 후속 자료는 확인된 세 곳만 추가하고 기존 키와 날짜를 따른다", () => {
+  const rows = verifiedDining.slice(740);
+  assert.deepEqual(rows.map(({ nameLocal, region, checkedAt }) => [nameLocal, region, checkedAt]), [
+    ["春和楼", "chi-qingdao", "2026-11-27"],
+    ["渔家人海鲜菜馆", "chi-qingdao", "2026-11-27"],
+    ["三盛楼饭店", "chi-qingdao", "2026-11-27"],
+  ]);
+  assert.equal(new Set(verifiedDining.map(({ id }) => id)).size, verifiedDining.length);
+  assert.ok(rows.every(({ id }) => !pendingDining.some((pending) => pending.id === id)));
+  for (const row of rows) assert.deepEqual(Object.keys(row).sort(), Object.keys(verifiedDining[739]).sort());
 });
