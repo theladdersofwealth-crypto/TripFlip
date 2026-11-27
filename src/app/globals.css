@@ -854,3 +854,6 @@ article.rank-card { cursor: pointer; }
   .home-themes .home-theme:last-child:nth-child(odd) { grid-column: auto; }
 }
 button.home-dest-card { border: 0; font: inherit; text-align: left; cursor: pointer; align-items: flex-start; }
+
+.results-themes { display: grid; gap: 8px; margin-top: 12px; }
+.results-themes .toggle-chip { min-height: 44px; }

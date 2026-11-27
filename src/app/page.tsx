@@ -8,6 +8,7 @@ import { DateEditor } from "@/components/DateEditor";
 import { CONCEPTS } from "@/data/regionsV1";
 import { TRAVEL_AREAS, normalizeTravelAreas, travelAreaOf, type TravelArea } from "@/data/travelAreas";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
+import { resultThemes, withResultThemes } from "@/lib/resultThemes";
 import type { Concept } from "@/data/regionsV1";
 import { makeQuestionDraft, saveHomeDraft, saveQuestionPreview } from "@/lib/flow";
 import { QUESTIONS, type Question } from "@/lib/questionFlow";
@@ -82,7 +83,7 @@ export default function Home() {
   const dateError = travelDateError(q);
   const days = calendarDays(q.startDate, q.endDate);
   const members = membersOf(q);
-  const interests = q.interests?.length ? q.interests : [q.main, ...q.subs];
+  const { main } = resultThemes(q);
   const rooms = roomEstimate(q);
   const selectedAreas = normalizeTravelAreas(q.preferredAreas);
   const hasAdult = members.some((m) => m.age === null ? m.relationship !== "child" : m.age >= 18);
@@ -102,16 +103,11 @@ export default function Home() {
     const next = normalizeTravelAreas(selectedAreas.includes(area) ? selectedAreas.filter((a) => a !== area) : [...selectedAreas, area]);
     patch({ preferredAreas: next.length ? next : undefined });
   };
-  const setInterests = (next: Concept[]) => patch({ interests: next, main: next[0], subs: next.slice(1) });
-  // 메인은 한 번 눌러 바꾸고, 서브는 누른 순서대로 1·2·3… (다시 누르면 빠지고 뒤 번호가 당겨짐)
-  const pickMain = (c: Concept) => setInterests([c, ...interests.slice(1).filter((s) => s !== c)]);
-  const toggleSub = (c: Concept) => {
-    const subs = interests.slice(1);
-    setInterests([interests[0], ...(subs.includes(c) ? subs.filter((s) => s !== c) : [...subs, c])]);
-  };
+  const pickMain = (c: Concept) => patch(withResultThemes(q, c, null));
   const go=()=>{
     if(error||pending||flying)return;
-    saveQuestionPreview(q,progress());
+    const { main, sub } = resultThemes(q);
+    saveQuestionPreview(withResultThemes(q, main, sub),progress());
     track("search",undefined,undefined,selectedAreas);
     setFlying(true);
     startTransition(()=>router.push("/results?preview=1"));
@@ -133,12 +129,9 @@ export default function Home() {
       </>;
       case "vibe": return <>
         <span className="label">메인 테마 · 1개</span>
-        <p className="xs muted">여행지를 고를 때 가장 크게 반영해요. 누르면 바로 바뀌어요.</p>
-        <div className="chips">{CONCEPTS.map((c) => { const isMain = interests[0] === c; return <button key={c} type="button" aria-label={`메인 ${c}`} className={`toggle-chip ${isMain ? "on main" : ""}`} aria-pressed={isMain} onClick={() => pickMain(c)}>{c}</button>; })}</div>
-        <span className="label" style={{ marginTop: 14, display: "block" }}>서브 테마 · 누른 순서대로</span>
-        <p className="xs muted">서브1 → 서브2 → 서브3 순서로 반영 비중이 줄어요. 다시 누르면 빠져요.</p>
-        <div className="chips">{CONCEPTS.filter((c) => c !== interests[0]).map((c) => { const n = interests.indexOf(c); return <button key={c} type="button" aria-label={c} className={`toggle-chip ${n > 0 ? "on also" : ""}`} aria-pressed={n > 0} onClick={() => toggleSub(c)}>{n > 0 && <span className="sub-num" aria-hidden>{n}</span>}{c}</button>; })}</div>
-        <p className="small"><b>메인 · {interests[0]}</b>{interests.slice(1).map((c, i) => <span key={c} className="muted"> · 서브{i + 1} {c}</span>)}</p>
+        <p className="xs muted">먼저 가장 중요한 테마를 골라요. 서브 테마는 추천 결과에서 하나 더할 수 있어요.</p>
+        <div className="chips">{CONCEPTS.map((c) => <button key={c} type="button" aria-label={`메인 ${c}`} className={`toggle-chip ${main === c ? "on main" : ""}`} aria-pressed={main === c} onClick={() => pickMain(c)}>{c}</button>)}</div>
+        <p className="small"><b>메인 · {main}</b></p>
       </>;
       case "flight": return <>
         <div className="seg sm">{FLIGHTS.map((f) => <button key={f.label} type="button" className={(q.maxFlightHours ?? null) === f.v ? "on" : ""} aria-pressed={(q.maxFlightHours ?? null) === f.v} onClick={() => patch({ maxFlightHours: f.v })}>{f.label}</button>)}</div>
@@ -167,8 +160,7 @@ export default function Home() {
     }
   };
   const openWithTheme=(c:Concept)=>{
-    const rest=interests.filter(x=>x!==c);
-    mark("vibe");setQ(old=>old?{...old,interests:[c,...rest],main:c,subs:rest}:old);
+    mark("vibe");setQ(old=>old?withResultThemes(old,c,null):old);
     setDirection("forward");setSlide(0);setShow(true);
   };
   const openWithArea=(country:string)=>{

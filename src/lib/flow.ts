@@ -2,7 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { RegionQuery } from "@/services/regionScore";
-import type { Board } from "@/services/planner";
+import { optimize, type Board } from "@/services/planner";
 import { normalizeParty } from "@/lib/travelParty";
 import { QUESTIONS, recommendationDefaults, selectedQuestions, questionIndex, defaultLabels, type Question } from "@/lib/questionFlow";
 import { addCalendarDays, calendarDays, travelDateError } from "@/lib/travelDates";
@@ -88,7 +88,12 @@ function committedQuery(): RegionQuery | null {
   return queryShape(raw) && !travelDateError(raw) ? normalizeParty({ ...DEFAULT_QUERY, ...raw }) : null;
 }
 export const loadQuery = (): RegionQuery => committedQuery() ?? normalizeParty(DEFAULT_QUERY);
-export const saveQuery = (q: RegionQuery) => write(K.query, q);
+const QUERY_EVENT = "tripflip:query-changed";
+export const saveQuery = (q: RegionQuery) => {
+  const ok = write(K.query, q);
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(QUERY_EVENT));
+  return ok;
+};
 
 export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null; slide?: number; answered?: Question[]; prefilled?: Question[] };
 type HomeDraft = { q: RegionQuery; progress: HomeProgress; base: string };
@@ -154,6 +159,10 @@ export function confirmQuestionPreview(snapshot: QuestionPreview) {
   saveHomeDraft(snapshot.q,snapshot.progress);
   write(CONFIRMED_DEFAULTS,{base:JSON.stringify(committedQuery()),defaults:snapshot.defaults});
 }
+export function saveResultThemes(q: RegionQuery, defaults: string[]) {
+  saveQuery(q);
+  write(CONFIRMED_DEFAULTS,{base:JSON.stringify(committedQuery()),defaults});
+}
 export function confirmedDefaultLabels(q: RegionQuery): string[] {
   const record=read<{base:string;defaults:string[]}|null>(CONFIRMED_DEFAULTS,null);
   return record?.base===JSON.stringify(q) && Array.isArray(record.defaults) ? record.defaults : [];
@@ -178,6 +187,17 @@ export const loadBoard = (regionId: string, key: string, planId?: string | null)
   try {
     const q = JSON.parse(key.slice(prefix.length)) as RegionQuery;
     if (!q || !Array.isArray(q.children) || !Array.isArray(q.subs) || travelDateError(q)) return null;
+    const sameDays = Array.isArray(b.days) && b.days.length === calendarDays(q.startDate, q.endDate)
+      && b.days.every((day, i) => day.date === addCalendarDays(q.startDate, i));
+    // A theme-only change refreshes the suggestions without discarding manual locks or editing saved trips.
+    if (!planId && sameDays && b.key.startsWith(prefix)) {
+      const previous = JSON.parse(b.key.slice(prefix.length)) as RegionQuery;
+      const nonTheme = ({ main, subs, interests, ...rest }: RegionQuery) =>
+        Object.entries(rest).sort(([a], [b]) => a.localeCompare(b));
+      if (queryShape(previous) && JSON.stringify(nonTheme(previous)) === JSON.stringify(nonTheme(q))) {
+        return optimize({ ...b, key }, regionId, q);
+      }
+    }
     const companions = q.companions?.length ? q.companions : [
       q.adults === 1 && !q.children.length ? "혼자" : "부부",
       ...(q.elders ? ["부모님"] : []),
@@ -186,8 +206,7 @@ export const loadBoard = (regionId: string, key: string, planId?: string | null)
       ...(q.children.some((c) => c.band === "중고등") ? ["10대"] : []),
     ];
     const legacyKey = [regionId, q.startDate, q.endDate, companions.join(","), q.main, q.subs.join(","), q.perDay].join("|");
-    if (b.key !== legacyKey || !Array.isArray(b.days) || b.days.length !== calendarDays(q.startDate, q.endDate)) return null;
-    if (!b.days.every((day, i) => day.date === addCalendarDays(q.startDate, i))) return null;
+    if (b.key !== legacyKey || !sameDays) return null;
     return { ...b, key };
   } catch { return null; }
 };
@@ -320,8 +339,14 @@ export function moveGuestPlansToAccount(ids?: string[]): number {
 export function useFlowQuery(planId?: string | null) {
   const [q, setQ] = useState<RegionQuery | null>(null);
   useEffect(() => {
-    const plan = planId ? loadPlans().find((p) => p.id === planId) : undefined;
-    setQ(plan ? normalizeParty(plan.query) : loadQuery());
+    const update = () => {
+      const plan = planId ? loadPlans().find((p) => p.id === planId) : undefined;
+      setQ(plan ? normalizeParty(plan.query) : loadQuery());
+    };
+    update();
+    if (planId) return;
+    window.addEventListener(QUERY_EVENT, update);
+    return () => window.removeEventListener(QUERY_EVENT, update);
   }, [planId]);
   return q;
 }
