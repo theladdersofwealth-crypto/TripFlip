@@ -3,6 +3,7 @@ test("미선택 추천 → 날짜/동행 → 예산·숙소 → 이어서 고르
   await page.setViewportSize({width:390,height:844});
   await page.route("https://**/*",r=>r.abort());
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   const next=page.getByRole("button",{name:"다음",exact:true});
   const recommend=page.getByRole("button",{name:"트립플립 추천",exact:true});
   const readCommitted=()=>page.evaluate(()=>localStorage.getItem("tripflip.flow.query"));

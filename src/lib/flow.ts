@@ -90,7 +90,7 @@ function committedQuery(): RegionQuery | null {
 export const loadQuery = (): RegionQuery => committedQuery() ?? normalizeParty(DEFAULT_QUERY);
 export const saveQuery = (q: RegionQuery) => write(K.query, q);
 
-export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null; slide?: number; answered?: Question[] };
+export type HomeProgress = { open: number | null; question: number; done: boolean[]; choice: number | null; slide?: number; answered?: Question[]; prefilled?: Question[] };
 type HomeDraft = { q: RegionQuery; progress: HomeProgress; base: string };
 
 // 홈에서 아직 추천에 적용하지 않은 편집은 기존 결과·일정과 별도. 다른 화면에서 조건을
@@ -113,13 +113,14 @@ type QuestionPreview = { q: RegionQuery; progress: HomeProgress; defaults: strin
 let previewMemory: QuestionPreview | null = null;
 export function makeQuestionDraft(resume = false) {
   const snapshot = resume ? loadQuestionPreview() : null;
-  if (snapshot) return { q:snapshot.q, slide:questionIndex(snapshot.progress.slide), answered:selectedQuestions(snapshot.progress.answered) };
+  // prefilled: 지난 검색에서 가져온 값(이번에 사용자가 직접 고르지 않음). 화면에서 '내가 고른 값'과 구분해 보여준다.
+  if (snapshot) return { q:snapshot.q, slide:questionIndex(snapshot.progress.slide), answered:selectedQuestions(snapshot.progress.answered), prefilled:selectedQuestions(snapshot.progress.prefilled) };
   const saved = loadHomeDraft();
   const p = saved.progress;
   if (p && typeof p.slide === "number" && Array.isArray(p.answered)) {
-    return { q: saved.q, slide: questionIndex(p.slide), answered: selectedQuestions(p.answered) };
+    return { q: saved.q, slide: questionIndex(p.slide), answered: selectedQuestions(p.answered), prefilled: selectedQuestions(p.prefilled) };
   }
-  if (!saved.hasSearch && !p) return { q: recommendationDefaults(saved.q), slide:0, answered:[] as Question[] };
+  if (!saved.hasSearch && !p) return { q: recommendationDefaults(saved.q), slide:0, answered:[] as Question[], prefilled:[] as Question[] };
   const legacySlide = p?.open === 0 ? p.question : p?.open === 1 ? 4+p.question : p?.open === 2 ? 6+p.question : p?.choice === 2 ? 7 : p?.choice === 1 ? 6 : p?.choice === 0 ? 4 : 0;
   const base = DEFAULT_QUERY, q = saved.q;
   const changed = (a:unknown,b:unknown) => JSON.stringify(a)!==JSON.stringify(b);
@@ -132,7 +133,7 @@ export function makeQuestionDraft(resume = false) {
     ...(q.totalBudgetKrw!=null?["budget"]:[]),...(q.stay!==base.stay?["stay"]:[]),...(q.price!==base.price?["price"]:[]),
     ...(q.roomCount!=null?["rooms"]:[]),...(q.pet?["pet"]:[]),
   ]);
-  return { q: !answered.includes("flight") ? {...q,maxFlightHours:5} : q, slide:questionIndex(legacySlide), answered };
+  return { q: !answered.includes("flight") ? {...q,maxFlightHours:5} : q, slide:questionIndex(legacySlide), answered, prefilled: saved.hasSearch ? answered : [] as Question[] };
 }
 export function saveQuestionPreview(q: RegionQuery, progress: HomeProgress) {
   const current=normalizeParty(q);

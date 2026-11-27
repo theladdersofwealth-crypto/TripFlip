@@ -777,13 +777,20 @@ article.rank-card { cursor: pointer; }
 /* One-question modal. Footer stays in place on all slides, including endpoints. */
 .question-dialog{border:0;padding:0;border-radius:20px;width:min(100% - 24px,560px);max-width:calc(100% - 24px);max-height:calc(100dvh - 24px);margin:auto;background:var(--paper,#fff);color:var(--ink,#102f54);overflow:hidden;box-shadow:0 18px 70px #0003}
 .question-dialog::backdrop{background:rgba(16,47,84,.44)}
-.question-panel{display:flex;flex-direction:column;height:min(720px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);min-width:0}
+/* 높이는 내용에 맞춤(빈 공간 없음). 내용이 길면 화면 높이까지 커지고 가운데만 스크롤. */
+.question-panel{display:flex;flex-direction:column;max-height:calc(100dvh - 24px);min-width:0}
 .question-head{flex:none;padding:16px 16px 8px}
 .question-head h2{font-size:21px;margin:10px 0 4px;outline:none}
 .question-progress{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:4px;margin-top:8px}
 .question-progress span{height:4px;border-radius:4px;background:#dce4e8}
-.question-progress span.selected{background:#8cced1}.question-progress span.active{background:#008b94}
-.question-scroll{min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:12px 16px 16px}
+.question-progress span.selected{background:#8cced1}.question-progress span.saved{background:repeating-linear-gradient(90deg,#8cced1 0 4px,#dce4e8 4px 7px)}
+.question-status.picked{color:var(--teal-dark);font-weight:700}
+/* 아직 고르지 않은 질문: 기본값·지난 조건은 점선으로 흐리게, 직접 고른 값만 진하게 */
+.question-content.unpicked .toggle-chip.on,.question-content.unpicked .seg button.on{background:transparent;color:var(--navy);border:1px dashed var(--navy);box-shadow:none}
+.question-content.unpicked .companion-summary,.companion-summary.unpicked{background:transparent;border:1px dashed #b7c6cf}
+.companion-summary.unpicked b{color:var(--muted,#5b6b7a);font-weight:600}
+.value-tag{align-self:flex-start;font-style:normal;font-size:11px;font-weight:700;color:#5b6b7a;background:#eef2f4;border-radius:6px;padding:1px 6px}.question-progress span.active{background:#008b94}
+.question-scroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:12px 16px 16px}
 .question-content{display:flex;flex-direction:column;gap:12px;margin-bottom:14px;animation:question-in .18s ease-out}
 .question-content.back{animation-name:question-back}
 .question-actions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.15fr) minmax(0,1fr);gap:6px;align-items:center;flex:none;padding:12px 12px max(12px,env(safe-area-inset-bottom));border-top:1px solid #dce4e8;background:inherit}

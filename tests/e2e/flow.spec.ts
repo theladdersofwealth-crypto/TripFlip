@@ -58,6 +58,7 @@ test.beforeEach(async ({ page }) => {
 
 test("자녀 실제 나이와 여행 날짜를 입력한다", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await expect(page.locator(".party-member")).toHaveCount(0);
   // 첫 질문부터 추천 가능. 선택하지 않은 항목은 기본값.
   const submit = page.getByRole("button", { name: "트립플립 추천", exact: true });
@@ -114,6 +115,8 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   });
 
   await page.goto("/");
+
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
   await page.getByLabel("2번째 구성원 관계", { exact: true }).selectOption("spouse");
   await page.getByRole("button", { name: "+ 자녀", exact: true }).click();
@@ -306,6 +309,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
   // 같은 권역으로 다른 초안을 만들어도 저장된 계획은 독립적으로 복원돼야 한다.
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   // Restore whichever slide the draft last used, then move back to the date slide.
   for(let i=0;i<11 && !(await page.getByRole("heading",{name:"언제 떠나요?"}).isVisible());i++){
     if(await page.getByRole("button",{name:"이전",exact:true}).isVisible()) await page.getByRole("button", { name: "이전", exact: true }).click();
@@ -351,6 +355,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
 
 test("식당 선택은 종류·검색·8개 후보로 시작하고 출처는 펼쳐서 확인한다", async ({ page }, testInfo) => {
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await expect(page.getByRole("button", { name: "트립플립 추천", exact: true })).toBeVisible();
   // 1단계 첫 질문만 보이고, 날짜·2·3단계는 아직 펼치지 않는다.
   await expect(page.getByRole("heading", { name: "누구랑 가나요?" })).toBeVisible();

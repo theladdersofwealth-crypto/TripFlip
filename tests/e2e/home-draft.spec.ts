@@ -7,6 +7,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
     else await route.abort();
   });
   await page.goto("/");
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   const logo = page.getByRole("link", { name: "TripFlip 홈", exact: true });
   await page.getByRole("button", { name: "다음", exact: true }).click();
   for (const date of ["2027-05-07", "2027-05-21"]) {
@@ -23,6 +24,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await page.getByRole("link", { name: /자주 묻는 질문/ }).click();
   await expect(page).toHaveURL(/\/guide/);
   await logo.click();
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await expect(page.getByRole("heading", { name: "어떤 여행인가요?" })).toBeVisible();
   await expect(page.getByRole("button", { name: "메인 휴양", exact: true })).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "다음", exact: true }).click();
@@ -47,6 +49,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   const original = await query();
   expect(JSON.parse(original ?? "{}")).toMatchObject({ startDate: "2027-05-07", endDate: "2027-05-21", stay: "하이엔드", roomCount: 2, perDay: 1, totalBudgetKrw: 10000000 });
   await logo.click();
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await expect(recommend).toBeEnabled();
   await recommend.click();
   await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();
@@ -63,6 +66,7 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await page.getByRole("dialog", { name: "2일차 오전 바꾸기" }).getByRole("button", { name: "숙소 휴식", exact: true }).click();
   await expect(morning).toContainText("숙소 휴식");
   await logo.click();
+  await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
   await expect(recommend).toBeEnabled();
   await recommend.click();
   await page.getByRole("button", { name: "이 조건으로 확정", exact: true }).click();

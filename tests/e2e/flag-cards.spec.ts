@@ -5,6 +5,7 @@ for (const width of [390, 1440]) {
   test(`추천 카드 깃발이 잘리지 않고 보인다 (${width}px)`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
+    await page.getByRole("button", { name: /^(여행지 추천 받기|조건 이어서 고르기)$/ }).click();
     await page.getByRole("button", { name: "구성원 설정", exact: true }).click();
     await page.getByRole("button", { name: "설정 완료", exact: true }).click();
     await page.getByRole("button", { name: "다음", exact: true }).click();
