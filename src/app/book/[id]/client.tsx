@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { BackButton } from "@/components/AppShell";
 import { AgodaStaySummary } from "@/components/AgodaStaySummary";
+import { EsimoaBookingCard } from "@/components/EsimoaBookingCard";
 import { Icon } from "@/components/Icon";
 import { relaxedNotice } from "@/lib/livePrices";
 import { currentAccount, loadBoard, loadPrefs, planState, savePlan, saveQuery, useFlowQuery } from "@/lib/flow";
@@ -119,6 +120,7 @@ export default function BookPage() {
           <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" target="_blank" rel="noopener noreferrer sponsored">KKday <Icon name="link" /></a>
         </div>
       </section>
+      <EsimoaBookingCard country={r.region.country} />
     </div>
     <p className="small muted" style={{ marginTop: 12 }}>현재 숙소 수준·객실 수 기준 일행 전체 예상 경비: {estimate.partyTotalKrw == null ? "미확인" : `약 ${Math.round(estimate.partyTotalKrw / 10000).toLocaleString()}만원`}. {estimate.priceSource.flight === "live" || estimate.priceSource.hotel === "live" ? "항공·숙박은 최근 2주 수집 평균, 식비는 가정으로 계산했어요." : "항공·숙박·식비의 과거 자료와 가정으로 계산했어요."}</p>
     {relaxedNotice(id) && <p className="xs muted">⚠ {relaxedNotice(id)}</p>}

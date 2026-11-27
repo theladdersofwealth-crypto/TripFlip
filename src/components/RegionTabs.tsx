@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AgodaStaySummary } from "@/components/AgodaStaySummary";
+import { EsimoaBookingCard } from "@/components/EsimoaBookingCard";
 import { Icon } from "@/components/Icon";
 import { PlaceThumb, ThumbCredit, usePlaceImage, useThumbRef } from "@/components/PlaceThumb";
 import { DiningMapDetails, DiningStatusBadge } from "@/components/DiningMapDetails";
@@ -86,6 +87,7 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
         <a className="btn btn-block" href={kkdaySearchUrl(r.region.searchName)} data-usage-outbound="outbound" {...aff}>KKday <Icon name="link" /></a>
       </div>
     </section>
+    <EsimoaBookingCard country={r.region.country} />
     <p className="xs muted">ⓘ {AFFILIATE_NOTE}</p>
     <Link href={`/book/${id}`} className="btn btn-primary btn-block">예약 상태 체크하고 내 여행에 저장 <Icon name="next" /></Link>
     {open === "flight" && <FlightSheet region={r.region} q={q} flightKrw={s.flightKrw} onClose={() => setOpen(null)} />}
