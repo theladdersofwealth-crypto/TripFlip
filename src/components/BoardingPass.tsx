@@ -1,6 +1,7 @@
 "use client";
 import type { RegionQuery } from "@/services/regionScore";
 import type { TravelMember } from "@/lib/travelParty";
+import { budgetManwon, perTravelerKrw } from "@/lib/travelBudget";
 import { fmtDate } from "@/services/itineraryV1";
 
 type Slot = { n: string; k: string; v: string; sub: string; target: string };
@@ -18,7 +19,7 @@ export function BoardingPass({ q, members, days, interests, onSlot, hint = "칸�
     { n: "①", k: "PASSENGER · 누구와", v: `${members.length}명`, sub: kids.length ? `성인 ${adults} · 자녀 ${kids.length}` : `성인 ${adults}`, target: "who" },
     { n: "②", k: "DATE · 언제", v: okDays ? `${days - 1}박 ${days}일` : "날짜 선택", sub: okDays ? `${fmtDate(q.startDate)} ~ ${fmtDate(q.endDate)}` : "출발·귀국일", target: "when" },
     { n: "③", k: "VIBE · 여행취향", v: `메인 ${interests[0] ?? "-"}`, sub: [interests.length > 1 ? `+ ${interests.slice(1, 3).join("·")}${interests.length > 3 ? ` 외 ${interests.length - 3}` : ""}` : null, `하루 ${q.perDay}곳`].filter(Boolean).join(" · "), target: "vibe" },
-    { n: "④", k: "BUDGET · 예산", v: q.totalBudgetKrw != null ? `${Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원` : "미정", sub: q.stay, target: "s3" },
+    { n: "④", k: "BUDGET · 1인 예산", v: q.totalBudgetKrw != null ? `${budgetManwon(perTravelerKrw(q.totalBudgetKrw, members.length))}만원` : "미정", sub: q.stay, target: "s3" },
   ];
   // 작은 보딩패스는 칸마다 한 줄씩만 — 줄바꿈 없이 짧게
   const compactSub = (s: Slot) => {

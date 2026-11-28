@@ -13,6 +13,7 @@ import type { Concept } from "@/data/regionsV1";
 import { makeQuestionDraft, saveHomeDraft, saveQuestionPreview } from "@/lib/flow";
 import { QUESTIONS, type Question } from "@/lib/questionFlow";
 import { membersOf, normalizeParty, roomEstimate } from "@/lib/travelParty";
+import { budgetManwon, perTravelerKrw, totalBudgetFromManwon } from "@/lib/travelBudget";
 import { calendarDays, travelDateError } from "@/lib/travelDates";
 import { track } from "@/lib/analytics";
 import { FlagBg } from "@/components/FlagBg";
@@ -43,7 +44,7 @@ const HOW: { t: string; d: string }[] = [
   { t: "추천 순위 보기", d: "조건에 맞는 여행지를 적합도 순으로 보여 주고, 경비·비행시간도 함께 추정해요." },
   { t: "일정 · 예약", d: "날짜별 일정표를 만들고, 항공·숙소는 예약 사이트로 바로 이동해요." },
 ];
-const Q_TITLE: Record<Q,string> = {who:"누구랑 가나요?",when:"언제 떠나요?",area:"가고 싶은 지역",vibe:"어떤 여행인가요?",flight:"비행은 몇 시간까지 괜찮아요?",intensity:"하루에 몇 곳 둘러볼까요?",budget:"일행 전체 예산은요?",stay:"어떤 숙소를 선호하나요?",price:"지역 물가는요?",rooms:"객실은 몇 개 필요해요?",pet:"반려동물도 함께 가나요?"};
+const Q_TITLE: Record<Q,string> = {who:"누구랑 가나요?",when:"언제 떠나요?",area:"가고 싶은 지역",vibe:"어떤 여행인가요?",flight:"비행은 몇 시간까지 괜찮아요?",intensity:"하루에 몇 곳 둘러볼까요?",budget:"1인당 여행 예산은요?",stay:"어떤 숙소를 선호하나요?",price:"지역 물가는요?",rooms:"객실은 몇 개 필요해요?",pet:"반려동물도 함께 가나요?"};
 export default function Home() {
   const router = useRouter();
   const [q, setQ] = useState<RegionQuery | null>(null);
@@ -88,7 +89,7 @@ export default function Home() {
   const selectedAreas = normalizeTravelAreas(q.preferredAreas);
   const hasAdult = members.some((m) => m.age === null ? m.relationship !== "child" : m.age >= 18);
   const partyError = !hasAdult ? "성인 구성원을 한 명 이상 입력해 주세요." : members.some((m) => m.relationship === "child" && m.age === null) ? "자녀의 만 나이를 입력해 주세요." : null;
-  const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "전체 예산은 0보다 큰 금액으로 입력해 주세요." : null;
+  const budgetError = q.totalBudgetKrw != null && (!Number.isFinite(q.totalBudgetKrw) || q.totalBudgetKrw <= 0) ? "1인당 예산은 0보다 큰 금액으로 입력해 주세요." : null;
   const error = dateError || partyError || budgetError;
   const curQ=QUESTIONS[slide];
   const mark=(k:Question)=>{setAnswered(old=>old.includes(k)?old:[...old,k]);setPrefilled(old=>old.filter(x=>x!==k));};
@@ -144,7 +145,10 @@ export default function Home() {
           <button type="button" className={`toggle-chip ${q.totalBudgetKrw != null && q.budgetMode !== "cap" ? "on" : ""}`} aria-pressed={q.totalBudgetKrw != null && q.budgetMode !== "cap"} onClick={() => patch({ totalBudgetKrw: q.totalBudgetKrw ?? 10000000, budgetMode: "flexible" })}>대략 이 정도</button>
           <button type="button" className={`toggle-chip ${q.totalBudgetKrw != null && q.budgetMode === "cap" ? "on" : ""}`} aria-pressed={q.totalBudgetKrw != null && q.budgetMode === "cap"} onClick={() => patch({ totalBudgetKrw: q.totalBudgetKrw ?? 10000000, budgetMode: "cap" })}>상한 금액</button>
         </div>
-        {q.totalBudgetKrw != null && <label className="budget-input"><input className="input" type="number" inputMode="numeric" min={1} step={10} aria-label="일행 전체 예산 만원" value={q.totalBudgetKrw / 10000} onChange={(e) => patch({ totalBudgetKrw: e.target.value === "" ? 0 : Number(e.target.value) * 10000 })} /><span>만원 / 전체</span></label>}
+        {q.totalBudgetKrw != null && <>
+          <label className="budget-input"><input className="input" type="number" inputMode="decimal" min={0.0001} step="any" aria-label="1인당 여행 예산 만원" value={q.totalBudgetKrw === 0 ? "" : perTravelerKrw(q.totalBudgetKrw, members.length) / 10000} onChange={(e) => patch({ totalBudgetKrw: totalBudgetFromManwon(e.target.value, members.length) })} /><span>만원 / 1인</span></label>
+          {!budgetError && <p className="xs muted">{members.length}인 기준 총 {budgetManwon(q.totalBudgetKrw)}만원 · 항공·숙소·식비</p>}
+        </>}
         {budgetError && <p className="small form-error" role="alert">{budgetError}</p>}
       </>;
       case "stay": return <>

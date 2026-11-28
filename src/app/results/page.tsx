@@ -15,6 +15,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { CONCEPTS, type Concept } from "@/data/regionsV1";
 import { resultThemes, withResultThemes } from "@/lib/resultThemes";
 import type { RegionQuery } from "@/services/regionScore";
+import { budgetManwon, perTravelerKrw } from "@/lib/travelBudget";
 import { coreInterests, membersOf } from "@/lib/travelParty";
 import { scoreRegions, tripDays } from "@/services/regionScore";
 import { normalizeTravelAreas, TRAVEL_AREAS } from "@/data/travelAreas";
@@ -131,15 +132,15 @@ export default function ResultsPage() {
         <span className="chip">{q.stay}</span>
         <span className="chip">편도 {q.maxFlightHours==null?"제한 없음":q.maxFlightHours+"시간 희망"}</span>
         {normalizeTravelAreas(q.preferredAreas).map((id) => <span key={id} className="chip">{TRAVEL_AREAS.find((a) => a.id === id)!.label}</span>)}
-        {q.totalBudgetKrw != null && <span className="chip">전체 {Math.round(q.totalBudgetKrw / 10000).toLocaleString()}만원 {q.budgetMode === "cap" ? "상한" : "목표"}</span>}
+        {q.totalBudgetKrw != null && <span className="chip">1인 {budgetManwon(perTravelerKrw(q.totalBudgetKrw, membersOf(q).length))}만원 {q.budgetMode === "cap" ? "상한" : "목표"}</span>}
       </div>
       {members.some((m) => m.preferences.length) && <p className="xs muted" style={{ marginBottom: 12 }}>구성원별로 선택한 취향도 함께 반영했어요.</p>}
       {!ranked.length && <div className="card-soft stack" role="status"><b>현재 조건으로 보여드릴 추천이 없어요.</b><p className="small muted">예산이나 취향을 조정해 보세요. 데이터가 부족한 지역은 실제로 맞지 않는다고 단정하지 않아요.</p><Link href={draftPreview?"/?resume=1":"/"} className="btn btn-sm">조건 다시 선택하기</Link></div>}
       {!member && ranked.length > 0 ? <div className="stack">
-        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={open} previewOnly={previewOnly} />
+        <RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} travelers={membersOf(q).length} onOpen={open} previewOnly={previewOnly} />
         {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} returnTo={draftPreview?"/results?preview=1":undefined} />}
       </div> : <div className="stack">
-        <RankCards ranked={ranked} budget={q.totalBudgetKrw} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={open} previewOnly={previewOnly} />
+        <RankCards ranked={ranked} budget={q.totalBudgetKrw} travelers={membersOf(q).length} selected={split ? picked : null} onSelect={split ? setSel : undefined} onOpen={open} previewOnly={previewOnly} />
         {others.map((r) => <div key={r.region.id} className="card-soft small muted">{r.region.name}: {r.status === "데이터 부족" ? "추천에 필요한 자료를 보강하고 있어요." : "등록된 자료에서 조건에 맞는 후보를 찾지 못했어요."}</div>)}
       </div>}
       </div>

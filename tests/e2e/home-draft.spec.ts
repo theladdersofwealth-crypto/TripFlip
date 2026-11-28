@@ -33,7 +33,8 @@ test("모바일에서 추천과 일정의 로고를 눌러도 날짜·설정 단
   await page.getByRole("button", { name: "여유롭게 · 1곳", exact: true }).click();
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
-  await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
+  await page.getByLabel("1인당 여행 예산 만원", { exact: true }).fill("500");
+  await expect(page.getByText("2인 기준 총 1,000만원 · 항공·숙소·식비", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("하이엔드");
   await page.getByRole("button", { name: "다음", exact: true }).click();
