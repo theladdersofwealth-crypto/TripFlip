@@ -12,11 +12,14 @@ function heroBg(country: string) {
   for (const ch of country) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return `linear-gradient(135deg,${HERO[h % HERO.length]})`;
 }
-function budgetLine(total: number | null, budget: number | null | undefined) {
+function budgetLine(total: number | null, budget: number | null | undefined, travelers: number) {
   if (budget == null) return "예산 미정";
   if (total == null) return "비교 불가";
-  const diff = Math.round((budget - total) / 10000);
-  return diff >= 0 ? `${diff.toLocaleString()}만원 여유` : `${(-diff).toLocaleString()}만원 초과`;
+  const delta = budget - total;
+  if (!delta) return "예산과 같아요";
+  const diff = Math.round(Math.abs(delta) / Math.max(1, travelers) / 10000);
+  const amount = diff ? `${diff.toLocaleString()}만원` : "1만원 미만";
+  return `1인 기준 ${amount} ${delta > 0 ? "여유" : "초과"}`;
 }
 
 export function priceNote(s?: { flight: string; hotel: string; updatedAt: string | null }) {
@@ -49,7 +52,7 @@ export function GuestPreview({ count, startRank = 1, beforeGo, returnTo = "/resu
           <div className="rank-hero-sub">○○ · ○월 ○○ · 적합도 추정</div>
         </div>
         <div className="rank-stats">
-          <div><span>일행 예상 경비</span><b>약 ○○○만원</b></div>
+          <div><span>1인 평균 경비</span><b>약 ○○○만원</b></div>
           <div><span>예산 대비</span><b>○○만원 여유</b></div>
           <div><span>일정 준비</span><b>○○ 가능</b></div>
         </div>
@@ -67,7 +70,7 @@ export function GuestPreview({ count, startRank = 1, beforeGo, returnTo = "/resu
 }
 
 /** 추천 순위 카드 목록. onSelect가 있으면(PC 2단) 페이지 이동 대신 오른쪽 상세를 바꾼다 */
-export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewOnly = false }: { ranked: RegionResult[]; budget: number | null | undefined; selected?: string | null; onSelect?: (id: string) => void; onOpen: (id: string) => void; previewOnly?: boolean }) {
+export function RankCards({ ranked, budget, travelers, selected, onSelect, onOpen, previewOnly = false }: { ranked: RegionResult[]; budget: number | null | undefined; travelers: number; selected?: string | null; onSelect?: (id: string) => void; onOpen: (id: string) => void; previewOnly?: boolean }) {
   const go = (id: string) => (!previewOnly && onSelect ? onSelect(id) : onOpen(id));
   const detailStyle = { color: "var(--teal-dark)", fontWeight: 700 };
   const detailLabel = <>자세히 보기 · 예약·일정·관광지·음식점 <Icon name="next" size={16} /></>;
@@ -87,9 +90,10 @@ export function RankCards({ ranked, budget, selected, onSelect, onOpen, previewO
               <span className="small">{r.themes?.length ? r.themes.slice(0, 2).map((t) => `${t.icon} ${t.names[0]}`).join(" · ") : r.reasons[0] ?? ""}</span>
             </div>
             <div className="rank-brief">
-              <b className="small">일행 {r.stay.partyTotalKrw == null ? "경비 미확인" : `약 ${Math.round(r.stay.partyTotalKrw / 10000).toLocaleString()}만원`}</b>
-              <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, budget)}</span>
+              <b className="small">1인 평균 {r.stay.totalKrw == null ? "경비 미확인" : `약 ${Math.round(r.stay.totalKrw / 10000).toLocaleString()}만원`}</b>
+              <span className={`xs ${r.stay.budgetStatus === "over" ? "warn" : r.stay.budgetStatus === "within" ? "ok" : "muted"}`}>{budgetLine(r.stay.partyTotalKrw, budget, travelers)}</span>
             </div>
+            {r.stay.partyTotalKrw != null && travelers > 1 && <span className="xs muted">{travelers}인 합계 약 {Math.round(r.stay.partyTotalKrw / 10000).toLocaleString()}만원</span>}
             {(r.flags.some((f) => f.includes("적합도를")) || r.overFlight || r.weather.judge === "스콜성 우기") && <span className="xs warn">⚠ {[r.flags.some((f) => f.includes("적합도를")) ? "일부 추정값" : "", r.overFlight ? "희망 비행시간 초과" : "", r.weather.judge === "스콜성 우기" ? "스콜성 우기" : ""].filter(Boolean).join(" · ")}</span>}
             {r.region.id==="HK"&&<span className="xs muted">마카오 당일치기 별도 선택 · 홍콩 시내 일정에는 포함하지 않아요</span>}
             {r.admissionNeedsCheck && <span className="xs muted">일부 장소 입장 조건 확인 필요</span>}

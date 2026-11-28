@@ -45,7 +45,7 @@ export function BookTab({ r, q }: { r: RegionResult; q: RegionQuery }) {
   const estimated = !hotels.length && s.priceSource.hotel !== "live" && hotelEstimated(PILOT_TWIN_OF[r.region.id] ?? r.region.id);
   const id = r.region.id;
   return <div className="stack" style={{ marginTop: 14 }}>
-    <p className="small"><b>일행 예상 경비 {s.partyTotalKrw == null ? "미확인" : `약 ${man(s.partyTotalKrw)}`}</b> <span className="xs muted">· {s.nights}박 · {s.rooms}객실{s.roomEstimated ? " 가정" : ""} · 항공·숙소·식비</span></p>
+    <p className="small"><b>1인 평균 예상 경비 {s.totalKrw == null ? "미확인" : `약 ${man(s.totalKrw)}`}</b> <span className="xs muted">{s.partyTotalKrw == null ? "" : `· 일행 합계 약 ${man(s.partyTotalKrw)} `}· {s.nights}박 · {s.rooms}객실{s.roomEstimated ? " 가정" : ""} · 항공·숙소·식비</span></p>
     <section className="book-card">
       <div className="row"><Icon name="plane" size={20} /><b>항공</b></div>
       <button type="button" className="cost-row" onClick={() => setOpen("flight")}>

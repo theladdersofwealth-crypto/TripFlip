@@ -155,7 +155,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   await page.getByRole("button", { name: "알차게 · 3곳", exact: true }).click();
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByRole("button", { name: "대략 이 정도", exact: true }).click();
-  await page.getByLabel("일행 전체 예산 만원", { exact: true }).fill("1000");
+  await page.getByLabel("1인당 여행 예산 만원", { exact: true }).fill("200");
   await page.getByRole("button", { name: "다음", exact: true }).click();
   await page.getByLabel("숙소 선호", { exact: true }).selectOption("가성비");
   await page.getByRole("button", { name: "다음", exact: true }).click();
@@ -181,7 +181,7 @@ test("6인 가족이 추천·일정·예약 비교·저장·복원·파일 보�
   expect(query.members).toHaveLength(6);
   expect(query.children.map((child: { actualAge: number }) => child.actualAge)).toEqual([1, 8]);
   expect(query.interests).toEqual(["휴양", "액티비티"]);
-  expect(query.totalBudgetKrw).toBe(10_000_000);
+  expect(query.totalBudgetKrw).toBe(12_000_000);
   expect(query.roomCount).toBe(3);
   await noHorizontalOverflow(page);
   await expect(page.locator(".rank-card .rank-brief").first()).toBeVisible();

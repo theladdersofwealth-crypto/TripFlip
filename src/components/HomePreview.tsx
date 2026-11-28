@@ -2,7 +2,7 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { AUTH_EVENT, loadAuth } from "@/lib/account";
 import { useLivePrices } from "@/lib/livePrices";
-import { normalizeParty } from "@/lib/travelParty";
+import { membersOf, normalizeParty } from "@/lib/travelParty";
 import { scoreRegions } from "@/services/regionScore";
 import type { RegionQuery } from "@/services/regionScore";
 import { GUEST_OPEN, GuestPreview, RankCards } from "@/components/RankList";
@@ -28,9 +28,9 @@ export function HomePreview({ q, ready, blocked, onOpen, save }: { q: RegionQuer
       : blocked ? <div className="card-soft small muted" role="status">{blocked}</div>
       : member === null ? null
       : !ranked.length ? <div className="card-soft small muted" role="status">현재 조건으로 보여드릴 추천이 없어요. 예산이나 취향을 조정해 보세요.</div>
-      : !member ? <div className="stack"><div className="rank-grid"><RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={q.totalBudgetKrw} onOpen={onOpen} /></div>
+      : !member ? <div className="stack"><div className="rank-grid"><RankCards ranked={ranked.slice(0, GUEST_OPEN)} budget={dq.totalBudgetKrw} travelers={membersOf(dq).length} onOpen={onOpen} /></div>
         {ranked.length > GUEST_OPEN && <GuestPreview count={ranked.length - GUEST_OPEN} startRank={GUEST_OPEN + 1} beforeGo={save} />}</div>
-      : <div className="rank-grid"><RankCards ranked={ranked} budget={q.totalBudgetKrw} onOpen={onOpen} /></div>}
+      : <div className="rank-grid"><RankCards ranked={ranked} budget={dq.totalBudgetKrw} travelers={membersOf(dq).length} onOpen={onOpen} /></div>}
     {ready && !blocked && member && ranked.length > 0 && <p className="xs faint" style={{ marginTop: 12 }}>상위 {ranked.length}곳 미리보기예요. 카드를 누르면 예약·일정·관광지·음식점을 볼 수 있어요. 적합도·경비는 추정이에요.</p>}
   </>;
 }
